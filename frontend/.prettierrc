@@ -1,0 +1,45 @@
+{
+	"trailingComma": "es5",
+	"tabWidth": 2,
+	"useTabs": true,
+	"semi": true,
+	"singleQuote": true,
+	"jsxSingleQuote": true,
+	"endOfLine": "lf",
+	"bracketSpacing": true,
+	"bracketSameLine": true,
+	"singleAttributePerLine": true,
+	"importOrder": [
+		"<THIRD_PARTY_MODULES>",
+
+		"^@/pages/(.*)$",
+		"^@/screens/(.*)$",
+		"^@/widgets/(.*)$",
+		"^@/features/(.*)$",
+		"^@/entities/(.*)$",
+		"^@/shared/(.*)$",
+
+		"^@/api/(.*)$",
+		"^@/layouts/(.*)$",
+		"^@/routes/(.*)$",
+		"^@/components/(.*)$",
+		"^@/store/(.*)$",
+		"^@/lib/(.*)$",
+		"^@/types/(.*)$",
+		"^@/hooks/(.*)$",
+		"^@/config/(.*)$",
+		"^@/consts/(.*)$",
+		"^@/settings/(.*)$",
+		"^@/utils/(.*)$",
+
+		"^@/assets/(.*)$",
+
+		"^@/styles/(.*)$",
+		"^../(?!.*\\.(css|scss)$).*",
+		"^./(?!.*\\.(css|scss)$).*",
+		".*\\.(scss|css|module\\.scss|module\\.css)$"
+	],
+	"importOrderSeparation": true,
+	"importOrderSortSpecifiers": true,
+	"plugins": ["@trivago/prettier-plugin-sort-imports"]
+}

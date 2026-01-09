@@ -1,0 +1,14 @@
+query GetUserByUsername($filters: UsersPermissionsUserFiltersInput) {
+	usersPermissionsUsers(filters: $filters) {
+		avatar
+		blocked
+		createdAt
+		email
+		publishedAt
+		role {
+			name
+		}
+		updatedAt
+		username
+	}
+}

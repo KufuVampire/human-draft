@@ -1,0 +1,55 @@
+import { HTMLAttributes, ReactNode } from 'react';
+
+import { DropdownItem } from './DropdownItem/DropdownItem';
+import { DisplayDropdownDirection } from '@/types';
+import { cn } from '@/utils';
+
+interface Props extends Omit<HTMLAttributes<HTMLUListElement>, 'className'> {
+	listClassName?: string;
+	itemClassName?: string;
+	isOpen: boolean;
+	items: ReactNode[];
+	displayDirection: DisplayDropdownDirection;
+}
+
+const originMap: Record<DisplayDropdownDirection, string> = {
+	top: 'origin-top',
+	'top-left': 'origin-top-left',
+	'top-right': 'origin-top-right',
+	bottom: 'origin-bottom',
+	'bottom-left': 'origin-bottom-left',
+	'bottom-right': 'origin-bottom-right',
+	left: 'origin-left',
+	right: 'origin-right',
+	center: 'origin-center',
+};
+
+export const DropdownList = ({
+	listClassName,
+	itemClassName,
+	isOpen,
+	items,
+	displayDirection,
+	...props
+}: Props) => {
+	return (
+		<ul
+			{...props}
+			className={cn(
+				'absolute top-[calc(100%+0.75rem)] right-0 z-[var(--z-dropdown)] flex flex-col min-w-max rounded-xl bg-[var(--background-color-card)] scale-0 transition-all opacity-0',
+				originMap[displayDirection],
+				{
+					['scale-100 opacity-100']: isOpen,
+				},
+				listClassName
+			)}>
+			{items.map((Component, i) => (
+				<DropdownItem
+					key={i}
+					className={itemClassName}>
+					{Component}
+				</DropdownItem>
+			))}
+		</ul>
+	);
+};

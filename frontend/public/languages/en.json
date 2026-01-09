@@ -1,0 +1,166 @@
+{
+	"btns": {
+		"createPost": "Create post",
+		"createBlog": "Create blog",
+		"editPoster": "Edit poster",
+		"removePoster": "Remove poster",
+		"subscribe": "Subscribe",
+		"unsubscribe": "Unsubscribe",
+		"signIn": "Sign in",
+		"signUp": "Sign up",
+		"saveChanges": "Save changes",
+		"save": "Save",
+		"cancel": "Cancel",
+		"remove": "Delete",
+		"ok": "OK",
+		"showPassword": "Show password",
+		"hidePassword": "Hide password"
+	},
+	"dashboard": {
+		"expand": "Expand",
+		"collapse": "Collapse",
+		"language": "Language"
+	},
+	"navigation": {
+		"profile": "Profile",
+		"myProfile": "My profile",
+		"feed": "Feed",
+		"users": "Users",
+		"settings": "Settings",
+		"publicOffer": "Public offer",
+		"privacyPolicy": "Privacy policy",
+		"logout": "Log out",
+		"goToHome": "Go to home",
+		"aboutUs": "About us"
+	},
+	"fields": {
+		"searchInput": "Search by title, author, or tag",
+		"username": "Username",
+		"email": "Email",
+		"password": "Password",
+		"repeatPassword": "Repeat password",
+		"leaveComment": "Comment",
+		"shortDescription": "Short description"
+	},
+	"authTabLinks": {
+		"signIn": "Login",
+		"signUp": "Registration"
+	},
+	"filters": {
+		"posts": "Posts",
+		"blogs": "Blogs",
+		"myPosts": "My posts",
+		"myBlogs": "My blogs",
+		"subscriptions": "Subscriptions"
+	},
+	"header": {
+		"logo": "HUMAN DRAFT",
+		"theme": {
+			"light": "Light theme",
+			"dark": "Dark theme"
+		}
+	},
+	"authPages": {
+		"signIn": {
+			"metadata": {
+				"title": "Authorization",
+				"description": "Sign in to your account on the HUMAN DRAFTS portal"
+			},
+			"title": "Authorization",
+			"signInSuccess": "You have successfully signed in",
+			"signInErrors": {
+				"unableSignIn": "Something went wrong, unable to sign in. Please check the correctness of the entered data"
+			}
+		},
+		"signUp": {
+			"metadata": {
+				"title": "Registration",
+				"description": "Here you can register on our HUMAN DRAFTS portal to become a member and get access to all functionality"
+			},
+			"title": "Registration",
+			"signUpSuccess": "You have successfully registered",
+			"signUpErrors": {
+				"unableSignUp": "Failed to create an account, something went wrong, please try again later",
+				"usernameExists": "A user with this username already exists",
+				"emailExists": "A user with this email already exists",
+				"passwordsNotMatched": "Passwords do not match"
+			},
+			"fieldsBottomText": {
+				"min3Username": "Minimum username length is 3 characters",
+				"min8Password": "Minimum password length is 8 characters",
+				"repeatPassword": "Enter the password again to confirm"
+			}
+		}
+	},
+	"comments": {
+		"leaveComment": "Save comment",
+		"reply": "Reply",
+		"replies": "Replies"
+	},
+	"homePage": {
+		"metadata": {
+			"title": "Feed",
+			"description": "Here you can see all new posts and blogs created by other users that are available for viewing and reading"
+		},
+		"filters": "Filters"
+	},
+	"modals": {
+		"needAuth": "You need to sign in",
+		"removeBlog": "Delete blog?",
+		"removePost": "Delete post?",
+		"saveChanges": "Save changes"
+	},
+	"profilePage": {
+		"metadata": {
+			"title": "My profile",
+			"description": "Your profile page displaying all your data, posts, and blogs available for viewing"
+		},
+		"editProfile": "Edit profile"
+	},
+	"settingsPage": {
+		"metadata": {
+			"title": "Profile settings",
+			"description": "Here you can change your profile data such as avatar, username, email, and description"
+		},
+		"editAvatar": "Edit avatar"
+	},
+	"postPage": {
+		"metadata": {
+			"title": "",
+			"description": ""
+		},
+		"like": "Like",
+		"commentsCount": "Number of comments",
+		"viewsCount": "Number of views",
+		"editPost": "Edit post",
+		"pinBlog": {
+			"pin": "Pin blog",
+			"searchFieldPlaceholder": "Search blogs"
+		}
+	},
+	"blogPage": {
+		"metadata": {
+			"title": "",
+			"description": ""
+		},
+		"editFields": {
+			"title": "Title",
+			"description": "Blog description"
+		},
+		"editBlog": "Edit blog",
+		"pinPosts": {
+			"pin": "Pin posts",
+			"searchFieldPlaceholder": "Search posts"
+		}
+	},
+	"loading": "Loading...",
+	"404": {
+		"metadata": {
+			"title": "Page Not Found"
+		},
+		"title": "Oops! The page got lost",
+		"description": "But don’t worry, you’ve found the Debugging Duck. Try explaining out loud to the duck which article or author you were looking for. They say it helps to find a solution.",
+		"bottomText": "If the duck is silent, try returning to the main page.",
+		"goToMain": "Thank you, Duck, take me to the home page"
+	}
+}

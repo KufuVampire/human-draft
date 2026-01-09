@@ -1,0 +1,110 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+	/* light theme */
+	--main-bg-light-theme: #e5e5e5;
+	--card-bg-light-theme: #ffffff;
+	--tag-bg-light-theme: #e5e5e5;
+
+	--primary-text-color-light-theme: #151517;
+
+	--dropdown-border-color-light-theme: #e5e5e5;
+
+	--form-icon-color-light-theme: #151517;
+
+	/* dark theme */
+	--main-bg-dark-theme: #171717;
+	--card-bg-dark-theme: #242424;
+	--tag-bg-dark-theme: rgba(229, 229, 229, 0.25);
+
+	--primary-text-color-dark-theme: #ffffff;
+
+	--dropdown-border-color-dark-theme: #7d7d7d;
+
+	--form-icon-color-dark-theme: #ffffff;
+
+	/* neutral */
+	--layout-bg: #2d2d2d;
+
+	--secondary-text-color: #e5e5e5;
+
+	--primary-color: #1b4a5a;
+	--primary-color-hover: #246276;
+
+	--placeholder-color: #7d7d7d;
+	--error-color: #ee4545;
+	--layout-color: #2d2d2d;
+	--secondary-color: #e5e5e5;
+	--disabled-color: rgba(255, 255, 255, 0.25);
+
+	--footer-border-bottom-color: rgba(255, 255, 255, 0.5);
+	--field-border-color: #e5e5e5;
+
+	--primary-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+	--secondary-shadow: 2px 4px 4px 0px rgba(0, 0, 0, 0.25);
+	--input-filled-shadow: 0px 0px 6px 0px #1b4a5a;
+
+	--bg-blur: blur(4px);
+}
+
+@theme inline {
+	--background-color-main: var(--main-bg-light-theme);
+	--background-color-card: var(--card-bg-light-theme);
+	--background-color-tag: var(--tag-bg-light-theme);
+
+	--text-color-main: var(--primary-text-color-light-theme);
+	--color-text: var(--primary-text-color-light-theme);
+
+	--stroke-form-icon: var(--form-icon-color-light-theme);
+
+	/* neutral styles for all themes */
+	--background-color-layout: var(--layout-bg);
+
+	--text-color-secondary: var(--secondary-text-color);
+	--text-color-primary: var(--primary-color);
+	--text-color-primary-hover: var(--primary-color-hover);
+
+	--color-primary: var(--primary-color);
+	--color-primary-hover: var(--primary-color-hover);
+	--color-error: var(--error-color);
+	--color-placeholder: var(--placeholder-color);
+	--color-secondary: var(--secondary-color);
+	--color-layout: var(--layout-color);
+	--color-disabled: var(--disabled-color);
+
+	--border-color-primary: var(--primary-color);
+	--border-color-footer-bottom: var(--footer-border-bottom-color);
+	--border-color-field: var(--field-border-color);
+
+	--backdrop-blur-disabled: var(--bg-blur);
+
+	--z-header: 100;
+	--z-dropdown: 110;
+
+	--shadow-filled-input: var(--input-filled-shadow);
+	--shadow-primary: var(--primary-shadow);
+	--shadow-secondary: var(--secondary-shadow);
+
+	--font-title: var(--font-ubuntu);
+	--font-text: var(--font-roboto);
+}
+
+.dark {
+	--background-color-main: var(--main-bg-dark-theme);
+	--background-color-card: var(--card-bg-dark-theme);
+	--background-color-tag: var(--tag-bg-dark-theme);
+
+	--text-color-main: var(--primary-text-color-dark-theme);
+
+	--border-color-primary: var(--primary-color-dark-theme);
+
+	--stroke-form-icon: var(--form-icon-color-dark-theme);
+}
+
+body {
+	@apply font-text;
+	color: var(--text-color-main);
+	background-color: var(--background-color-main);
+}

@@ -1,0 +1,16 @@
+query Me {
+	me {
+		id
+		role {
+			description
+			id
+			name
+			type
+		}
+		username
+		email
+		documentId
+		confirmed
+		blocked
+	}
+}
