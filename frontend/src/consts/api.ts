@@ -1,2 +1,1 @@
-export const API_URL =
-	process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:1337/graphql';
+export const API_URL = process.env.NEXT_PUBLIC_SERVER_URL as string;

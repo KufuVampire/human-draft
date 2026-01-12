@@ -4,8 +4,14 @@ import { useTranslations } from 'next-intl';
 import Link, { LinkProps } from 'next/link';
 import { AnchorHTMLAttributes, PropsWithChildren } from 'react';
 
+
+
 import { LinkAndButtonVariantType, LinkAndButtonVariants } from '@/types';
 import { cn } from '@/utils';
+
+
+
+
 
 type AnchorProps = AnchorHTMLAttributes<HTMLAnchorElement>;
 
@@ -20,10 +26,11 @@ const styles: LinkAndButtonVariantType = {
 	primary:
 		'bg-primary text-secondary hover:bg-primary-hover focus-visible:bg-primary-hover',
 	secondary:
-		'bg-transparent text-primary border border-primary hover:bg-primary-hover hover:border-primary-hover focus-visible:bg-primary-hover focus-visible:border-primary-hover',
+		'bg-transparent text-primary border border-primary hover:bg-primary-hover hover:border-primary-hover focus-visible:bg-primary-hover focus-visible:border-primary-hover hover:text-secondary focus-visible:text-primary',
 	disabled:
 		'bg-disabled hover:bg-disabled backdrop-blur-disabled text-[var(--text-color-main)] cursor-auto',
 	clear: 'hover:text-primary-hover focus-visible:text-primary-hover',
+	light: '',
 };
 
 export const CustomLink = ({
@@ -42,7 +49,7 @@ export const CustomLink = ({
 				styles[variant],
 				props.className
 			)}>
-			{!isLoading ? (text || children) : t('loading')}
+			{!isLoading ? text || children : t('loading')}
 		</Link>
 	);
 };

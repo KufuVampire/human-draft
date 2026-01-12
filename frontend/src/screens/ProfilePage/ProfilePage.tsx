@@ -1,44 +1,141 @@
 'use client';
 
+import { Trash } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import Image from 'next/image';
 import { redirect } from 'next/navigation';
+import { ChangeEvent, useState } from 'react';
 
 import { routesConfig } from '@/config';
 import { useGetUserByUsernameQuery } from '@/graphql/generated/output';
+import { useProfilePoster } from '@/hooks';
+import { Button, CustomLink, Section } from '@/shared';
 import { useProfile } from '@/store';
 
 interface Props {
-	username?: string;
+	username: string;
 }
 
 export const ProfilePage = ({ username }: Props) => {
 	const { profile } = useProfile();
+	const t = useTranslations();
+	const [poster, setPoster] = useState<File | null>(null);
+
+	const {
+		changePosterLoading,
+		changePosterMutation,
+		removePosterLoading,
+		removePosterMutation,
+	} = useProfilePoster();
 	const { data, loading } = useGetUserByUsernameQuery({
-		variables: {
-			filters: {
-				username: {
-					eq: username,
-				},
-			},
-		},
+		variables: { username },
 	});
 
-	if (
-		!loading &&
-		(!data || !data.usersPermissionsUsers || !data.usersPermissionsUsers.length)
-	) {
+	if (!data && !loading) {
 		redirect(routesConfig.notFound);
 	}
 
-	if (loading) {
-		return <div>Loading...</div>;
-	}
+	const user = data?.getUserByUsername;
+
+	const isOwner = profile?.username === user?.username;
+
+	const handleLoad = (e: ChangeEvent<HTMLInputElement>) => {
+		const file = e.target.files?.[0];
+		if (!file) return;
+		setPoster(file);
+		changePosterMutation({
+			variables: {
+				file,
+			},
+		});
+	};
+
+	const handleRemovePoster = () => {
+		removePosterMutation();
+		setPoster(null);
+	};
 
 	return (
-		<div>
-			<img src="./duck.webp" alt="poster" />
-			<div>
-				{username === profile?.username ? 'Your Profile' : username}
-			</div>
-		</div>
+		<>
+			<Section className='flex flex-col w-full md:py-0 bg-[var(--background-color-card)] rounded-xl overflow-hidden'>
+				<div className='min-h-[15.625rem] max-h-[15.625rem] bg-placeholder relative'>
+					{(isOwner && profile?.posterUrl && !poster) || user?.posterUrl && (
+							<Image
+								src={user.posterUrl}
+								alt='poster'
+								fill
+								sizes='100%'
+								className='object-cover'
+								priority
+							/>
+						)}
+					{poster && (
+						<Image
+							src={URL.createObjectURL(poster)}
+							alt='poster'
+							fill
+							sizes='100%'
+							className='object-cover'
+						/>
+					)}
+					<div className='flex justify-between absolute top-0 left-0 right-0 w-full py-3 px-6'>
+						{isOwner && (
+							<label className='text-secondary py-2 px-3 rounded-lg font-bold leading-6 bg-disabled hover:bg-disabled backdrop-blur-disabled hover:text-primary-hover focus-visible:text-primary-hover cursor-pointer transition-colors'>
+								{t('btns.editPoster')}
+								<input
+									type='file'
+									className='hidden'
+									onChange={handleLoad}
+									disabled={removePosterLoading || changePosterLoading}
+								/>
+							</label>
+						)}
+						{isOwner && (user?.posterUrl || poster) && (
+							<Button
+								disabled={removePosterLoading || changePosterLoading}
+								onClick={handleRemovePoster}
+								variant='light'
+								className='rounded-lg py-2 px-3 group'>
+								<Trash className='stroke-secondary group-hover:stroke-primary-hover transition-colors' />
+							</Button>
+						)}
+					</div>
+				</div>
+				<div className='flex justify-between px-6 py-3 min-h-[7.188rem]'>
+					<div className='flex gap-x-[1.125rem]'>
+						<div className='size-[9.375rem] p-[0.313rem] rounded-full -mt-[5.5rem] bg-[var(--background-color-card)] z-30'>
+							{user?.avatarUrl ? (
+								<Image
+									src={user.avatarUrl}
+									alt={`${user.username} avatar`}
+									width={140}
+									height={140}
+								/>
+							) : (
+								<div className='uppercase size-[8.75rem] flex items-center justify-center bg-[#dc5c4b] text-secondary rounded-full text-7xl cursor-default'>
+									{user?.username.at(0)}
+								</div>
+							)}
+						</div>
+						<div className='flex flex-col gap-y-2'>
+							<h1 className='font-title font-bold text-4xl leading-[110%]'>
+								{user?.username}
+							</h1>
+							<p className='leading-6'>{user?.description}</p>
+						</div>
+					</div>
+					{isOwner ? (
+						<CustomLink
+							href={routesConfig.settings}
+							variant='secondary'
+							className='py-2 px-3 font-bold leading-6 self-start rounded-lg dark:text-secondary'>
+							{t('navigation.settings')}
+						</CustomLink>
+					) : (
+						<Button className='self-start'>{t('btns.subscribe')}</Button>
+					)}
+				</div>
+			</Section>
+		</>
 	);
 };

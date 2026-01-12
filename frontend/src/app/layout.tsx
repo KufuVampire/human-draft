@@ -2,6 +2,7 @@ import { LazyMotion, domAnimation } from 'motion/react';
 import type { Metadata } from 'next';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
+import { ThemeProvider } from 'next-themes';
 import { Roboto, Ubuntu } from 'next/font/google';
 import { ReactNode } from 'react';
 import { Toaster } from 'sonner';
@@ -43,20 +44,28 @@ export default async function RootLayout({
 	const messages = await getMessages();
 
 	return (
-		<html lang={locale}>
+		<html
+			lang={locale}
+			suppressHydrationWarning>
 			<body className={cn(ubuntu.variable, roboto.variable, 'antialiased')}>
 				<ApolloClientProvider>
 					<NextIntlClientProvider messages={messages}>
-						<LazyMotion
-							features={domAnimation}
-							strict>
-							{children}
-							<Toaster
-								position='bottom-right'
-								duration={5000}
-								closeButton
-							/>
-						</LazyMotion>
+						<ThemeProvider
+							attribute='class'
+							defaultTheme='light'
+							themes={['light', 'dark']}
+							enableSystem={false}>
+							<LazyMotion
+								features={domAnimation}
+								strict>
+								{children}
+								<Toaster
+									position='bottom-right'
+									duration={5000}
+									closeButton
+								/>
+							</LazyMotion>
+						</ThemeProvider>
 					</NextIntlClientProvider>
 				</ApolloClientProvider>
 			</body>

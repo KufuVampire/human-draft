@@ -8,12 +8,17 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 scalar DateTime
 
 type Mutation {
+  changeProfilePoster(file: Upload!): UserModel!
+  removeProfilePoster: UserModel!
+  signIn(data: SignInInput!): UserModel!
+  signOutAccount: Boolean!
   signUp(data: SignUpInput!): UserModel!
 }
 
 type Query {
   findAllUsers: [UserModel!]!
-  signIn(data: SignInInput!): UserModel!
+  getUserByUsername(username: String!): UserModel!
+  userProfile: UserModel!
 }
 
 input SignInInput {
@@ -27,11 +32,16 @@ input SignUpInput {
   username: String!
 }
 
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
+
 type UserModel {
   avatarUrl: String
   createdAt: DateTime!
+  description: String
   email: String!
   id: ID!
+  posterUrl: String
   updatedAt: DateTime!
   username: String!
 }

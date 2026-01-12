@@ -8,7 +8,7 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
 import { routesConfig } from '@/config';
-import { useLoginMutation } from '@/graphql/generated/output';
+import { useSignInMutation } from '@/graphql/generated/output';
 import { TypeSignInAccount, signInAccountSchema } from '@/schemas';
 import { Button, FormField } from '@/shared';
 import { useProfile } from '@/store';
@@ -32,7 +32,6 @@ const fields: IField<TypeSignInAccount>[] = [
 ];
 
 export const SignInForm = () => {
-	const setToken = useProfile((s) => s.setToken);
 	const t = useTranslations();
 	const {
 		register,
@@ -46,12 +45,13 @@ export const SignInForm = () => {
 			password: '',
 		},
 	});
+	const { setProfile } = useProfile();
 
-	const [login, { loading }] = useLoginMutation({
+	const [signInMutation, { loading }] = useSignInMutation({
 		onCompleted(data) {
-			toast.success(t('authPages.signIn.signInSuccess'));
-			if (data.login?.jwt) {
-				setToken(data.login.jwt);
+			if (data.signIn) {
+				setProfile(data.signIn);
+				toast.success(t('authPages.signIn.signInSuccess'));
 				redirect(routesConfig.home);
 			}
 		},
@@ -65,9 +65,10 @@ export const SignInForm = () => {
 	}, [setFocus]);
 
 	const onSubmit: SubmitHandler<TypeSignInAccount> = (data) => {
-		login({
+		const { username, password } = data;
+		signInMutation({
 			variables: {
-				input: { identifier: data.username, password: data.password },
+				data: { username, password },
 			},
 		});
 	};

@@ -1,45 +1,39 @@
-import { API_URL } from '@/consts';
-import { TypeUserProfile } from '@/schemas';
+import { cookies } from 'next/headers';
 
-export async function fetchMe(
-	token: string | undefined
-): Promise<TypeUserProfile | null> {
-	if (!token) {
-		throw new Error('Failed to fetch user data');
-	}
+import { API_URL } from '@/consts';
+import { UserModel } from '@/graphql/generated/output';
+
+export async function fetchMe(): Promise<UserModel | null> {
+	const cookieStore = await cookies();
+	const allCookies = cookieStore.toString();
 
 	try {
 		const res = await fetch(API_URL, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
-				Authorization: `Bearer ${token}`,
+				Cookie: allCookies,
 			},
 			body: JSON.stringify({
 				query: `
           query Me {
-            me {
+            userProfile {
               id
 							email
 							username
 							avatarUrl
-							blocked
-							role {
-								name
-							}
-							confirmed
 							createdAt
 							updatedAt
             }
           }
         `,
 			}),
+			cache: 'no-store',
 		});
 
 		const data = await res.json();
-		console.log(data)
 
-		return data?.data?.me ?? null;
+		return !('errors' in data) ? data.data.userProfile : null;
 	} catch (error) {
 		console.error('Error fetching user data:', error);
 		throw error;

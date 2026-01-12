@@ -2,7 +2,6 @@
 
 import { ArrowLeft } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useEffect, useState } from 'react';
 
 import { useLocalStorage } from '@/hooks';
 import { Button, LanguageSwitcher, Navigation } from '@/shared';
@@ -10,28 +9,20 @@ import { cn } from '@/utils';
 
 export const Dashboard = () => {
 	const t = useTranslations('dashboard');
-	const [storedIsExpanded, setStoredIsExpanded] = useLocalStorage(
+	const [isExpanded, setExpanded] = useLocalStorage(
 		'dashboard-sidebar-expanded',
 		true
 	);
-	const [isExpanded, setExpanded] = useState(true);
-
-	useEffect(() => {
-		setExpanded(storedIsExpanded);
-	}, []);
 
 	const handleClick = () => {
-		setExpanded((prev) => {
-			setStoredIsExpanded(!prev);
-			return !prev;
-		});
+		setExpanded((prev) => !prev);
 	};
 
 	return (
 		<aside
 			className={cn(
-				'sticky py-6 top-0 bg-[var(--background-color-card)] shadow-primary rounded-xl md:flex flex-col hidden gap-y-8',
-				!isExpanded && 'px-6'
+				'sticky py-6 top-0 bg-[var(--background-color-card)] shadow-primary rounded-xl md:flex flex-col hidden gap-y-8 h-min max-w-[10.625rem]',
+				!isExpanded ? 'px-6' : 'w-full'
 			)}>
 			<Button
 				variant='clear'

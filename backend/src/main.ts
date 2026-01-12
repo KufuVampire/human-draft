@@ -9,6 +9,8 @@ import { AppModule } from './app.module';
 import { RedisService } from './modules';
 import { ms, StringValue } from './utils';
 import { parseBoolean } from '@/src/utils';
+import { graphqlUploadExpress } from 'graphql-upload-ts';
+import { MAX_FILE_SIZE } from './consts';
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
@@ -17,6 +19,9 @@ async function bootstrap() {
 	const redis = app.get(RedisService);
 
 	app.use(cookieParser(config.getOrThrow<string>('COOKIE_SECRET')));
+	app.use(graphqlUploadExpress({
+		maxFileSize: MAX_FILE_SIZE
+}))
 
 	app.useGlobalPipes(new ValidationPipe({ transform: true }));
 

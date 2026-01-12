@@ -21,17 +21,17 @@ interface Props {
 
 const listItem = [
 	{
-		href: 'profile',
+		href: routesConfig.profile,
 		translationKey: 'profile',
 		Icon: User,
 	},
 	{
-		href: '/',
+		href: routesConfig.home,
 		translationKey: 'feed',
 		Icon: Newspaper,
 	},
 	{
-		href: 'users',
+		href: routesConfig.users,
 		translationKey: 'users',
 		Icon: Users,
 	},
@@ -69,8 +69,8 @@ export const Navigation = ({
 						<li key={href}>
 							<CustomLink
 								href={
-									href === routesConfig.profile
-										? (profile?.username as string)
+									href === routesConfig.profile && profile?.username
+										? profile?.username
 										: href
 								}
 								className={cn(

@@ -12,6 +12,7 @@ import {
 } from '@/src/modules';
 import { IS_DEV_ENV } from '@/src/utils';
 import { UserModule } from './modules/user/user.module';
+import { AwsStorageModule } from './modules/aws-storage/aws-storage.module';
 
 @Module({
 	imports: [
@@ -30,6 +31,7 @@ import { UserModule } from './modules/user/user.module';
 		AccountModule,
 		SessionModule,
 		UserModule,
+		AwsStorageModule,
 	],
 })
 export class AppModule {}

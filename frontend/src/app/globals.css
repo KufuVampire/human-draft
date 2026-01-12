@@ -104,7 +104,7 @@
 }
 
 body {
-	@apply font-text;
+	@apply font-text transition-colors;
 	color: var(--text-color-main);
 	background-color: var(--background-color-main);
 }

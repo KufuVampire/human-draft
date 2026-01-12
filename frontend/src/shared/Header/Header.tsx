@@ -1,9 +1,9 @@
+import { UserModel } from '@/graphql/generated/output';
 import { ThemeSwitcher, UserProfile } from '@/modules';
-import { TypeUserProfile } from '@/schemas';
 import { BurgerMenu, Container, Logo } from '@/shared';
 
 interface Props {
-	userProfile: TypeUserProfile | null;
+	userProfile: UserModel | null;
 }
 
 export const Header = ({ userProfile }: Props) => {

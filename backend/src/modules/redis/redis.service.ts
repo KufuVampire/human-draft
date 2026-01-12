@@ -13,7 +13,7 @@ export class RedisService implements OnModuleInit {
 				port: configService.getOrThrow<number>('REDIS_PORT'),
 			},
 			username: configService.getOrThrow('REDIS_USER'),
-			password: configService.getOrThrow('REDIS_PASSWORD'),
+			password: configService.getOrThrow('REDIS_PASSWORD')
 		});
 
 		this.client.on('connect', () => console.log('✅ Redis подключен'));

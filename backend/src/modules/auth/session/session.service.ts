@@ -44,6 +44,42 @@ import { SignInInput, SignUpInput } from '@/src/inputs';
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @Injectable()
 export class SessionService {
 	public constructor(
@@ -88,18 +124,17 @@ export class SessionService {
 		return this.saveSession(req, user);
 	}
 
-	public async singOut(req: Request) {
+	public async signOut(req: Request) {
 		return this.destroySession(req);
 	}
 
 	public async saveSession(req: Request, user: UserModel) {
 		return new Promise((resolve, reject) => {
-			req.session.createAt = new Date().toISOString();
+			req.session.createdAt = new Date().toISOString();
 			req.session.userId = user.id;
 
 			req.session.save((err) => {
 				if (err) {
-					console.error('Redis Save Error:', err);
 					return reject(
 						new InternalServerErrorException('Unable to save session')
 					);
@@ -118,7 +153,6 @@ export class SessionService {
 						new InternalServerErrorException('Unable to complete session')
 					);
 				}
-
 				req.res?.clearCookie(
 					this.configService.getOrThrow<string>('SESSION_NAME')
 				);

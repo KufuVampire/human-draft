@@ -26,7 +26,7 @@
 		"myProfile": "My profile",
 		"feed": "Feed",
 		"users": "Users",
-		"settings": "Settings",
+		"settings": "Edit profile",
 		"publicOffer": "Public offer",
 		"privacyPolicy": "Privacy policy",
 		"logout": "Log out",
@@ -162,5 +162,6 @@
 		"description": "But don’t worry, you’ve found the Debugging Duck. Try explaining out loud to the duck which article or author you were looking for. They say it helps to find a solution.",
 		"bottomText": "If the duck is silent, try returning to the main page.",
 		"goToMain": "Thank you, Duck, take me to the home page"
-	}
+	},
+	"logoutSuccess": "You have successfully logged out of your account."
 }

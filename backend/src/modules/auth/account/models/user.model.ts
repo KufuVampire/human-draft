@@ -1,6 +1,6 @@
 import { Field, GraphQLISODateTime, ID, ObjectType } from '@nestjs/graphql';
 
-@ObjectType({ isAbstract: true })
+@ObjectType()
 export class UserModel {
 	@Field(() => ID)
 	id: string;
@@ -12,7 +12,13 @@ export class UserModel {
 	username: string;
 
 	@Field(() => String, { nullable: true })
+	description?: string | null;
+
+	@Field(() => String, { nullable: true })
 	avatarUrl?: string | null;
+
+	@Field(() => String, { nullable: true })
+	posterUrl?: string | null;
 
 	@Field(() => GraphQLISODateTime)
 	createdAt: Date;
