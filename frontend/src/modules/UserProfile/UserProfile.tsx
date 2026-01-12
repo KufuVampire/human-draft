@@ -19,7 +19,7 @@ const items = [
 	},
 	{
 		href: routesConfig.settings,
-		translationKey: 'navigation.settings',
+		translationKey: 'navigation.settingsShort',
 		Icon: Settings,
 	},
 	{

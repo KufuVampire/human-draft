@@ -22,13 +22,14 @@ export async function fetchMe(): Promise<UserModel | null> {
 							email
 							username
 							avatarUrl
+							posterUrl
 							createdAt
 							updatedAt
             }
           }
         `,
 			}),
-			cache: 'no-store',
+			cache: 'no-cache',
 		});
 
 		const data = await res.json();

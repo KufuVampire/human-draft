@@ -4,7 +4,6 @@ import { Trash } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { redirect } from 'next/navigation';
-import { ChangeEvent, useState } from 'react';
 
 import { routesConfig } from '@/config';
 import { useGetUserByUsernameQuery } from '@/graphql/generated/output';
@@ -19,13 +18,12 @@ interface Props {
 export const ProfilePage = ({ username }: Props) => {
 	const { profile } = useProfile();
 	const t = useTranslations();
-	const [poster, setPoster] = useState<File | null>(null);
-
 	const {
 		changePosterLoading,
-		changePosterMutation,
 		removePosterLoading,
-		removePosterMutation,
+		poster,
+		handleLoadPoster,
+		handleRemovePoster,
 	} = useProfilePoster();
 	const { data, loading } = useGetUserByUsernameQuery({
 		variables: { username },
@@ -36,39 +34,32 @@ export const ProfilePage = ({ username }: Props) => {
 	}
 
 	const user = data?.getUserByUsername;
-
 	const isOwner = profile?.username === user?.username;
-
-	const handleLoad = (e: ChangeEvent<HTMLInputElement>) => {
-		const file = e.target.files?.[0];
-		if (!file) return;
-		setPoster(file);
-		changePosterMutation({
-			variables: {
-				file,
-			},
-		});
-	};
-
-	const handleRemovePoster = () => {
-		removePosterMutation();
-		setPoster(null);
-	};
 
 	return (
 		<>
 			<Section className='flex flex-col w-full md:py-0 bg-[var(--background-color-card)] rounded-xl overflow-hidden'>
 				<div className='min-h-[15.625rem] max-h-[15.625rem] bg-placeholder relative'>
-					{(isOwner && profile?.posterUrl && !poster) || user?.posterUrl && (
-							<Image
-								src={user.posterUrl}
-								alt='poster'
-								fill
-								sizes='100%'
-								className='object-cover'
-								priority
-							/>
-						)}
+					{!isOwner && user?.posterUrl && !poster && (
+						<Image
+							src={`${user.posterUrl}?t=${new Date().getTime()}`}
+							alt='poster'
+							fill
+							sizes='100%'
+							className='object-cover'
+							priority
+						/>
+					)}
+					{isOwner && profile?.posterUrl && !poster && (
+						<Image
+							src={`${profile.posterUrl}?t=${new Date().getTime()}`}
+							alt='poster'
+							fill
+							sizes='100%'
+							className='object-cover'
+							priority
+						/>
+					)}
 					{poster && (
 						<Image
 							src={URL.createObjectURL(poster)}
@@ -85,12 +76,12 @@ export const ProfilePage = ({ username }: Props) => {
 								<input
 									type='file'
 									className='hidden'
-									onChange={handleLoad}
+									onChange={handleLoadPoster}
 									disabled={removePosterLoading || changePosterLoading}
 								/>
 							</label>
 						)}
-						{isOwner && (user?.posterUrl || poster) && (
+						{isOwner && (profile?.posterUrl || poster) && (
 							<Button
 								disabled={removePosterLoading || changePosterLoading}
 								onClick={handleRemovePoster}

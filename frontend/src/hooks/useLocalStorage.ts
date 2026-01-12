@@ -11,7 +11,7 @@ export const useLocalStorage = <T>(
 			const item = localStorage.getItem(key);
 			return item ? (JSON.parse(item) as T) : initialValue;
 		} catch (error) {
-			console.error(error);
+			console.error(error, 'getItemLocalStorage');
 			return initialValue;
 		}
 	};
@@ -22,7 +22,7 @@ export const useLocalStorage = <T>(
 		try {
 			localStorage.setItem(key, JSON.stringify(storedValue));
 		} catch (error) {
-			console.error(error);
+			console.error(error, 'setItemLocalStorage');
 		}
 	}, [key, storedValue]);
 

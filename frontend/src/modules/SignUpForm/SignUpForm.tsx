@@ -88,7 +88,7 @@ export const SignUpForm = () => {
 	const onSubmit: SubmitHandler<TypeCreateAccountSchema> = (data) => {
 		if (data.password === data.confirmPassword) {
 			const { email, password, username } = data;
-			const user = signUpMutation({
+			signUpMutation({
 				variables: {
 					data: {
 						email,
@@ -97,7 +97,6 @@ export const SignUpForm = () => {
 					},
 				},
 			});
-			console.log(user);
 		} else {
 			toast.error(t('authPages.signUp.signUpErrors.passwordsNotMatched'));
 		}

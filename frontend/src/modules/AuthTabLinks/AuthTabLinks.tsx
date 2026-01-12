@@ -3,17 +3,15 @@
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useLayoutEffect } from 'react';
 
 import { routesConfig } from '@/config';
-import { useLocalStorage, useResizeObserver } from '@/hooks';
+import { useResizeObserver } from '@/hooks';
 import { cn } from '@/utils';
 
 const tabLinkStyles =
 	'w-full text-center cursor-pointer rounded-md py-1.5 hover:bg-primary-hover hover:text-secondary transition-colors z-10';
 
 export const AuthTabLinks = () => {
-	const [theme] = useLocalStorage('theme', 'light');
 	const t = useTranslations('authTabLinks');
 	const pathname = usePathname();
 
@@ -27,12 +25,6 @@ export const AuthTabLinks = () => {
 	const isSignUpPath = pathname === routesConfig.signup;
 
 	const isCalculateWidthFinished = leftRect.width > 0 && rightRect.width > 0;
-
-	useLayoutEffect(() => {
-		const isDark = theme === 'dark';
-
-		document.body.classList.toggle('dark', isDark);
-	}, [theme]);
 
 	return (
 		<div className='flex items-center relative border-2 border-primary rounded-xl'>

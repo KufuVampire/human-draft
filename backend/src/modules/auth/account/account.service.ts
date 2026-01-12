@@ -95,7 +95,7 @@ export class AccountService {
 
 	public async changePoster(user: UserModel, file: FileUpload) {
 		if (user.posterUrl) {
-			await this.storageService.remove(user.posterUrl);
+			await this.storageService.remove(`users/${user.id}-poster.webp`);
 		}
 
 		if (!file) {
@@ -130,7 +130,6 @@ export class AccountService {
 		if (!user.posterUrl) {
 			return;
 		}
-		console.log(user.posterUrl)
 		await this.storageService.remove(`users/${user.id}-poster.webp`);
 
 		return await this.userService.updateUser(user.id, 'posterUrl', null);
