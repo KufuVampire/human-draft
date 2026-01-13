@@ -12,11 +12,11 @@ import { Request } from 'express';
 import { FileUpload } from 'graphql-upload-ts';
 import * as sharp from 'sharp';
 
+import { UserModel } from '@/src/models';
 import { AwsStorageService } from '../../aws-storage/aws-storage.service';
 import { UserService } from '../../user/user.service';
 import { SessionService } from '../session/session.service';
 
-import { UserModel } from './models/user.model';
 import { SignInInput, SignUpInput } from '@/src/inputs';
 import { PrismaService } from '@/src/modules/prisma/prisma.service';
 
@@ -28,15 +28,6 @@ export class AccountService {
 		private readonly sessionService: SessionService,
 		private readonly storageService: AwsStorageService
 	) {}
-
-	public async findAll() {
-		const users = await this.prismaService.user.findMany();
-
-		if (!users || !users.length) return [];
-
-		return users;
-	}
-
 	public async signUp(req: Request, input: SignUpInput) {
 		const { email, password, username } = input;
 
@@ -123,7 +114,7 @@ export class AccountService {
 		await this.storageService.upload(processesBuffer, fileName, 'image/webp');
 
 		const fileUrl = this.storageService.getFileUrl(fileName);
-		return await this.userService.updateUser(user.id, 'posterUrl', fileUrl);
+		return await this.userService.updateUser(user.id, { posterUrl: fileUrl });
 	}
 
 	public async removePoster(user: UserModel) {
@@ -132,6 +123,48 @@ export class AccountService {
 		}
 		await this.storageService.remove(`users/${user.id}-poster.webp`);
 
-		return await this.userService.updateUser(user.id, 'posterUrl', null);
+		return await this.userService.updateUser(user.id, { posterUrl: null });
+	}
+
+	public async changeAvatar(user: UserModel, file: FileUpload) {
+		if (user.avatarUrl) {
+			await this.storageService.remove(`users/${user.id}-avatar.webp`);
+		}
+
+		if (!file) {
+			throw new BadRequestException('The file was not transferred');
+		}
+
+		const chunks: Buffer[] = [];
+
+		for await (const chunk of file.createReadStream()) {
+			chunks.push(chunk);
+		}
+
+		const buffer = Buffer.concat(chunks);
+
+		const fileName = `users/${user.id}-avatar.webp`;
+		if (file.filename && file.filename.startsWith('.gif')) {
+			throw new UnsupportedMediaTypeException('Unsupported file type');
+		}
+
+		const processesBuffer = await sharp(buffer)
+			.resize(950, 250)
+			.webp()
+			.toBuffer();
+
+		await this.storageService.upload(processesBuffer, fileName, 'image/webp');
+
+		const fileUrl = this.storageService.getFileUrl(fileName);
+		return await this.userService.updateUser(user.id, { avatarUrl: fileUrl });
+	}
+
+	public async removeAvatar(user: UserModel) {
+		if (!user.avatarUrl) {
+			return;
+		}
+		await this.storageService.remove(`users/${user.id}-avatar.webp`);
+
+		return await this.userService.updateUser(user.id, { avatarUrl: null });
 	}
 }

@@ -2,21 +2,67 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type BlogModel {
+  author: UserModel!
+  createdAt: DateTime!
+  description: String
+  id: ID!
+  posterUrl: String
+  posts: [PostModel!]!
+  tags: [TagModel!]!
+  updatedAt: DateTime!
+}
+
+type CommentModel {
+  author: UserModel!
+  createdAt: DateTime!
+  id: ID!
+  parent: CommentModel
+  post: PostModel
+  replies: [CommentModel!]!
+  text: String!
+  updatedAt: DateTime!
+}
+
 """
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
 scalar DateTime
 
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+
 type Mutation {
+  changeProfileAvatar(file: Upload!): UserModel!
   changeProfilePoster(file: Upload!): UserModel!
+  removeProfileAvatar: UserModel!
   removeProfilePoster: UserModel!
   signIn(data: SignInInput!): UserModel!
   signOutAccount: Boolean!
   signUp(data: SignUpInput!): UserModel!
+  subscribeToUser(toId: String!): Boolean!
+  unsubscribeFromUser(toId: String!): Boolean!
+  updateUser(data: UpdateUserInput!): UserModel!
+}
+
+type PostModel {
+  author: UserModel!
+  blog: BlogModel
+  comments: [CommentModel!]!
+  commentsCount: Int!
+  content: JSON!
+  createdAt: DateTime!
+  id: ID!
+  likesCount: Int!
+  tags: [TagModel!]!
+  updatedAt: DateTime!
+  viewsCount: Int!
 }
 
 type Query {
-  findAllUsers: [UserModel!]!
+  getAllUsers: UserModel!
   getUserByUsername(username: String!): UserModel!
   userProfile: UserModel!
 }
@@ -32,16 +78,46 @@ input SignUpInput {
   username: String!
 }
 
+type SubscriptionModel {
+  createdAt: DateTime!
+  fromUser: UserModel!
+  id: ID!
+  toUser: UserModel!
+  updatedAt: DateTime!
+}
+
+type TagModel {
+  blogs: [BlogModel!]!
+  createdAt: DateTime!
+  id: ID!
+  name: String!
+  posts: [PostModel!]!
+  updatedAt: DateTime!
+}
+
+input UpdateUserInput {
+  avatarUrl: String
+  description: String
+  email: String
+  posterUrl: String
+  username: String
+}
+
 """The `Upload` scalar type represents a file upload."""
 scalar Upload
 
 type UserModel {
   avatarUrl: String
+  blogs: [BlogModel!]!
+  comments: [CommentModel!]!
   createdAt: DateTime!
   description: String
   email: String!
   id: ID!
   posterUrl: String
+  posts: [PostModel!]!
+  subscribers: [SubscriptionModel!]!
+  subscriptions: [SubscriptionModel!]!
   updatedAt: DateTime!
   username: String!
 }

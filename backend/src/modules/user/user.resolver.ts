@@ -1,6 +1,6 @@
 import { Args, Query, Resolver } from '@nestjs/graphql';
 
-import { UserModel } from '../auth/account/models/user.model';
+import { UserModel } from '@/src/models';
 
 import { UserService } from './user.service';
 
@@ -11,5 +11,10 @@ export class UserResolver {
 	@Query(() => UserModel, { name: 'getUserByUsername' })
 	public async getUserByUsername(@Args('username') username: string) {
 		return this.userService.getUserByUsername(username);
+	}
+
+	@Query(() => UserModel, {name: "getAllUsers"})
+	public async getAllUsers() {
+		return this.userService.getAllUsers();
 	}
 }

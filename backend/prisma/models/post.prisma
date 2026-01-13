@@ -1,0 +1,20 @@
+model Post {
+  id            String   @id @default(uuid())
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+  content       Json     @db.JsonB
+  likesCount    Int      @default(0)
+  viewsCount    Int      @default(0)
+  commentsCount Int      @default(0)
+
+  blogId   String? @map("blog_id")
+  authorId String  @map("author_id")
+
+  blog   Blog? @relation(fields: [blogId], references: [id])
+  author User  @relation(fields: [authorId], references: [id])
+
+  comments Comment[]
+  tags     Tag[]
+
+  @@map("posts")
+}

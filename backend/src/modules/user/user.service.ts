@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 
-import { UserModel } from '../auth/account/models/user.model';
+import { UpdateUserModel } from '@/src/types';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -13,6 +13,10 @@ export class UserService {
 				username,
 			},
 		});
+
+		if (!user) {
+			throw new NotFoundException(`User not found by ${username}`);
+		}
 
 		return user;
 	}
@@ -49,18 +53,21 @@ export class UserService {
 
 	public async updateUser(
 		id: string,
-		fieldName: keyof UserModel,
-		fieldValue: string | null
+		data: UpdateUserModel
 	) {
 		const updatedUser = await this.prismaService.user.update({
 			where: {
 				id,
 			},
 			data: {
-				[fieldName]: fieldValue,
+				...data,
 			},
 		});
 
 		return updatedUser;
+	}
+
+	public async getAllUsers() {
+		return this.prismaService.user.findMany();
 	}
 }
