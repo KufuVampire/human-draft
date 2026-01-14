@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -30,6 +30,12 @@ export class TagService {
 	}
 
 	async delete(name: string) {
+		const isExists = await this.findByName(name);
+
+		if (!isExists) {
+			throw new NotFoundException('Tag was not found')
+		}
+
 		await this.prismaService.tag.delete({
 			where: {
 				name
