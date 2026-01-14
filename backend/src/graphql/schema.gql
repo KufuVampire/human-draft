@@ -37,6 +37,8 @@ scalar JSON
 type Mutation {
   changeProfileAvatar(file: Upload!): UserModel!
   changeProfilePoster(file: Upload!): UserModel!
+  createTag(name: String!): TagModel!
+  deleteTag(name: String!): Boolean!
   removeProfileAvatar: UserModel!
   removeProfilePoster: UserModel!
   signIn(data: SignInInput!): UserModel!

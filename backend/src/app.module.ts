@@ -14,6 +14,7 @@ import { IS_DEV_ENV } from '@/src/utils';
 import { UserModule } from './modules/user/user.module';
 import { AwsStorageModule } from './modules/aws-storage/aws-storage.module';
 import { SubscriptionModule } from './modules/subscription/subscription.module';
+import { TagModule } from './modules/tag/tag.module';
 
 @Module({
 	imports: [
@@ -34,6 +35,7 @@ import { SubscriptionModule } from './modules/subscription/subscription.module';
 		UserModule,
 		AwsStorageModule,
 		SubscriptionModule,
+		TagModule,
 	],
 })
 export class AppModule {}
