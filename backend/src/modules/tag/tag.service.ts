@@ -1,5 +1,12 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+	ConflictException,
+	Injectable,
+	NotFoundException,
+} from '@nestjs/common';
+
 import { PrismaService } from '../prisma/prisma.service';
+
+import { normalizeTagName } from '@/src/utils';
 
 @Injectable()
 export class TagService {
@@ -8,39 +15,39 @@ export class TagService {
 	async findByName(name: string) {
 		return this.prismaService.tag.findUnique({
 			where: {
-				name
-			}
-		})
+				name,
+			},
+		});
 	}
 
 	async create(name: string) {
-		const isExists = await this.findByName(name);
+		const isExists = await this.findByName(normalizeTagName(name));
 
 		if (isExists) {
-			throw new ConflictException('Tag is already exists')
+			throw new ConflictException('Tag is already exists');
 		}
 
 		const tag = await this.prismaService.tag.create({
 			data: {
-				name
-			}
-		})
+				name,
+			},
+		});
 
 		return tag;
 	}
 
 	async delete(name: string) {
-		const isExists = await this.findByName(name);
+		const isExists = await this.findByName(normalizeTagName(name));
 
 		if (!isExists) {
-			throw new NotFoundException('Tag was not found')
+			throw new NotFoundException('Tag was not found');
 		}
 
 		await this.prismaService.tag.delete({
 			where: {
-				name
-			}
-		})
+				name,
+			},
+		});
 
 		return true;
 	}

@@ -1,31 +1,35 @@
 import { Field, GraphQLISODateTime, ID, ObjectType } from '@nestjs/graphql';
-import { UserModel } from './user.model';
+
 import { PostModel } from './post.model';
 import { TagModel } from './tag.model';
+import { UserModel } from './user.model';
 
 @ObjectType()
 export class BlogModel {
-  @Field(() => ID)
-  id: string;
+	@Field(() => ID)
+	id: string;
 
-  @Field(() => String, { nullable: true })
-  description?: string | null;
+	@Field(() => String)
+	title: string;
 
-  @Field(() => String, { nullable: true })
-  posterUrl?: string | null;
+	@Field(() => String)
+	description: string;
 
-  @Field(() => GraphQLISODateTime)
-  createdAt: Date;
+	@Field(() => String, { nullable: true })
+	posterUrl?: string | null;
 
-  @Field(() => GraphQLISODateTime)
-  updatedAt: Date;
+	@Field(() => GraphQLISODateTime)
+	createdAt: Date;
 
-  @Field(() => UserModel)
-  author: UserModel;
+	@Field(() => GraphQLISODateTime)
+	updatedAt: Date;
 
-  @Field(() => [PostModel])
-  posts: PostModel[];
+	@Field(() => UserModel)
+	author: UserModel;
 
-  @Field(() => [TagModel])
-  tags: TagModel[];
+	@Field(() => [PostModel])
+	posts: PostModel[];
+
+	@Field(() => [TagModel])
+	tags: TagModel[];
 }
