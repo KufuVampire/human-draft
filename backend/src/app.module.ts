@@ -17,6 +17,7 @@ import { SubscriptionModule } from './modules/subscription/subscription.module';
 import { TagModule } from './modules/tag/tag.module';
 import { BlogModule } from './modules/blog/blog.module';
 import { PostModule } from './modules/post/post.module';
+import { CommentModule } from './modules/comment/comment.module';
 
 @Module({
 	imports: [
@@ -40,6 +41,7 @@ import { PostModule } from './modules/post/post.module';
 		TagModule,
 		BlogModule,
 		PostModule,
+		CommentModule,
 	],
 })
 export class AppModule {}

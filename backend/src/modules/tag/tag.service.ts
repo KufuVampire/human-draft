@@ -51,4 +51,66 @@ export class TagService {
 
 		return true;
 	}
+
+	async updateTags(tags: string[], to: { postId?: string; blogId?: string }) {
+		const { postId, blogId } = to;
+
+		if (postId) {
+			const post = await this.prismaService.post.findUnique({
+				where: {
+					id: postId,
+				},
+			});
+
+			if (!post) {
+				throw new NotFoundException('Post not found');
+			}
+
+			const uniqueTags = [...new Set(tags)];
+
+			return this.prismaService.post.update({
+				where: {
+					id: postId,
+				},
+				data: {
+					tags: {
+						set: [],
+						connectOrCreate: uniqueTags.map((tag) => ({
+							where: { name: tag },
+							create: { name: tag },
+						})),
+					},
+				},
+			});
+		}
+
+		if (blogId) {
+			const blog = await this.prismaService.blog.findUnique({
+				where: {
+					id: blogId,
+				},
+			});
+
+			if (!blog) {
+				throw new NotFoundException('Post not found');
+			}
+
+			const uniqueTags = [...new Set(tags)];
+
+			return this.prismaService.blog.update({
+				where: {
+					id: blogId,
+				},
+				data: {
+					tags: {
+						set: [],
+						connectOrCreate: uniqueTags.map((tag) => ({
+							where: { name: tag },
+							create: { name: tag },
+						})),
+					},
+				},
+			});
+		}
+	}
 }

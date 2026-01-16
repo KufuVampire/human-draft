@@ -19,4 +19,13 @@ export class TagResolver {
 	async delete(@Args('name') name: string) {
 		return this.tagService.delete(name);
 	}
+
+	@Auth()
+	@Mutation(() => Boolean, { name: 'updatePostOrBlogTags' })
+	async updatePostOrBlogTags(
+		@Args('tags') tags: string[],
+		@Args('to') to: { postId?: string; blogid?: string }
+	) {
+		return this.tagService.updateTags(tags, to);
+	}
 }
