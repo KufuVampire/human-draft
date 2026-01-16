@@ -36,4 +36,23 @@ export class BlogResolver {
 	) {
 		return this.blogService.delete(authorId, blogId);
 	}
+
+	@Auth()
+	@Mutation(() => BlogModel, { name: 'pinPostToBlog' })
+	async pinPostsToBlog(
+		@Authorized('id') authorId: string,
+		@Args('blogId') blogId: string,
+		@Args('postIds') postIds: string[]
+	) {
+		return this.blogService.pinPostsToBlog(authorId, blogId, postIds);
+	}
+	@Auth()
+	@Mutation(() => BlogModel, { name: 'unPinPostFromBlog' })
+	async unPinPostsFromBlog(
+		@Authorized('id') authorId: string,
+		@Args('blogId') blogId: string,
+		@Args('postIds') postIds: string[]
+	) {
+		return this.blogService.unPinPostsFromBlog(authorId, blogId, postIds);
+	}
 }

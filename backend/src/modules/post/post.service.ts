@@ -1,5 +1,6 @@
 import {
 	ConflictException,
+	ForbiddenException,
 	Injectable,
 	NotFoundException,
 } from '@nestjs/common';
@@ -71,17 +72,19 @@ export class PostService {
 		return true;
 	}
 
-	async pin(authorId: string, postId: string, blogId: string) {
+	async pinPostToBlog(authorId: string, postId: string, blogId: string) {
 		const post = await this.prismaService.post.findUnique({
 			where: {
 				id: postId,
 			},
 		});
 
-		if (!post || post.authorId !== authorId) {
-			throw new NotFoundException(
-				'Cannot be pinned. Post not found or not author'
-			);
+		if (!post) {
+			throw new NotFoundException('Cannot be pinned. Post not found');
+		}
+
+		if (post.authorId !== authorId) {
+			throw new ForbiddenException('You are not the author of this post');
 		}
 
 		if (post.blogId === blogId) {
@@ -98,6 +101,10 @@ export class PostService {
 			throw new NotFoundException('Blog not found');
 		}
 
+		if (blog.authorId !== authorId) {
+			throw new ForbiddenException('You are not the author of this blog');
+		}
+
 		return this.prismaService.post.update({
 			where: {
 				id: postId,
@@ -112,7 +119,7 @@ export class PostService {
 		});
 	}
 
-	async unPin(authorId: string, postId: string, blogId: string) {
+	async unPinPostFromBlog(authorId: string, postId: string, blogId: string) {
 		const post = await this.prismaService.post.findUnique({
 			where: {
 				id: postId,

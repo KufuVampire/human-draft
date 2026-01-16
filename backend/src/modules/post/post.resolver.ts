@@ -39,22 +39,22 @@ export class PostResolver {
 	}
 
 	@Auth()
-	@Mutation(() => PostModel, { name: 'pinPost' })
-	async pin(
+	@Mutation(() => PostModel, { name: 'pinPostToBlog' })
+	async pinPostToBlog(
 		@Authorized('id') authorId: string,
 		@Args('postId') postId: string,
 		@Args('blogId') blogId: string
 	) {
-		return this.postService.pin(authorId, postId, blogId);
+		return this.postService.pinPostToBlog(authorId, postId, blogId);
 	}
 
 	@Auth()
-	@Mutation(() => PostModel, { name: 'unPinPost' })
-	async unPin(
+	@Mutation(() => PostModel, { name: 'unPinPostFromBlog' })
+	async unPinPostFromBlog(
 		@Authorized('id') authorId: string,
 		@Args('postId') postId: string,
 		@Args('blogId') blogId: string
 	) {
-		return this.postService.unPin(authorId, postId, blogId);
+		return this.postService.unPinPostFromBlog(authorId, postId, blogId);
 	}
 }

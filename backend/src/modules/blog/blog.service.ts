@@ -1,12 +1,34 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+	BadRequestException,
+	Injectable,
+	NotFoundException,
+} from '@nestjs/common';
 
+import { PostService } from '../post/post.service';
 import { PrismaService } from '../prisma/prisma.service';
 
 import { CreateBlogInput, UpdateBlogInput } from '@/src/inputs';
 
 @Injectable()
 export class BlogService {
-	constructor(private readonly prismaService: PrismaService) {}
+	constructor(
+		private readonly prismaService: PrismaService,
+		private readonly postService: PostService
+	) {}
+
+	private async findBlogById(id: string) {
+		const blog = await this.prismaService.blog.findUnique({
+			where: {
+				id,
+			},
+		});
+
+		if (!blog) {
+			throw new NotFoundException(`Blog not found - ${id}`);
+		}
+
+		return blog;
+	}
 
 	async create(authorId: string, input: CreateBlogInput) {
 		const blog = await this.prismaService.blog.create({
@@ -57,5 +79,33 @@ export class BlogService {
 		});
 
 		return true;
+	}
+
+	async pinPostsToBlog(authorId: string, blogId: string, postIds: string[]) {
+		if (postIds.length === 0) {
+			throw new BadRequestException('No posts provided to pin');
+		}
+
+		for (const postId of postIds) {
+			await this.postService.pinPostToBlog(authorId, postId, blogId);
+		}
+
+		return this.findBlogById(blogId);
+	}
+
+	async unPinPostsFromBlog(
+		authorId: string,
+		blogId: string,
+		postIds: string[]
+	) {
+		if (postIds.length === 0) {
+			throw new BadRequestException('No posts provided to unpin');
+		}
+
+		for (const postId of postIds) {
+			await this.postService.unPinPostFromBlog(authorId, postId, blogId);
+		}
+
+		return this.findBlogById(blogId);
 	}
 }
