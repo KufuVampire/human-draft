@@ -16,6 +16,7 @@ import { AwsStorageModule } from './modules/aws-storage/aws-storage.module';
 import { SubscriptionModule } from './modules/subscription/subscription.module';
 import { TagModule } from './modules/tag/tag.module';
 import { BlogModule } from './modules/blog/blog.module';
+import { PostModule } from './modules/post/post.module';
 
 @Module({
 	imports: [
@@ -38,6 +39,7 @@ import { BlogModule } from './modules/blog/blog.module';
 		SubscriptionModule,
 		TagModule,
 		BlogModule,
+		PostModule,
 	],
 })
 export class AppModule {}
