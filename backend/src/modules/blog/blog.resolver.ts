@@ -46,7 +46,7 @@ export class BlogResolver {
 	async pinPostsToBlog(
 		@Authorized('id') authorId: string,
 		@Args('blogId') blogId: string,
-		@Args('postIds') postIds: string[]
+		@Args('postIds', { type: () => [String] }) postIds: string[]
 	) {
 		return this.blogService.pinPostsToBlog(authorId, blogId, postIds);
 	}
@@ -55,7 +55,7 @@ export class BlogResolver {
 	async unPinPostsFromBlog(
 		@Authorized('id') authorId: string,
 		@Args('blogId') blogId: string,
-		@Args('postIds') postIds: string[]
+		@Args('postIds', { type: () => [String] }) postIds: string[]
 	) {
 		return this.blogService.unPinPostsFromBlog(authorId, blogId, postIds);
 	}

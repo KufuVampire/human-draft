@@ -5,12 +5,21 @@
 type BlogModel {
   author: UserModel!
   createdAt: DateTime!
-  description: String
+  description: String!
   id: ID!
   posterUrl: String
   posts: [PostModel!]!
   tags: [TagModel!]!
+  title: String!
   updatedAt: DateTime!
+}
+
+type BlogPagination {
+  data: [BlogModel!]!
+  page: Int!
+  perPage: Int!
+  totalCount: Int!
+  totalPages: Int!
 }
 
 type CommentModel {
@@ -22,6 +31,17 @@ type CommentModel {
   replies: [CommentModel!]!
   text: String!
   updatedAt: DateTime!
+}
+
+input CreateBlogInput {
+  description: String!
+  postIds: [ID!]!
+  posterUrl: String
+  title: String!
+}
+
+input CreatePostInput {
+  content: JSON!
 }
 
 """
@@ -37,15 +57,27 @@ scalar JSON
 type Mutation {
   changeProfileAvatar(file: Upload!): UserModel!
   changeProfilePoster(file: Upload!): UserModel!
+  createBlog(data: CreateBlogInput!): BlogModel!
+  createComment(parentId: String, postId: String!, text: String!): CommentModel!
+  createPost(blogId: String, data: CreatePostInput!): PostModel!
   createTag(name: String!): TagModel!
+  deleteBlog(blogId: String!): BlogModel!
+  deleteComment(commentId: String!): CommentModel!
+  deletePost(postId: String!): Boolean!
   deleteTag(name: String!): Boolean!
+  pinPostToBlog(blogId: String!, postId: String!): PostModel!
   removeProfileAvatar: UserModel!
   removeProfilePoster: UserModel!
   signIn(data: SignInInput!): UserModel!
   signOutAccount: Boolean!
   signUp(data: SignUpInput!): UserModel!
   subscribeToUser(toId: String!): Boolean!
+  unPinPostFromBlog(blogId: String!, postId: String!): PostModel!
   unsubscribeFromUser(toId: String!): Boolean!
+  updateBlog(blogId: String!, data: UpdateBlogInput!): BlogModel!
+  updateComment(commentId: String!, text: String!): CommentModel!
+  updatePost(data: UpdatePostInput!, postId: String!): PostModel!
+  updatePostOrBlogTags(tags: [String!]!, to: UpdatePostOrBlogTagsInput!): Boolean!
   updateUser(data: UpdateUserInput!): UserModel!
 }
 
@@ -63,10 +95,25 @@ type PostModel {
   viewsCount: Int!
 }
 
+type PostPagination {
+  data: [PostModel!]!
+  page: Int!
+  perPage: Int!
+  totalCount: Int!
+  totalPages: Int!
+}
+
 type Query {
-  getAllUsers: UserModel!
+  getAllBlogsPagination(searchParams: SearchParamsInput!): BlogPagination!
+  getAllPostsPagination(searchParams: SearchParamsInput!): PostPagination!
+  getAllUsersPagination(searchParams: SearchParamsInput!): UserPagination!
   getUserByUsername(username: String!): UserModel!
   userProfile: UserModel!
+}
+
+input SearchParamsInput {
+  page: Int
+  perPage: Int
 }
 
 input SignInInput {
@@ -97,6 +144,21 @@ type TagModel {
   updatedAt: DateTime!
 }
 
+input UpdateBlogInput {
+  description: String
+  posterUrl: String
+  title: String
+}
+
+input UpdatePostInput {
+  content: JSON!
+}
+
+input UpdatePostOrBlogTagsInput {
+  blogId: String
+  postId: String
+}
+
 input UpdateUserInput {
   avatarUrl: String
   description: String
@@ -122,4 +184,12 @@ type UserModel {
   subscriptions: [SubscriptionModel!]!
   updatedAt: DateTime!
   username: String!
+}
+
+type UserPagination {
+  data: [UserModel!]!
+  page: Int!
+  perPage: Int!
+  totalCount: Int!
+  totalPages: Int!
 }

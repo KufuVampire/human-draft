@@ -1,8 +1,12 @@
 import { Module } from '@nestjs/common';
-import { BlogService } from './blog.service';
+
+import { PostModule } from '../post/post.module';
+
 import { BlogResolver } from './blog.resolver';
+import { BlogService } from './blog.service';
 
 @Module({
-  providers: [BlogResolver, BlogService],
+	providers: [BlogResolver, BlogService],
+	imports: [PostModule],
 })
 export class BlogModule {}

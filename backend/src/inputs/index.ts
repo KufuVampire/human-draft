@@ -5,4 +5,5 @@ export { SignInInput } from './signIn.input';
 export { SignUpInput } from './signUp.input';
 export { UpdateBlogInput } from './updateBlog.input';
 export { UpdatePostInput } from './updatePost.input';
+export { UpdatePostOrBlogTagsInput } from './updatePostOrBlogTags.input';
 export { UpdateUserInput } from './updateUser.input';

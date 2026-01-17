@@ -2,6 +2,7 @@ import { Args, Mutation, Resolver } from '@nestjs/graphql';
 
 import { TagService } from './tag.service';
 import { Auth } from '@/src/decorators';
+import { UpdatePostOrBlogTagsInput } from '@/src/inputs';
 import { TagModel } from '@/src/models';
 
 @Resolver('Tag')
@@ -23,8 +24,8 @@ export class TagResolver {
 	@Auth()
 	@Mutation(() => Boolean, { name: 'updatePostOrBlogTags' })
 	async updatePostOrBlogTags(
-		@Args('tags') tags: string[],
-		@Args('to') to: { postId?: string; blogid?: string }
+		@Args('tags', { type: () => [String] }) tags: string[],
+		@Args('to') to: UpdatePostOrBlogTagsInput
 	) {
 		return this.tagService.updateTags(tags, to);
 	}

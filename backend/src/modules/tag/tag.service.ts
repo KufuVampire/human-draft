@@ -6,6 +6,7 @@ import {
 
 import { PrismaService } from '../prisma/prisma.service';
 
+import { UpdatePostOrBlogTagsInput } from '@/src/inputs';
 import { normalizeTagName } from '@/src/utils';
 
 @Injectable()
@@ -52,7 +53,7 @@ export class TagService {
 		return true;
 	}
 
-	async updateTags(tags: string[], to: { postId?: string; blogId?: string }) {
+	async updateTags(tags: string[], to: UpdatePostOrBlogTagsInput) {
 		const { postId, blogId } = to;
 
 		if (postId) {
