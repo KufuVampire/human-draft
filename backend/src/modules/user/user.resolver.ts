@@ -14,7 +14,13 @@ export class UserResolver {
 	}
 
 	@Query(() => UserPagination, { name: 'getAllUsersPagination' })
-	async getAllUsers(@Args('searchParams') searchParams: SearchParamsInput) {
+	async getAllUsers(
+		@Args('searchParams', {
+			nullable: true,
+			defaultValue: { page: 1, perPage: 10 },
+		})
+		searchParams: SearchParamsInput
+	) {
 		return this.userService.getAllUsers(searchParams);
 	}
 }

@@ -61,7 +61,13 @@ export class BlogResolver {
 	}
 
 	@Query(() => BlogPagination, { name: 'getAllBlogsPagination' })
-	async getAllBlogs(@Args('searchParams') searchParams: SearchParamsInput) {
+	async getAllBlogs(
+		@Args('searchParams', {
+			nullable: true,
+			defaultValue: { page: 1, perPage: 10 },
+		})
+		searchParams: SearchParamsInput
+	) {
 		return this.blogService.getAllBlogs(searchParams);
 	}
 }

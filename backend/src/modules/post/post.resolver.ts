@@ -63,7 +63,13 @@ export class PostResolver {
 	}
 
 	@Query(() => PostPagination, { name: 'getAllPostsPagination' })
-	async getAllPosts(@Args('searchParams') searchParams: SearchParamsInput) {
+	async getAllPosts(
+		@Args('searchParams', {
+			nullable: true,
+			defaultValue: { page: 1, perPage: 10 },
+		})
+		searchParams: SearchParamsInput
+	) {
 		return this.postService.getAllPosts(searchParams);
 	}
 }
