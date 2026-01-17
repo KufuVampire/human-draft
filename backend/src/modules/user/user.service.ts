@@ -2,8 +2,9 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { PrismaService } from '../prisma/prisma.service';
 
-import { UpdateUserModel } from '@/src/types';
+import { PAGINATION_PAGE, PAGINATION_PER_PAGE } from '@/src/consts';
 import { SearchParamsInput } from '@/src/inputs';
+import { UpdateUserModel } from '@/src/types';
 
 @Injectable()
 export class UserService {
@@ -67,7 +68,8 @@ export class UserService {
 	}
 
 	public async getAllUsers(searchParams: SearchParamsInput) {
-		const { page = 1, perPage = 20 } = searchParams;
+		const { page = PAGINATION_PAGE, perPage = PAGINATION_PER_PAGE } =
+			searchParams;
 
 		const skip = (page - 1) * perPage;
 

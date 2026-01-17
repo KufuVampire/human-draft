@@ -7,7 +7,12 @@ import {
 
 import { PrismaService } from '../prisma/prisma.service';
 
-import { CreatePostInput, SearchParamsInput, UpdatePostInput } from '@/src/inputs';
+import { PAGINATION_PAGE, PAGINATION_PER_PAGE } from '@/src/consts';
+import {
+	CreatePostInput,
+	SearchParamsInput,
+	UpdatePostInput,
+} from '@/src/inputs';
 
 @Injectable()
 export class PostService {
@@ -157,7 +162,8 @@ export class PostService {
 	}
 
 	async getAllPosts(searchParams: SearchParamsInput) {
-		const { page = 1, perPage = 5 } = searchParams;
+		const { page = PAGINATION_PAGE, perPage = PAGINATION_PER_PAGE } =
+			searchParams;
 
 		const skip = (page - 1) * perPage;
 
