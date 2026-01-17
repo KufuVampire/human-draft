@@ -1,8 +1,12 @@
-import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 
 import { PostService } from './post.service';
 import { Auth, Authorized } from '@/src/decorators';
-import { CreatePostInput, UpdatePostInput } from '@/src/inputs';
+import {
+	CreatePostInput,
+	SearchParamsInput,
+	UpdatePostInput,
+} from '@/src/inputs';
 import { PostModel, PostPagination } from '@/src/models';
 
 @Resolver('Post')
@@ -59,10 +63,7 @@ export class PostResolver {
 	}
 
 	@Query(() => PostPagination, { name: 'getAllPostsPagination' })
-	async getAllPosts(
-		@Args('page', { type: () => Int, nullable: true }) page = 1,
-		@Args('perPage', { type: () => Int, nullable: true }) perPage = 10
-	) {
-		return this.postService.getAllPosts({ page, perPage });
+	async getAllPosts(@Args('searchParams') searchParams: SearchParamsInput) {
+		return this.postService.getAllPosts(searchParams);
 	}
 }

@@ -1,5 +1,6 @@
 export { CreateBlogInput } from './createBlog.input';
 export { CreatePostInput } from './createPost.input';
+export { SearchParamsInput } from './searchParams.input';
 export { SignInInput } from './signIn.input';
 export { SignUpInput } from './signUp.input';
 export { UpdateBlogInput } from './updateBlog.input';

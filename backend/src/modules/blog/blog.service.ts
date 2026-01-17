@@ -7,7 +7,7 @@ import {
 import { PostService } from '../post/post.service';
 import { PrismaService } from '../prisma/prisma.service';
 
-import { CreateBlogInput, UpdateBlogInput } from '@/src/inputs';
+import { CreateBlogInput, SearchParamsInput, UpdateBlogInput } from '@/src/inputs';
 
 @Injectable()
 export class BlogService {
@@ -109,7 +109,7 @@ export class BlogService {
 		return this.findBlogById(blogId);
 	}
 
-	async getAllBlogs(searchParams: { perPage?: number; page?: number }) {
+	async getAllBlogs(searchParams: SearchParamsInput) {
 		const { page = 1, perPage = 5 } = searchParams;
 
 		const skip = (page - 1) * perPage;

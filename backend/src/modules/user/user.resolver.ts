@@ -1,6 +1,7 @@
-import { Args, Int, Query, Resolver } from '@nestjs/graphql';
+import { Args, Query, Resolver } from '@nestjs/graphql';
 
 import { UserService } from './user.service';
+import { SearchParamsInput } from '@/src/inputs';
 import { UserModel, UserPagination } from '@/src/models';
 
 @Resolver('User')
@@ -13,10 +14,7 @@ export class UserResolver {
 	}
 
 	@Query(() => UserPagination, { name: 'getAllUsersPagination' })
-	async getAllUsers(
-		@Args('page', { type: () => Int, nullable: true }) page = 1,
-		@Args('perPage', { type: () => Int, nullable: true }) perPage = 10
-	) {
-		return this.userService.getAllUsers({ page, perPage });
+	async getAllUsers(@Args('searchParams') searchParams: SearchParamsInput) {
+		return this.userService.getAllUsers(searchParams);
 	}
 }

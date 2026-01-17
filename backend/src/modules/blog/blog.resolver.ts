@@ -1,8 +1,12 @@
-import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 
 import { BlogService } from './blog.service';
 import { Auth, Authorized } from '@/src/decorators';
-import { CreateBlogInput, UpdateBlogInput } from '@/src/inputs';
+import {
+	CreateBlogInput,
+	SearchParamsInput,
+	UpdateBlogInput,
+} from '@/src/inputs';
 import { BlogModel, BlogPagination } from '@/src/models';
 
 @Resolver('Blog')
@@ -57,10 +61,7 @@ export class BlogResolver {
 	}
 
 	@Query(() => BlogPagination, { name: 'getAllBlogsPagination' })
-	async getAllBlogs(
-		@Args('page', { type: () => Int, nullable: true }) page = 1,
-		@Args('perPage', { type: () => Int, nullable: true }) perPage = 10
-	) {
-		return this.blogService.getAllBlogs({ page, perPage });
+	async getAllBlogs(@Args('searchParams') searchParams: SearchParamsInput) {
+		return this.blogService.getAllBlogs(searchParams);
 	}
 }
