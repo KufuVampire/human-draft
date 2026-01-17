@@ -67,16 +67,25 @@ export class UserService {
 		return updatedUser;
 	}
 
-	public async getAllUsers(searchParams: SearchParamsInput) {
+	public async getAllUsers(searchParams: SearchParamsInput, userId?: string) {
 		const { page = PAGINATION_PAGE, perPage = PAGINATION_PER_PAGE } =
 			searchParams;
 
 		const skip = (page - 1) * perPage;
 
+		const where = userId
+			? {
+					id: {
+						not: userId,
+					},
+				}
+			: undefined;
+
 		const [users, totalCount] = await this.prismaService.$transaction([
 			this.prismaService.user.findMany({
 				take: perPage,
 				skip,
+				where,
 				orderBy: { id: 'asc' },
 			}),
 			this.prismaService.user.count(),

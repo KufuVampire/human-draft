@@ -1,8 +1,9 @@
-import { Args, Query, Resolver } from '@nestjs/graphql';
+import { Args, Context, Query, Resolver } from '@nestjs/graphql';
 
-import { UserService } from './user.service';
 import { SearchParamsInput } from '@/src/inputs';
 import { UserModel, UserPagination } from '@/src/models';
+import { IGQLContext } from '@/src/types';
+import { UserService } from './user.service';
 
 @Resolver('User')
 export class UserResolver {
@@ -19,8 +20,9 @@ export class UserResolver {
 			nullable: true,
 			defaultValue: { page: 1, perPage: 10 },
 		})
-		searchParams: SearchParamsInput
+		searchParams: SearchParamsInput,
+		@Context() { req }: IGQLContext
 	) {
-		return this.userService.getAllUsers(searchParams);
+		return this.userService.getAllUsers(searchParams, req.session.userId);
 	}
 }
