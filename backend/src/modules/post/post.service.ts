@@ -155,4 +155,27 @@ export class PostService {
 			},
 		});
 	}
+
+	async getAllPosts(searchParams: { perPage?: number; page?: number }) {
+		const { page = 1, perPage = 5 } = searchParams;
+
+		const skip = (page - 1) * perPage;
+
+		const [posts, totalCount] = await this.prismaService.$transaction([
+			this.prismaService.post.findMany({
+				take: perPage,
+				skip,
+				orderBy: { id: 'asc' },
+			}),
+			this.prismaService.post.count(),
+		]);
+
+		return {
+			data: posts,
+			totalCount,
+			page,
+			perPage,
+			totalPages: Math.ceil(totalCount / perPage),
+		};
+	}
 }

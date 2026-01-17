@@ -1,9 +1,9 @@
-import { Args, Mutation, Resolver } from '@nestjs/graphql';
+import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 
 import { PostService } from './post.service';
 import { Auth, Authorized } from '@/src/decorators';
 import { CreatePostInput, UpdatePostInput } from '@/src/inputs';
-import { PostModel } from '@/src/models';
+import { PostModel, PostPagination } from '@/src/models';
 
 @Resolver('Post')
 export class PostResolver {
@@ -56,5 +56,13 @@ export class PostResolver {
 		@Args('blogId') blogId: string
 	) {
 		return this.postService.unPinPostFromBlog(authorId, postId, blogId);
+	}
+
+	@Query(() => PostPagination, { name: 'getAllPostsPagination' })
+	async getAllPosts(
+		@Args('page', { type: () => Int, nullable: true }) page = 1,
+		@Args('perPage', { type: () => Int, nullable: true }) perPage = 10
+	) {
+		return this.postService.getAllPosts({ page, perPage });
 	}
 }

@@ -108,4 +108,27 @@ export class BlogService {
 
 		return this.findBlogById(blogId);
 	}
+
+	async getAllBlogs(searchParams: { perPage?: number; page?: number }) {
+		const { page = 1, perPage = 5 } = searchParams;
+
+		const skip = (page - 1) * perPage;
+
+		const [blogs, totalCount] = await this.prismaService.$transaction([
+			this.prismaService.blog.findMany({
+				take: perPage,
+				skip,
+				orderBy: { id: 'asc' },
+			}),
+			this.prismaService.blog.count(),
+		]);
+
+		return {
+			data: blogs,
+			totalCount,
+			page,
+			perPage,
+			totalPages: Math.ceil(totalCount / perPage),
+		};
+	}
 }

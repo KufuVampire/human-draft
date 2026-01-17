@@ -1,8 +1,7 @@
-import { Args, Query, Resolver } from '@nestjs/graphql';
-
-import { UserModel } from '@/src/models';
+import { Args, Int, Query, Resolver } from '@nestjs/graphql';
 
 import { UserService } from './user.service';
+import { UserModel, UserPagination } from '@/src/models';
 
 @Resolver('User')
 export class UserResolver {
@@ -13,8 +12,11 @@ export class UserResolver {
 		return this.userService.getUserByUsername(username);
 	}
 
-	@Query(() => UserModel, {name: "getAllUsers"})
-	public async getAllUsers() {
-		return this.userService.getAllUsers();
+	@Query(() => UserPagination, { name: 'getAllUsersPagination' })
+	async getAllUsers(
+		@Args('page', { type: () => Int, nullable: true }) page = 1,
+		@Args('perPage', { type: () => Int, nullable: true }) perPage = 10
+	) {
+		return this.userService.getAllUsers({ page, perPage });
 	}
 }

@@ -1,7 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 
-import { UpdateUserModel } from '@/src/types';
 import { PrismaService } from '../prisma/prisma.service';
+
+import { UpdateUserModel } from '@/src/types';
 
 @Injectable()
 export class UserService {
@@ -51,10 +52,7 @@ export class UserService {
 		return user;
 	}
 
-	public async updateUser(
-		id: string,
-		data: UpdateUserModel
-	) {
+	public async updateUser(id: string, data: UpdateUserModel) {
 		const updatedUser = await this.prismaService.user.update({
 			where: {
 				id,
@@ -67,7 +65,26 @@ export class UserService {
 		return updatedUser;
 	}
 
-	public async getAllUsers() {
-		return this.prismaService.user.findMany();
+	public async getAllUsers(searchParams: { perPage?: number; page?: number }) {
+		const { page = 1, perPage = 20 } = searchParams;
+
+		const skip = (page - 1) * perPage;
+
+		const [users, totalCount] = await this.prismaService.$transaction([
+			this.prismaService.user.findMany({
+				take: perPage,
+				skip,
+				orderBy: { id: 'asc' },
+			}),
+			this.prismaService.user.count(),
+		]);
+
+		return {
+			data: users,
+			totalCount,
+			page,
+			perPage,
+			totalPages: Math.ceil(totalCount / perPage),
+		};
 	}
 }
