@@ -28,6 +28,7 @@ export class AccountService {
 		private readonly sessionService: SessionService,
 		private readonly storageService: AwsStorageService
 	) {}
+
 	public async signUp(req: Request, input: SignUpInput) {
 		const { email, password, username } = input;
 
@@ -52,8 +53,8 @@ export class AccountService {
 			throw new UnprocessableEntityException('Unable to create account');
 		}
 
-		const userInSession = await this.sessionService.signUp(req, newUser);
-		return userInSession;
+		await this.sessionService.signUp(req, newUser);
+		return true;
 	}
 
 	public async signIn(req: Request, input: SignInInput) {
@@ -71,9 +72,8 @@ export class AccountService {
 			throw new UnauthorizedException('Unable to sign in to your account');
 		}
 
-		const userInSession = await this.sessionService.saveSession(req, user);
-
-		return userInSession;
+		await this.sessionService.saveSession(req, user);
+		return true;
 	}
 
 	public async signOut(req: Request) {
@@ -86,7 +86,11 @@ export class AccountService {
 				id,
 			},
 			include: {
-				blogs: true,
+				blogs: {
+					include: {
+						posts: true,
+					},
+				},
 				posts: true,
 				subscribers: {
 					select: {
@@ -109,6 +113,8 @@ export class AccountService {
 
 		return {
 			...user,
+			posts: user.posts ?? [],
+			blogs: user.blogs ?? [],
 			subscribers: user.subscribers.map((s) => s.fromUserId),
 			subscriptions: user.subscriptions.map((s) => s.toUserId),
 		};

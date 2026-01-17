@@ -36,12 +36,12 @@ export class UserModel {
 	@Field(() => [String])
 	subscribers: string[];
 
-	@Field(() => [BlogModel])
-	blogs: BlogModel[];
+	@Field(() => [BlogModel], { nullable: true })
+	blogs?: BlogModel[];
 
-	@Field(() => [PostModel])
-	posts: PostModel[];
+	@Field(() => [PostModel], { nullable: true })
+	posts?: PostModel[];
 
-	@Field(() => [CommentModel])
-	comments: CommentModel[];
+	@Field(() => [CommentModel], { nullable: true })
+	comments?: CommentModel[];
 }
