@@ -37,8 +37,8 @@ export class AccountResolver {
 
 	@Auth()
 	@Query(() => UserModel, { name: 'userProfile' })
-	public profile(@Authorized() user: UserModel) {
-		return this.accountService.profile(user);
+	public profile(@Authorized('id') id: string) {
+		return this.accountService.profile(id);
 	}
 
 	@Auth()

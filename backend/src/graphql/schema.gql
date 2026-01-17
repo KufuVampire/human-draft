@@ -127,14 +127,6 @@ input SignUpInput {
   username: String!
 }
 
-type SubscriptionModel {
-  createdAt: DateTime!
-  fromUser: UserModel!
-  id: ID!
-  toUser: UserModel!
-  updatedAt: DateTime!
-}
-
 type TagModel {
   blogs: [BlogModel!]!
   createdAt: DateTime!
@@ -180,8 +172,8 @@ type UserModel {
   id: ID!
   posterUrl: String
   posts: [PostModel!]!
-  subscribers: [SubscriptionModel!]!
-  subscriptions: [SubscriptionModel!]!
+  subscribers: [String!]!
+  subscriptions: [String!]!
   updatedAt: DateTime!
   username: String!
 }

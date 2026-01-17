@@ -12,12 +12,12 @@ import { Request } from 'express';
 import { FileUpload } from 'graphql-upload-ts';
 import * as sharp from 'sharp';
 
-import { UserModel } from '@/src/models';
 import { AwsStorageService } from '../../aws-storage/aws-storage.service';
 import { UserService } from '../../user/user.service';
 import { SessionService } from '../session/session.service';
 
 import { SignInInput, SignUpInput } from '@/src/inputs';
+import { UserModel } from '@/src/models';
 import { PrismaService } from '@/src/modules/prisma/prisma.service';
 
 @Injectable()
@@ -80,8 +80,38 @@ export class AccountService {
 		return this.sessionService.signOut(req);
 	}
 
-	public profile(user: UserModel) {
-		return user;
+	public async profile(id: string) {
+		const user = await this.prismaService.user.findUnique({
+			where: {
+				id,
+			},
+			include: {
+				blogs: true,
+				posts: true,
+				subscribers: {
+					select: {
+						fromUserId: true,
+						id: true,
+					},
+				},
+				subscriptions: {
+					select: {
+						toUserId: true,
+						id: true,
+					},
+				},
+			},
+		});
+
+		if (!user) {
+			throw new NotFoundException('User not found');
+		}
+
+		return {
+			...user,
+			subscribers: user.subscribers.map((s) => s.fromUserId),
+			subscriptions: user.subscriptions.map((s) => s.toUserId),
+		};
 	}
 
 	public async changePoster(user: UserModel, file: FileUpload) {

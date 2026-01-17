@@ -4,6 +4,7 @@ export { CommentModel } from './comment.model';
 export { PostModel } from './post.model';
 export { PostPagination } from './postPagination.model';
 export { SubscriptionModel } from './subscription.model';
+export { SubscriptionIdModel } from './subscriptionId.model';
 export { TagModel } from './tag.model';
 export { UserModel } from './user.model';
 export { UserPagination } from './userPagination.model';
