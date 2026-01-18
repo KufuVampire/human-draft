@@ -7,4 +7,5 @@ echo "🏗️ Building and starting containers..."
 docker-compose -f docker-compose.dev.yml up --build -d
 yarn db:gen
 yarn db:push
+yarn db:seed
 yarn start:dev
