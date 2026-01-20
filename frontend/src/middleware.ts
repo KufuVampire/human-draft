@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
 
+import { NextRequest, NextResponse } from 'next/server';
 import { fetchMe } from './api';
 import { routesConfig } from './config';
 
