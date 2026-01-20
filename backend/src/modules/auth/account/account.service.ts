@@ -31,7 +31,7 @@ export class AccountService {
 
 	public async signUp(req: Request, input: SignUpInput) {
 		const { email, password, username } = input;
-
+		console.log(input)
 		const isUserExists = await this.userService.findByFields([
 			{ username },
 			{ email },

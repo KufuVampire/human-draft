@@ -1,7 +1,7 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 
 import { BlogModel as Blog } from './blog.model';
-import { BlogModel } from '@/prisma/generated/models';
+import { BlogModel } from '../../prisma/generated/models';
 
 @ObjectType()
 export class BlogPagination {
