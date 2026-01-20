@@ -1,11 +1,5 @@
 mutation RemoveProfilePoster {
 	removeProfilePoster {
-		id
-		username
-		email
-		createdAt
-		updatedAt
-		avatarUrl
 		posterUrl
 	}
 }

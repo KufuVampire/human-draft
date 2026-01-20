@@ -6,9 +6,14 @@ import { useLayoutEffect, useRef, useState } from 'react';
 
 import { routesConfig } from '@/config';
 import { UserModel } from '@/graphql/generated/output';
-import { useClickOutside } from '@/hooks';
-import { Button, CustomLink, Dropdown, LogoutButton } from '@/shared';
-import { useProfile } from '@/store';
+import { useActiveLink, useClickOutside, useProfile } from '@/hooks';
+import {
+	Button,
+	CustomLink,
+	Dropdown,
+	LogoutButton,
+	UserBadge,
+} from '@/shared';
 import { cn } from '@/utils';
 
 const items = [
@@ -35,32 +40,52 @@ export const UserProfile = ({ userProfile }: Props) => {
 	const t = useTranslations();
 	const profileRef = useRef<HTMLDivElement>(null);
 	const [isOpen, setOpen] = useState(false);
-	const { profile, isAuth, setProfile } = useProfile();
+	const { profile, isAuth, setProfile, setSubscriptions, setLoading } =
+		useProfile();
+	const isActiveLink = useActiveLink();
 
 	useLayoutEffect(() => {
-		if (userProfile) {
+		if (userProfile && !profile) {
 			setProfile(userProfile);
+			setSubscriptions(userProfile.subscriptions);
+			setLoading(false);
 		}
-	}, [userProfile, setProfile]);
+	}, [profile, setLoading, setProfile, setSubscriptions, userProfile]);
 
 	useClickOutside(profileRef, () => setOpen(false));
 
 	const navigationItems = items.map(
-		({ Component, Icon, href, translationKey }) =>
-			Component ? (
-				<Component
-					key={href}
-					className='text-secondary'
-				/>
-			) : (
+		({ Component, Icon, href, translationKey }) => {
+			if (Component) {
+				return (
+					<Component
+						key={href}
+						className='text-secondary'
+					/>
+				);
+			}
+
+			const settingsHref =
+				href === routesConfig.settings && profile?.username
+					? `/${profile?.username}/${routesConfig.settings}`
+					: href;
+			const profileHref =
+				href === routesConfig.profile && profile?.username
+					? `/${profile.username}`
+					: href;
+			const currentHref =
+				href === routesConfig.profile ? profileHref : settingsHref;
+
+			return (
 				<CustomLink
 					key={href}
-					href={href}
-					className='p-2 hover:bg-main-hover text-secondary transition-colors w-full flex items-center justify-normal gap-x-1'>
+					href={currentHref}
+					className={cn('p-2 hover:bg-main-hover text-secondary transition-colors w-full flex items-center justify-normal gap-x-1', isActiveLink(currentHref) && 'text-primary')}>
 					<Icon />
 					{t(translationKey)}
 				</CustomLink>
-			)
+			);
+		}
 	);
 
 	return (
@@ -69,15 +94,21 @@ export const UserProfile = ({ userProfile }: Props) => {
 				<Dropdown
 					isOpen={isOpen}
 					items={navigationItems}
-					className='w-full max-w-28 py-0.5 px-2 hidden md:block'
-					listClassName='bg-layout top-[calc(100%+2.5rem)]'
+					className='py-0.5 px-2 hidden md:block'
+					listClassName='bg-layout top-[calc(100%+2rem)]'
 					displayDirection='top-right'
 					ref={profileRef}>
 					<Button
 						variant='clear'
 						onClick={() => setOpen((prev) => !prev)}
-						className='w-full flex items-center justify-end gap-x-3 text-secondary'>
-						<span className='text-lg'>{profile?.username}</span>
+						className='w-full flex items-center justify-end gap-x-2 text-secondary'>
+						{userProfile && (
+							<UserBadge
+								username={userProfile?.username}
+								avatarUrl={userProfile?.avatarUrl}
+								location='header'
+							/>
+						)}
 						<ChevronRight
 							className={cn('size-5 transition-transform', {
 								['rotate-90']: isOpen,

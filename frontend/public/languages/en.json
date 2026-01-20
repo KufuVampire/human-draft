@@ -116,7 +116,11 @@
 			"title": "My profile",
 			"description": "Your profile page displaying all your data, posts, and blogs available for viewing"
 		},
-		"editProfile": "Edit profile"
+		"editProfile": "Edit profile",
+		"notifications": {
+			"changePosterSuccess": "Poster successfully changed",
+			"removePosterSuccess": "Poster successfully deleted"
+		}
 	},
 	"settingsPage": {
 		"metadata": {
@@ -164,5 +168,6 @@
 		"bottomText": "If the duck is silent, try returning to the main page.",
 		"goToMain": "Thank you, Duck, take me to the home page"
 	},
-	"logoutSuccess": "You have successfully logged out of your account."
+	"logoutSuccess": "You have successfully logged out of your account.",
+	"userAvatar": "User avatar"
 }

@@ -8,7 +8,7 @@ interface Props {
 
 export const Header = ({ userProfile }: Props) => {
 	return (
-		<header className='w-full py-4 md:py-4.5 shadow fixed top-0 z-[var(--z-header)] bg-layout min-h-[3.625rem] md:min-h-[5.75rem] flex items-center'>
+		<header className='w-full py-4 shadow fixed top-0 z-[var(--z-header)] bg-layout flex items-center'>
 			<Container className='flex justify-between items-center'>
 				<Logo />
 				<div className='flex items-center gap-x-6'>

@@ -1,4 +1,5 @@
-'use client'
+'use client';
+
 import { type Dispatch, type SetStateAction, useEffect, useState } from 'react';
 
 export const useLocalStorage = <T>(
@@ -16,7 +17,9 @@ export const useLocalStorage = <T>(
 		}
 	};
 
-	const [storedValue, setStoredValue] = useState<T>(() => getItem());
+	const defaultValue = getItem();
+
+	const [storedValue, setStoredValue] = useState<T>(defaultValue);
 
 	useEffect(() => {
 		try {

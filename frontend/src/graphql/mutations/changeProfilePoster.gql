@@ -1,11 +1,5 @@
 mutation ChangeProfilePoster($file: Upload!) {
 	changeProfilePoster(file: $file) {
-		id
-		username
-		email
-		createdAt
-		updatedAt
-		avatarUrl
 		posterUrl
 	}
 }

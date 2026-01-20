@@ -11,7 +11,6 @@ import { routesConfig } from '@/config';
 import { useSignUpMutation } from '@/graphql/generated/output';
 import { TypeCreateAccountSchema, createAccountSchema } from '@/schemas';
 import { Button, FormField } from '@/shared';
-import { useProfile } from '@/store';
 import { IField } from '@/types';
 
 const buttonStyles = 'py-2 rounded-lg';
@@ -66,12 +65,10 @@ export const SignUpForm = () => {
 		},
 	});
 	const t = useTranslations();
-	const { setProfile } = useProfile();
 
 	const [signUpMutation, { loading }] = useSignUpMutation({
 		onCompleted(data) {
-			if (data.signUp) {
-				setProfile(data.signUp);
+			if (data) {
 				toast.success(t('authPages.signUp.signUpSuccess'));
 				redirect(routesConfig.home);
 			}

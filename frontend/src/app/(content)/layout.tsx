@@ -1,10 +1,10 @@
 import { ReactNode } from 'react';
 
-import { Dashboard } from '@/modules';
+import { fetchMe } from '@/api';
+import { ConfirmationChangesModal, Dashboard } from '@/modules';
 import { Container, Footer, Header, Main } from '@/shared';
 
 import '@/app/globals.css';
-import { fetchMe } from '@/api';
 
 export default async function ContentLayout({
 	children,
@@ -21,6 +21,7 @@ export default async function ContentLayout({
 					{children}
 				</Container>
 			</Main>
+			<ConfirmationChangesModal />
 			<Footer />
 		</>
 	);

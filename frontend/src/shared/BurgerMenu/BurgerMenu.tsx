@@ -7,9 +7,15 @@ import { useMediaQuery } from 'react-responsive';
 
 import { Burger } from './Burger/Burger';
 import { routesConfig } from '@/config';
-import { useClickOutside } from '@/hooks';
-import { CustomLink, Dropdown, LanguageSwitcher, LogoutButton } from '@/shared';
-import { useProfile } from '@/store';
+import { useActiveLink, useClickOutside, useProfile } from '@/hooks';
+import {
+	CustomLink,
+	Dropdown,
+	LanguageSwitcher,
+	LogoutButton,
+	UserBadge,
+} from '@/shared';
+import { cn } from '@/utils';
 
 interface Props {
 	className?: string;
@@ -37,7 +43,7 @@ const burgerDropdownItems = [
 	{
 		needAuth: true,
 		href: routesConfig.settings,
-		translationKey: 'navigation.settings',
+		translationKey: 'navigation.settingsShort',
 		Icon: Settings,
 	},
 	{
@@ -53,8 +59,9 @@ const burgerDropdownItems = [
 export const BurgerMenu = ({ className }: Props) => {
 	const t = useTranslations();
 	const [isOpen, setOpen] = useState(false);
-	const { isAuth } = useProfile();
+	const { isAuth, profile } = useProfile();
 	const isMobile = useMediaQuery({ maxWidth: 768 });
+	const isActiveLink = useActiveLink();
 
 	const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -70,7 +77,7 @@ export const BurgerMenu = ({ className }: Props) => {
 		}
 	}, [isMobile]);
 	const dropdownItems = useMemo(() => {
-		return burgerDropdownItems
+		const items = burgerDropdownItems
 			.map(({ Icon, href, translationKey, Component, needAuth }, i) => {
 				if (needAuth && !isAuth) {
 					return null;
@@ -85,18 +92,45 @@ export const BurgerMenu = ({ className }: Props) => {
 					);
 				}
 
+				const settingsHref =
+					href === routesConfig.settings && profile?.username
+						? `/${profile?.username}/${routesConfig.settings}`
+						: href;
+
+				const profileHref =
+					href === routesConfig.profile && profile?.username
+						? `/${profile.username}`
+						: href;
+				const currentHref =
+					href === routesConfig.profile ? profileHref : settingsHref;
+
 				return (
 					<CustomLink
 						key={href}
-						href={href}
-						className='p-2 hover:bg-main-hover w-full flex gap-x-1 justify-normal text-secondary'>
+						href={currentHref}
+						className={cn(
+							'p-2 hover:bg-main-hover w-full flex gap-x-1 justify-normal text-secondary',
+							isActiveLink(currentHref) && 'text-primary'
+						)}>
 						<Icon />
 						{t(translationKey)}
 					</CustomLink>
 				);
 			})
 			.filter(Boolean);
-	}, [isAuth, t]);
+
+		return [
+			<div key='user-profile' className='flex gap-x-1 p-2 w-full items-center'>
+				<UserBadge
+					username={profile?.username}
+					avatarUrl={profile?.avatarUrl}
+					location='burger-menu'
+					className='size-6'
+				/>
+			</div>,
+			...items,
+		];
+	}, [isActiveLink, isAuth, profile, t]);
 
 	return (
 		<Dropdown

@@ -7,24 +7,26 @@ import { redirect } from 'next/navigation';
 
 import { routesConfig } from '@/config';
 import { useGetUserByUsernameQuery } from '@/graphql/generated/output';
-import { useProfilePoster } from '@/hooks';
-import { Button, CustomLink, Section } from '@/shared';
-import { useProfile } from '@/store';
+import { useProfile } from '@/hooks';
+import { SubscribeUnsubscribeButtons } from '@/modules';
+import { Button, CustomLink, Section, UserAvatar } from '@/shared';
 
 interface Props {
 	username: string;
 }
 
 export const ProfilePage = ({ username }: Props) => {
-	const { profile } = useProfile();
-	const t = useTranslations();
 	const {
+		profile,
+		subscriptions,
 		changePosterLoading,
 		removePosterLoading,
 		poster,
 		handleLoadPoster,
 		handleRemovePoster,
-	} = useProfilePoster();
+	} = useProfile();
+	const t = useTranslations();
+
 	const { data, loading } = useGetUserByUsernameQuery({
 		variables: { username },
 	});
@@ -38,9 +40,9 @@ export const ProfilePage = ({ username }: Props) => {
 
 	return (
 		<>
-			<Section className='flex flex-col w-full md:py-0 bg-[var(--background-color-card)] rounded-xl overflow-hidden'>
-				<div className='min-h-[15.625rem] max-h-[15.625rem] bg-placeholder relative'>
-					{!isOwner && user?.posterUrl && !poster && (
+			<Section className='flex flex-col w-full py-0 md:py-0 bg-[var(--background-color-card)] rounded-xl overflow-hidden transition-colors'>
+				<div className='min-h-[12.5rem] md:min-h-[15.625rem] max-h-[12.5rem] md:max-h-[15.625rem] bg-placeholder relative'>
+					{!isOwner && user?.posterUrl && (
 						<Image
 							src={`${user.posterUrl}?t=${new Date().getTime()}`}
 							alt='poster'
@@ -50,9 +52,13 @@ export const ProfilePage = ({ username }: Props) => {
 							priority
 						/>
 					)}
-					{isOwner && profile?.posterUrl && !poster && (
+					{isOwner && poster && (
 						<Image
-							src={`${profile.posterUrl}?t=${new Date().getTime()}`}
+							src={
+								poster instanceof File
+									? URL.createObjectURL(poster)
+									: `${poster}?t=${new Date().getTime()}`
+							}
 							alt='poster'
 							fill
 							sizes='100%'
@@ -60,16 +66,7 @@ export const ProfilePage = ({ username }: Props) => {
 							priority
 						/>
 					)}
-					{poster && (
-						<Image
-							src={URL.createObjectURL(poster)}
-							alt='poster'
-							fill
-							sizes='100%'
-							className='object-cover'
-						/>
-					)}
-					<div className='flex justify-between absolute top-0 left-0 right-0 w-full py-3 px-6'>
+					<div className='flex justify-between absolute top-0 left-0 right-0 w-full p-2 md:py-3 md:px-6'>
 						{isOwner && (
 							<label className='text-secondary py-2 px-3 rounded-lg font-bold leading-6 bg-disabled hover:bg-disabled backdrop-blur-disabled hover:text-primary-hover focus-visible:text-primary-hover cursor-pointer transition-colors'>
 								{t('btns.editPoster')}
@@ -81,7 +78,7 @@ export const ProfilePage = ({ username }: Props) => {
 								/>
 							</label>
 						)}
-						{isOwner && (profile?.posterUrl || poster) && (
+						{isOwner && poster && (
 							<Button
 								disabled={removePosterLoading || changePosterLoading}
 								onClick={handleRemovePoster}
@@ -92,38 +89,30 @@ export const ProfilePage = ({ username }: Props) => {
 						)}
 					</div>
 				</div>
-				<div className='flex justify-between px-6 py-3 min-h-[7.188rem]'>
-					<div className='flex gap-x-[1.125rem]'>
-						<div className='size-[9.375rem] p-[0.313rem] rounded-full -mt-[5.5rem] bg-[var(--background-color-card)] z-30'>
-							{user?.avatarUrl ? (
-								<Image
-									src={user.avatarUrl}
-									alt={`${user.username} avatar`}
-									width={140}
-									height={140}
-								/>
-							) : (
-								<div className='uppercase size-[8.75rem] flex items-center justify-center bg-[#dc5c4b] text-secondary rounded-full text-7xl cursor-default'>
-									{user?.username.at(0)}
-								</div>
-							)}
-						</div>
-						<div className='flex flex-col gap-y-2'>
+				<div className='flex md:flex-row flex-col items-center gap-y-2 md:items-stretch justify-between px-6 pb-6 md:py-3 min-h-[7.188rem]'>
+					<div className='flex md:flex-row flex-col items-center md:items-stretch gap-x-[1.125rem] gap-y-2'>
+						{user && <UserAvatar username={user.username} avatarUrl={user.avatarUrl} />}
+						<div className='flex flex-col gap-y-2 items-center md:items-stretch'>
 							<h1 className='font-title font-bold text-4xl leading-[110%]'>
 								{user?.username}
 							</h1>
-							<p className='leading-6'>{user?.description}</p>
+							{user?.description && <p className='leading-6'>{user.description}</p>}
 						</div>
 					</div>
-					{isOwner ? (
+					{isOwner && profile && (
 						<CustomLink
-							href={routesConfig.settings}
+							href={`${profile.username}/${routesConfig.settings}`}
 							variant='secondary'
-							className='py-2 px-3 font-bold leading-6 self-start rounded-lg dark:text-secondary'>
+							className='py-2 px-3 font-bold leading-6 md:self-start rounded-lg dark:text-secondary'>
 							{t('navigation.settings')}
 						</CustomLink>
-					) : (
-						<Button className='self-start'>{t('btns.subscribe')}</Button>
+					)}
+					{!isOwner && user?.id && (
+						<SubscribeUnsubscribeButtons
+							toId={user.id}
+							className='py-2 px-3 font-bold leading-6 md:self-start rounded-lg'
+							isSubscribed={subscriptions.includes(user.id)}
+						/>
 					)}
 				</div>
 			</Section>

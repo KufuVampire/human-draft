@@ -7,7 +7,7 @@ import { CustomLink } from '../CustomLink/CustomLink';
 
 import { routesConfig } from '@/config';
 import { UNAVAILABLE_ROUTES_IF_NOT_AUTH } from '@/consts';
-import { useProfile } from '@/store';
+import { useActiveLink, useProfile } from '@/hooks';
 import { cn } from '@/utils';
 
 type NavigationVariants = 'dashboard' | 'footer';
@@ -51,6 +51,7 @@ export const Navigation = ({
 }: Props) => {
 	const t = useTranslations('navigation');
 	const { isAuth, profile } = useProfile();
+	const isActiveLink = useActiveLink();
 
 	return (
 		<nav className={className}>
@@ -65,17 +66,19 @@ export const Navigation = ({
 						return null;
 					}
 
+					const currentHref =
+						href === routesConfig.profile && profile?.username
+							? `/${profile?.username}`
+							: href;
+
 					return (
 						<li key={href}>
 							<CustomLink
-								href={
-									href === routesConfig.profile && profile?.username
-										? profile?.username
-										: href
-								}
+								href={currentHref}
 								className={cn(
 									'justify-normal w-full md:text-xl',
-									styles[variant]
+									styles[variant],
+									isActiveLink(currentHref) && 'text-primary'
 								)}>
 								{variant === 'dashboard' && <Icon className='size-6' />}
 								<span className={cn(!isExpanded && 'hidden')}>

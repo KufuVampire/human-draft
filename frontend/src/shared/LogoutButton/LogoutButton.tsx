@@ -7,8 +7,8 @@ import { toast } from 'sonner';
 import { Button } from '../Button/Button';
 
 import { useSignOutMutation } from '@/graphql/generated/output';
-import { useProfile } from '@/store';
 import { cn } from '@/utils';
+import { useProfile } from '@/hooks';
 
 interface Props {
 	className?: string;

@@ -11,7 +11,6 @@ import { routesConfig } from '@/config';
 import { useSignInMutation } from '@/graphql/generated/output';
 import { TypeSignInAccount, signInAccountSchema } from '@/schemas';
 import { Button, FormField } from '@/shared';
-import { useProfile } from '@/store';
 import { IField } from '@/types';
 
 const fields: IField<TypeSignInAccount>[] = [
@@ -45,12 +44,10 @@ export const SignInForm = () => {
 			password: '',
 		},
 	});
-	const { setProfile } = useProfile();
 
 	const [signInMutation, { loading }] = useSignInMutation({
 		onCompleted(data) {
-			if (data.signIn) {
-				setProfile(data.signIn);
+			if (data) {
 				toast.success(t('authPages.signIn.signInSuccess'));
 				redirect(routesConfig.home);
 			}

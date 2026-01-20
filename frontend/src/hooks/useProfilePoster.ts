@@ -1,5 +1,5 @@
 import { useTranslations } from 'next-intl';
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 import {
@@ -9,14 +9,13 @@ import {
 import { useProfile } from '@/store';
 
 export const useProfilePoster = () => {
-	const { setProfile } = useProfile();
-	const [poster, setPoster] = useState<File | null>(null);
+	const { profile } = useProfile();
+	const [poster, setPoster] = useState<File | string | null>(null);
 	const t = useTranslations('profilePage.notifications');
 	const [removePosterMutation, { loading: removePosterLoading }] =
 		useRemoveProfilePosterMutation({
 			onCompleted(data) {
 				if (data.removeProfilePoster) {
-					setProfile(data.removeProfilePoster);
 					toast.success(t('removePosterSuccess'));
 				}
 			},
@@ -28,7 +27,7 @@ export const useProfilePoster = () => {
 		useChangeProfilePosterMutation({
 			onCompleted(data) {
 				if (data.changeProfilePoster) {
-					setProfile(data.changeProfilePoster);
+					setPoster(data.changeProfilePoster.posterUrl || null);
 					toast.success(t('changePosterSuccess'));
 				}
 			},
@@ -53,6 +52,12 @@ export const useProfilePoster = () => {
 		removePosterMutation();
 		setPoster(null);
 	};
+
+	useEffect(() => {
+		if (profile?.posterUrl) {
+			setPoster(profile.posterUrl);
+		}
+	}, [profile]);
 
 	return {
 		removePosterMutation,
