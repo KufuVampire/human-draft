@@ -1,4 +1,5 @@
-'use client'
+'use client';
+
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 type ObserverRect = Omit<DOMRectReadOnly, 'toJSON'>;
@@ -72,7 +73,7 @@ export function useResizeObserver<T extends HTMLElement = HTMLDivElement>(
 				cancelAnimationFrame(frameID.current);
 			}
 		};
-	}, [ref.current]);
+	}, [observer, options]);
 
 	return [ref, rect] as const;
 }

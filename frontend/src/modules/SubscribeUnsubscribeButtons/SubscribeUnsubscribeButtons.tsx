@@ -24,7 +24,7 @@ export const SubscribeUnsubscribeButtons = ({
 		if (!mounted) {
 			setMounted(true);
 		}
-	}, []);
+	}, [mounted]);
 
 	useEffect(() => {
 		if (!profile) {
