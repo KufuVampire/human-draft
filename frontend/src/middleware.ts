@@ -6,46 +6,38 @@ import { routesConfig } from './config';
 const authPages = [routesConfig.signin, routesConfig.signup];
 
 export async function middleware(req: NextRequest) {
-	const token = req.cookies.get('token')?.value;
+	const session = req.cookies.get(
+		process.env.NEXT_PUBLIC_SESSION_NAME || 'h_draft_sid'
+	)?.value;
 
-	if (!token) return NextResponse.next();
+	const url = req.nextUrl.clone();
+	const isAuthPages = authPages.includes(url.pathname);
 
 	try {
-		const data = await fetchMe(token);
+		const user = await fetchMe();
 
-		if (data) {
-			const url = req.nextUrl.clone();
+		if (!isAuthPages && !session) {
+			return NextResponse.next();
+		}
+
+		if (session && user) {
 			const referer = req.headers.get('referer');
-
-			if (authPages.includes(url.pathname)) {
-				return NextResponse.redirect(new URL(routesConfig.home, req.url));
-			}
-
 			if (referer) {
-				const prev = new URL(referer);
-				if (!authPages.includes(prev.pathname)) {
-					url.pathname = prev.pathname;
-					url.search = prev.search;
-					return NextResponse.redirect(url);
+				const refererUrl = new URL(referer);
+				if (refererUrl.origin === req.nextUrl.origin) {
+					return NextResponse.redirect(refererUrl);
+				} else {
+					return NextResponse.redirect(new URL(routesConfig.home, req.url));
 				}
 			}
 
-			return NextResponse.next();
+			return NextResponse.redirect(new URL(routesConfig.home, req.url));
 		}
 	} catch (error) {
-		console.error('Auth check failed:', error);
+		console.error(error);
 	}
-
-	return NextResponse.next();
 }
 
 export const config = {
-	matcher: [
-		'/sign-in',
-		'/sign-up',
-		'/blog/:blogId/edit',
-		'/post/:postId/edit',
-		'/post/create',
-		'/blog/create',
-	],
+	matcher: ['/sign-in', '/sign-up'],
 };

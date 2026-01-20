@@ -1,5 +1,6 @@
 export { BurgerMenu } from './BurgerMenu/BurgerMenu';
 export { Button } from './Button/Button';
+export { Checkbox } from './Checkbox/Checkbox';
 export { Container } from './Container/Container';
 export { CustomLink } from './CustomLink/CustomLink';
 export { Dropdown } from './Dropdown/Dropdown';
@@ -12,8 +13,13 @@ export { LanguageSwitcher } from './LanguageSwitcher/LanguageSwitcher';
 export { Logo } from './Logo/Logo';
 export { LogoutButton } from './LogoutButton/LogoutButton';
 export { Main } from './Main/Main';
+export { Modal } from './Modal/Modal';
 export { Navigation } from './Navigation/Navigation';
-export { Section } from './Section/Section';
-export { Checkbox } from './Checkbox/Checkbox';
-export { RadioButton } from './RadioButton/RadioButton';
 export { Portal } from './Portal/Portal';
+export { RadioButton } from './RadioButton/RadioButton';
+export { Section } from './Section/Section';
+export { SubscribeButton } from './SubscribeButton/SubscribeButton';
+export { UnsubscribeButton } from './UnsubscribeButton/UnsubscribeButton';
+export { UserAvatar } from './UserAvatar/UserAvatar';
+export { UserBadge } from './UserBadge/UserBadge';
+

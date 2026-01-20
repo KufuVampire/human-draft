@@ -1,0 +1,14 @@
+query getAllUsers {
+	getAllUsersPagination {
+		data {
+			id
+			avatarUrl
+			username
+			description
+		}
+		page
+		perPage
+		totalCount
+		totalPages
+	}
+}

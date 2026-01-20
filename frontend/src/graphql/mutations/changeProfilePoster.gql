@@ -1,0 +1,5 @@
+mutation ChangeProfilePoster($file: Upload!) {
+	changeProfilePoster(file: $file) {
+		posterUrl
+	}
+}

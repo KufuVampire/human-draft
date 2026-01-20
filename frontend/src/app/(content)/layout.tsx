@@ -1,8 +1,7 @@
-import { cookies } from 'next/headers';
 import { ReactNode } from 'react';
 
 import { fetchMe } from '@/api';
-import { Dashboard } from '@/modules';
+import { ConfirmationChangesModal, Dashboard } from '@/modules';
 import { Container, Footer, Header, Main } from '@/shared';
 
 import '@/app/globals.css';
@@ -12,10 +11,7 @@ export default async function ContentLayout({
 }: Readonly<{
 	children: ReactNode;
 }>) {
-	const cookie = await cookies();
-	const token = cookie.get('token')?.value;
-	const profile = await fetchMe(token);
-
+	const profile = await fetchMe();
 	return (
 		<>
 			<Header userProfile={profile} />
@@ -25,6 +21,7 @@ export default async function ContentLayout({
 					{children}
 				</Container>
 			</Main>
+			<ConfirmationChangesModal />
 			<Footer />
 		</>
 	);

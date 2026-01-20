@@ -1,0 +1,16 @@
+model Blog {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  posterUrl   String?  @map("poster_url")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  authorId String @map("author_id")
+  author   User   @relation(fields: [authorId], references: [id])
+
+  posts Post[]
+  tags  Tag[]
+
+  @@map("blogs")
+}

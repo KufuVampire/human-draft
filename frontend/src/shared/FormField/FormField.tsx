@@ -39,7 +39,10 @@ export const FormField = ({
 				<input
 					{...props}
 					type={inputType}
-					className='p-2.5 outline-0 border border-field hover:border-primary focus:border-primary rounded-md w-full bg-transparent [&:not(:placeholder-shown)]:border-primary [&:not(:placeholder-shown)]:shadow-[0px_0px_6px_0px_var(--color-primary)]'
+					className={cn(
+						'p-2.5 outline-0 border border-field hover:border-primary focus:border-primary rounded-md w-full bg-transparent [&:not(:placeholder-shown)]:border-primary [&:not(:placeholder-shown)]:shadow-[0px_0px_6px_0px_var(--color-primary)]',
+						props.className
+					)}
 				/>
 				{type === 'password' && !isShowPassword && (
 					<Eye
@@ -56,7 +59,9 @@ export const FormField = ({
 					</EyeOff>
 				)}
 			</div>
-			<span className='text-sm text-gray-500'>{bottomText}</span>
+			{bottomText && (
+				<span className='text-sm text-gray-500'>{bottomText}</span>
+			)}
 		</label>
 	);
 };

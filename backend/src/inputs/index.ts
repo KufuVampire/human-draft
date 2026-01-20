@@ -1,0 +1,9 @@
+export { CreateBlogInput } from './createBlog.input';
+export { CreatePostInput } from './createPost.input';
+export { SearchParamsInput } from './searchParams.input';
+export { SignInInput } from './signIn.input';
+export { SignUpInput } from './signUp.input';
+export { UpdateBlogInput } from './updateBlog.input';
+export { UpdatePostInput } from './updatePost.input';
+export { UpdatePostOrBlogTagsInput } from './updatePostOrBlogTags.input';
+export { UpdateUserInput } from './updateUser.input';

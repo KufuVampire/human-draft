@@ -10,4 +10,4 @@ COPY . .
 
 EXPOSE 1337
 
-CMD ["sh", "-c", "yarn db:push && yarn start:dev"]
+CMD ["sh", "-c", "yarn db:generate && yarn db:push && yarn start:dev"]

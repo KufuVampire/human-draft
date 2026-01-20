@@ -1,0 +1,3 @@
+mutation Unsubscribe($toId: String!) {
+	unsubscribeFromUser(toId: $toId)
+}

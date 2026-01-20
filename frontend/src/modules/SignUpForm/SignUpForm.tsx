@@ -7,18 +7,11 @@ import { useEffect } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
-
-
 import { routesConfig } from '@/config';
-import { useRegisterMutation } from '@/graphql/generated/output';
+import { useSignUpMutation } from '@/graphql/generated/output';
 import { TypeCreateAccountSchema, createAccountSchema } from '@/schemas';
 import { Button, FormField } from '@/shared';
-import { useProfile } from '@/store';
 import { IField } from '@/types';
-
-
-
-
 
 const buttonStyles = 'py-2 rounded-lg';
 
@@ -57,7 +50,6 @@ const fields: IField<TypeCreateAccountSchema>[] = [
 ];
 
 export const SignUpForm = () => {
-	const { setToken } = useProfile();
 	const {
 		register,
 		handleSubmit,
@@ -74,11 +66,10 @@ export const SignUpForm = () => {
 	});
 	const t = useTranslations();
 
-	const [registerMutation, { loading }] = useRegisterMutation({
+	const [signUpMutation, { loading }] = useSignUpMutation({
 		onCompleted(data) {
-			toast.success(t('authPages.signUp.signUpSuccess'));
-			if (data.register?.jwt) {
-				setToken(data.register.jwt);
+			if (data) {
+				toast.success(t('authPages.signUp.signUpSuccess'));
 				redirect(routesConfig.home);
 			}
 		},
@@ -94,9 +85,9 @@ export const SignUpForm = () => {
 	const onSubmit: SubmitHandler<TypeCreateAccountSchema> = (data) => {
 		if (data.password === data.confirmPassword) {
 			const { email, password, username } = data;
-			registerMutation({
+			signUpMutation({
 				variables: {
-					input: {
+					data: {
 						email,
 						username,
 						password,

@@ -4,4 +4,4 @@ export {
 	type TypeCreateAccountSchema,
 	type TypeSignInAccount,
 } from './auth';
-export { userProfileSchema, type TypeUserProfile } from './profile';
+export { updateProfileSchema, type TypeUpdateProfileSchema } from './settings';

@@ -47,8 +47,8 @@ export const LanguageSwitcher = ({ className, isExpanded }: Props) => {
 		if (locale === currentLocale || !locales.includes(locale)) {
 			return;
 		}
-		
-		handleClose()
+
+		handleClose();
 		setLocale(locale);
 	};
 
@@ -89,7 +89,11 @@ export const LanguageSwitcher = ({ className, isExpanded }: Props) => {
 					</span>
 				</div>
 				<ChevronRight
-					className={cn(!isExpanded && 'md:hidden', isOpen && 'rotate-90')}
+					className={cn(
+						'transition-transform',
+						!isExpanded && 'md:hidden',
+						isOpen && 'rotate-90'
+					)}
 				/>
 			</Button>
 		</Dropdown>

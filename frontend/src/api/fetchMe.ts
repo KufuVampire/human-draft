@@ -1,47 +1,96 @@
-import { API_URL } from '@/consts';
-import { TypeUserProfile } from '@/schemas';
+import { cookies } from 'next/headers';
 
-export async function fetchMe(
-	token: string | undefined
-): Promise<TypeUserProfile | null> {
-	if (!token) {
-		throw new Error('Failed to fetch user data');
+import { API_URL } from '@/consts';
+import { UserModel } from '@/graphql/generated/output';
+
+const profileQuery = `
+	query me {
+		userProfile {
+			username
+			id
+			email
+			description
+			posterUrl
+			avatarUrl
+			createdAt
+			updatedAt
+			subscribers
+			subscriptions
+			posts {
+				id
+				author {
+					id
+					username
+				}
+				content
+				tags {
+					id
+					name
+				}
+				createdAt
+				updatedAt
+				likesCount
+				viewsCount
+				comments {
+					id
+					text
+					replies {
+						id
+						text
+						updatedAt
+						createdAt
+					}
+					createdAt
+					updatedAt
+				}
+				commentsCount
+			}
+			blogs {
+				id
+				title
+				author {
+					id
+					username
+				}
+				description
+				tags {
+					id
+					name
+				}
+				createdAt
+				updatedAt
+			}
+		}
 	}
+`;
+
+export async function fetchMe(): Promise<UserModel | null> {
+	const cookieStore = await cookies();
+	const allCookies = cookieStore.toString();
 
 	try {
 		const res = await fetch(API_URL, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
-				Authorization: `Bearer ${token}`,
+				Cookie: allCookies,
 			},
 			body: JSON.stringify({
-				query: `
-          query Me {
-            me {
-              id
-							email
-							username
-							avatarUrl
-							blocked
-							role {
-								name
-							}
-							confirmed
-							createdAt
-							updatedAt
-            }
-          }
-        `,
+				query: profileQuery,
 			}),
+			cache: 'no-cache',
 		});
 
-		const data = await res.json();
-		console.log(data)
+		if (!res.ok) {
+			console.error('Server error:', res.status);
+			return null;
+		}
 
-		return data?.data?.me ?? null;
+		const data = await res.json();
+
+		return !('errors' in data) ? data.data.userProfile : null;
 	} catch (error) {
 		console.error('Error fetching user data:', error);
-		throw error;
+		return null;
 	}
 }
