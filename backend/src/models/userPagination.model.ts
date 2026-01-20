@@ -1,7 +1,7 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 
 import { UserModel as User } from './user.model';
-import { UserModel } from '@/prisma/generated/models';
+import { UserModel } from '../../prisma/generated/models';
 
 @ObjectType()
 export class UserPagination {

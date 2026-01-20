@@ -1,7 +1,7 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 
 import { PostModel as Post } from './post.model';
-import { PostModel } from '@/prisma/generated/models';
+import { PostModel } from '../../prisma/generated/models';
 
 @ObjectType()
 export class PostPagination {
