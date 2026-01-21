@@ -34,10 +34,11 @@ async function bootstrap() {
 			resave: false,
 			saveUninitialized: false,
 			cookie: {
+				domain: config.getOrThrow<string>('SESSION_DOMAIN'),
 				maxAge,
 				httpOnly: parseBoolean(config.getOrThrow<string>('SESSION_HTTP_ONLY')),
 				secure: parseBoolean(config.getOrThrow<string>('SESSION_SECURE')),
-				sameSite: 'none',
+				sameSite: 'lax',
 			},
 			store: new RedisStore({
 				client: redis.client,
