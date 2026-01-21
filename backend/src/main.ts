@@ -7,7 +7,7 @@ import * as session from 'express-session';
 
 import { AppModule } from './app.module';
 import { RedisService } from './modules';
-import { ms, StringValue } from './utils';
+import { isDev, ms, StringValue } from './utils';
 import { parseBoolean } from '@/src/utils';
 import { graphqlUploadExpress } from 'graphql-upload-ts';
 import { MAX_FILE_SIZE } from './consts';
@@ -26,6 +26,11 @@ async function bootstrap() {
 	app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
 	const maxAge = ms(config.getOrThrow<StringValue>('SESSION_MAX_AGE'));
+
+	if (!isDev(config)) {
+		const server = app.getHttpAdapter().getInstance();
+		server.set('trust proxy', 1);
+	}
 
 	app.use(
 		session({
