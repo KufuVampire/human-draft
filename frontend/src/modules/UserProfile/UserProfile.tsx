@@ -2,11 +2,10 @@
 
 import { ChevronRight, Settings, User } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { routesConfig } from '@/config';
-import { UserModel } from '@/graphql/generated/output';
-import { useActiveLink, useClickOutside, useProfile } from '@/hooks';
+import { useActiveLink, useProfile } from '@/hooks';
 import {
 	Button,
 	CustomLink,
@@ -32,27 +31,17 @@ const items = [
 	},
 ];
 
-interface Props {
-	userProfile: UserModel | null;
-}
-
-export const UserProfile = ({ userProfile }: Props) => {
+export const UserProfile = () => {
 	const t = useTranslations();
-	const profileRef = useRef<HTMLDivElement>(null);
 	const [isOpen, setOpen] = useState(false);
-	const { profile, isAuth, setProfile, setSubscriptions, setLoading } =
-		useProfile();
+	const { profile, isAuth, setSubscriptions, isLoading } = useProfile();
 	const isActiveLink = useActiveLink();
 
-	useLayoutEffect(() => {
-		if (userProfile && !profile) {
-			setProfile(userProfile);
-			setSubscriptions(userProfile.subscriptions);
-			setLoading(false);
+	useEffect(() => {
+		if (profile) {
+			setSubscriptions(profile.subscriptions);
 		}
-	}, [profile, setLoading, setProfile, setSubscriptions, userProfile]);
-
-	useClickOutside(profileRef, () => setOpen(false));
+	}, [profile, setSubscriptions]);
 
 	const navigationItems = items.map(
 		({ Component, Icon, href, translationKey }) => {
@@ -80,7 +69,10 @@ export const UserProfile = ({ userProfile }: Props) => {
 				<CustomLink
 					key={href}
 					href={currentHref}
-					className={cn('p-2 hover:bg-main-hover text-secondary transition-colors w-full flex items-center justify-normal gap-x-1', isActiveLink(currentHref) && 'text-primary')}>
+					className={cn(
+						'p-2 hover:bg-main-hover text-secondary transition-colors w-full flex items-center justify-normal gap-x-1',
+						isActiveLink(currentHref) && 'text-primary'
+					)}>
 					<Icon />
 					{t(translationKey)}
 				</CustomLink>
@@ -93,22 +85,20 @@ export const UserProfile = ({ userProfile }: Props) => {
 			{isAuth && (
 				<Dropdown
 					isOpen={isOpen}
+					setOpen={setOpen}
 					items={navigationItems}
 					className='py-0.5 px-2 hidden md:block'
 					listClassName='bg-layout top-[calc(100%+2rem)]'
-					displayDirection='top-right'
-					ref={profileRef}>
+					displayDirection='top-right'>
 					<Button
 						variant='clear'
 						onClick={() => setOpen((prev) => !prev)}
 						className='w-full flex items-center justify-end gap-x-2 text-secondary'>
-						{userProfile && (
-							<UserBadge
-								username={userProfile?.username}
-								avatarUrl={userProfile?.avatarUrl}
-								location='header'
-							/>
-						)}
+						<UserBadge
+							username={profile?.username}
+							avatarUrl={profile?.avatarUrl}
+							location='header'
+						/>
 						<ChevronRight
 							className={cn('size-5 transition-transform', {
 								['rotate-90']: isOpen,
@@ -117,11 +107,17 @@ export const UserProfile = ({ userProfile }: Props) => {
 					</Button>
 				</Dropdown>
 			)}
-			{!isAuth && (
+			{isLoading && (
+				<Button
+					isLoading={isLoading}
+					className='rounded-[0.625rem] py-3 px-[3.906rem] font-bold text-xl text-secondary max-w-50 w-full text-center leading-6 hidden md:block'
+				/>
+			)}
+			{!isAuth && !isLoading && (
 				<CustomLink
 					variant='primary'
 					href={routesConfig.signin}
-					className='rounded-[0.625rem] py-4 px-[3.906rem] font-bold text-xl text-secondary max-w-[12.5rem] w-full text-center leading-6 hidden md:block min-w-[12.5rem]'>
+					className='rounded-[0.625rem] py-3 px-[3.906rem] font-bold text-xl text-secondary max-w-50 w-full text-center leading-6 hidden md:block'>
 					{t('btns.signIn')}
 				</CustomLink>
 			)}

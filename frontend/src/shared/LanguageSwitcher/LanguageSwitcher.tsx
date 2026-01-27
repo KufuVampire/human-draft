@@ -2,9 +2,8 @@
 
 import { ChevronRight, Globe } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
-import { MouseEvent, useRef, useState } from 'react';
+import { MouseEvent, useState } from 'react';
 
-import { useClickOutside } from '@/hooks';
 import { Locale, locales, setLocale } from '@/libs';
 import { Button, Dropdown, RadioButton } from '@/shared';
 import { cn } from '@/utils';
@@ -34,7 +33,10 @@ export const LanguageSwitcher = ({ className, isExpanded }: Props) => {
 	const currentLocale = useLocale();
 	const [isOpen, setOpen] = useState(false);
 	const t = useTranslations('dashboard');
-	const languageDropdownRef = useRef<HTMLDivElement>(null);
+
+	const handleClose = () => {
+		setOpen(false);
+	};
 
 	const handleClick = (e: MouseEvent<HTMLUListElement>) => {
 		const target = e.target as HTMLElement;
@@ -64,17 +66,11 @@ export const LanguageSwitcher = ({ className, isExpanded }: Props) => {
 		/>
 	));
 
-	const handleClose = () => {
-		setOpen(false);
-	};
-
-	useClickOutside(languageDropdownRef, handleClose);
-
 	return (
 		<Dropdown
 			isOpen={isOpen}
+			setOpen={setOpen}
 			items={mappedLanguageItems}
-			ref={languageDropdownRef}
 			className={className}
 			listClassName='md:left-0 right-0 px-2.5 py-6 gap-y-3 md:top-[calc(100%+2rem)] bg-[var(--background-color-main)] border border-primary bg-[var(--background-color-card)] origin-top-right md:origin-top-left'
 			onClick={handleClick}>

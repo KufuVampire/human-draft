@@ -1,7 +1,6 @@
-'use client';
-
-import { useTranslations } from 'next-intl';
 import { ButtonHTMLAttributes, PropsWithChildren } from 'react';
+
+import { Loader } from '../Loader/Loader';
 
 import { LinkAndButtonVariantType, LinkAndButtonVariants } from '@/types';
 import { cn } from '@/utils';
@@ -32,18 +31,16 @@ export const Button = ({
 	isLoading = false,
 	...props
 }: PropsWithChildren<Props>) => {
-	const t = useTranslations();
-
 	return (
 		<button
 			{...props}
-			disabled={isLoading}
+			disabled={isLoading || variant === 'disabled'}
 			className={cn(
-				'transition-colors cursor-pointer flex items-center justify-center',
-				styles[variant],
+				'transition-colors cursor-pointer flex items-center justify-center text-center',
+				isLoading ? styles['disabled'] : styles[variant],
 				props.className
 			)}>
-			{!isLoading ? text || children : t('loading')}
+			{!isLoading ? text || children : <Loader size='24' borderSize='3' />}
 		</button>
 	);
 };

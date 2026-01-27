@@ -4,14 +4,8 @@ import { useTranslations } from 'next-intl';
 import Link, { LinkProps } from 'next/link';
 import { AnchorHTMLAttributes, PropsWithChildren } from 'react';
 
-
-
 import { LinkAndButtonVariantType, LinkAndButtonVariants } from '@/types';
 import { cn } from '@/utils';
-
-
-
-
 
 type AnchorProps = AnchorHTMLAttributes<HTMLAnchorElement>;
 
@@ -45,7 +39,7 @@ export const CustomLink = ({
 		<Link
 			{...props}
 			className={cn(
-				'transition-colors flex items-center justify-center',
+				'transition-colors flex items-center justify-center text-center',
 				styles[variant],
 				props.className
 			)}>

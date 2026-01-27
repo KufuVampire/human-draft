@@ -7,7 +7,8 @@ import { Roboto, Ubuntu } from 'next/font/google';
 import { ReactNode } from 'react';
 import { Toaster } from 'sonner';
 
-import { ApolloClientProvider } from '@/providers';
+import { fetchMe } from '@/api';
+import { ApolloClientProvider, AuthProvider } from '@/providers';
 import { cn } from '@/utils';
 
 import './globals.css';
@@ -43,6 +44,8 @@ export default async function RootLayout({
 	const locale = await getLocale();
 	const messages = await getMessages();
 
+	const user = await fetchMe();
+
 	return (
 		<html
 			lang={locale}
@@ -55,6 +58,7 @@ export default async function RootLayout({
 							defaultTheme='light'
 							themes={['light', 'dark']}
 							enableSystem={false}>
+							<AuthProvider user={user} />
 							<LazyMotion
 								features={domAnimation}
 								strict>

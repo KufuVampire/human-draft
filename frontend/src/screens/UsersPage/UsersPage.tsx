@@ -1,14 +1,24 @@
 'use client';
 
-import { MouseEvent } from 'react';
+import { MouseEvent, useState } from 'react';
 
+import { SEARCH_PARAMS } from '@/consts';
 import { useGetAllUsersQuery } from '@/graphql/generated/output';
 import { useProfile } from '@/hooks';
 import { SubscribeUnsubscribeButtons } from '@/modules';
 import { CustomLink, Section, UserAvatar } from '@/shared';
 
 export const UsersPage = () => {
-	const { data } = useGetAllUsersQuery();
+	const [page] = useState<number>(SEARCH_PARAMS.PAGE);
+	const [perPage] = useState<number>(SEARCH_PARAMS.PER_PAGE);
+	const { data } = useGetAllUsersQuery({
+		variables: {
+			searchParams: {
+				page,
+				perPage,
+			},
+		},
+	});
 	const { profile, subscriptions } = useProfile();
 
 	const handleClick = (e: MouseEvent<HTMLUListElement>) => {
@@ -23,10 +33,11 @@ export const UsersPage = () => {
 	};
 
 	const users = data?.getAllUsersPagination.data;
+
 	return (
 		<Section className='w-full bg-[var(--background-color-card)] px-2 md:px-0 md:p-6 rounded-xl transition-colors'>
 			<ul
-				className='grid grid-cols-1 md:grid-cols-2 w-full gap-y-4 md:gap-6'
+				className='grid grid-cols-1 lg:grid-cols-2 w-full gap-y-4 md:gap-6'
 				onClickCapture={handleClick}>
 				{users &&
 					users.map(
@@ -37,7 +48,7 @@ export const UsersPage = () => {
 									className='w-full border border-primary rounded-xl hover:shadow-primary transition-shadow'>
 									<CustomLink
 										href={username}
-										className='flex w-full p-2 gap-x-4'>
+										className='flex w-full p-2 gap-x-4 text-left hover:text-[var(--text-color-main)] focus-visible:text-[var(--text-color-main)]'>
 										<UserAvatar
 											username={username}
 											avatarUrl={avatarUrl}

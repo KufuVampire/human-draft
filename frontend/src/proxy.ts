@@ -1,11 +1,11 @@
-
 import { NextRequest, NextResponse } from 'next/server';
+
 import { fetchMe } from './api';
-import { routesConfig } from './config';
+import { routesConfig } from '@/config';
 
 const authPages = [routesConfig.signin, routesConfig.signup];
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
 	const session = req.cookies.get(
 		process.env.NEXT_PUBLIC_SESSION_NAME || 'h_draft_sid'
 	)?.value;
@@ -16,21 +16,11 @@ export async function middleware(req: NextRequest) {
 	try {
 		const user = await fetchMe();
 
-		if (!isAuthPages && !session) {
+		if (isAuthPages && !session) {
 			return NextResponse.next();
 		}
 
 		if (session && user) {
-			const referer = req.headers.get('referer');
-			if (referer) {
-				const refererUrl = new URL(referer);
-				if (refererUrl.origin === req.nextUrl.origin) {
-					return NextResponse.redirect(refererUrl);
-				} else {
-					return NextResponse.redirect(new URL(routesConfig.home, req.url));
-				}
-			}
-
 			return NextResponse.redirect(new URL(routesConfig.home, req.url));
 		}
 	} catch (error) {

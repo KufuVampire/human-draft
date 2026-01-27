@@ -36,7 +36,7 @@ export const DropdownList = ({
 		<ul
 			{...props}
 			className={cn(
-				'absolute top-[calc(100%+0.75rem)] right-0 z-[var(--z-dropdown)] flex flex-col min-w-max rounded-xl bg-[var(--background-color-card)] scale-0 transition-all opacity-0',
+				'absolute top-[calc(100%+0.75rem)] right-0 z-dropdown flex flex-col min-w-max rounded-xl bg-[var(--background-color-card)] scale-0 transition-all opacity-0',
 				originMap[displayDirection],
 				{
 					['scale-100 opacity-100']: isOpen,

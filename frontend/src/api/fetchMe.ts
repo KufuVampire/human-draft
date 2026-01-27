@@ -78,7 +78,7 @@ export async function fetchMe(): Promise<UserModel | null> {
 			body: JSON.stringify({
 				query: profileQuery,
 			}),
-			cache: 'no-cache',
+			cache: 'force-cache',
 		});
 
 		if (!res.ok) {

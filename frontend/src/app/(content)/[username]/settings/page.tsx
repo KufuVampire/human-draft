@@ -1,6 +1,8 @@
-import { SettingsPage } from '@/screens';
 import { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
+
+import { AuthGuard } from '@/guards';
+import { SettingsPage } from '@/screens';
 
 export async function generateMetadata(): Promise<Metadata> {
 	const t = await getTranslations('settingsPage.metadata');
@@ -12,5 +14,9 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function ProfileSettings() {
-	return <SettingsPage />;
+	return (
+		<AuthGuard>
+			<SettingsPage />
+		</AuthGuard>
+	);
 }

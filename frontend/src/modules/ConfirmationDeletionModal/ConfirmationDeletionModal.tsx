@@ -5,7 +5,7 @@ import { useRef } from 'react';
 
 import { useClickOutside } from '@/hooks';
 import { Button, Modal } from '@/shared';
-import { useConfirmationChangesModal } from '@/store';
+import { useConfirmationDeletionModal } from '@/store';
 import { cn } from '@/utils';
 
 interface Props {
@@ -14,8 +14,8 @@ interface Props {
 
 const buttonStyles = 'py-3 w-full tracking-[5%] uppercase rounded-lg';
 
-export const ConfirmationChangesModal = ({ className }: Props) => {
-	const { isOpen, setOpen, cb } = useConfirmationChangesModal();
+export const ConfirmationDeletionModal = ({ className }: Props) => {
+	const { isOpen, setOpen, cb, type } = useConfirmationDeletionModal();
 	const t = useTranslations();
 	const modalRef = useRef<HTMLDivElement>(null);
 
@@ -34,7 +34,10 @@ export const ConfirmationChangesModal = ({ className }: Props) => {
 					className
 				)}>
 				<h2 className='font-title text-[1.75rem] md:text-4xl font-bold leading-[110%]'>
-					{t('modals.saveChanges')}
+					{type === 'post' && t('modals.removePost')}
+					{type === 'blog' && t('modals.removeBlog')}
+					{type === 'poster' && t('modals.removePoster')}
+					{type === 'avatar' && t('modals.removeAvatar')}
 				</h2>
 				<div className='flex justify-between gap-x-12'>
 					<Button
@@ -46,7 +49,7 @@ export const ConfirmationChangesModal = ({ className }: Props) => {
 					<Button
 						className={buttonStyles}
 						onClick={cb}>
-						{t('btns.save')}
+						{t('btns.remove')}
 					</Button>
 				</div>
 			</div>

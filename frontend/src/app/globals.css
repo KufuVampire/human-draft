@@ -80,8 +80,9 @@
 
 	--backdrop-blur-disabled: var(--bg-blur);
 
-	--z-header: 100;
-	--z-dropdown: 110;
+	--z-index-header: 20;
+	--z-index-dropdown: 30;
+	--z-index-modal: 40;
 
 	--shadow-filled-input: var(--input-filled-shadow);
 	--shadow-primary: var(--primary-shadow);
@@ -101,6 +102,10 @@
 	--border-color-primary: var(--primary-color-dark-theme);
 
 	--stroke-form-icon: var(--form-icon-color-dark-theme);
+}
+
+html {
+	scrollbar-gutter: stable;
 }
 
 body {

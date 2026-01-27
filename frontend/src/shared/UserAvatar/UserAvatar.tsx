@@ -8,7 +8,7 @@ import { cn } from '@/utils';
 interface Props {
 	avatarUrl?: string | null;
 	username?: string;
-	location?: 'profile-page' | 'users-page' | 'header' | 'burger-menu';
+	location?: 'profile-page' | 'users-page' | 'settings-page';
 	className?: string;
 }
 
@@ -23,42 +23,44 @@ export const UserAvatar = ({
 	return (
 		<div
 			className={cn(
-				'overflow-hidden',
+				'relative',
 				{
-					['-mt-[5.5rem] size-[9.375rem] p-[0.313rem] rounded-full bg-[var(--background-color-card)] z-30 transition-colors']:
+					['-mt-16 md:-mt-[5.5rem] size-[8rem] md:size-[9.375rem] p-1 md:p-[0.313rem] rounded-full bg-[var(--background-color-card)] z-10 transition-colors']:
 						location === 'profile-page',
 					['bg-placeholder shrink-0 size-[5.625rem] rounded-lg']:
 						location === 'users-page',
-					['rounded-xl']: location === 'header',
-					['rounded-sm']: location === 'burger-menu',
+					['size-full rounded-full bg-[var(--background-color-card)] transition-colors']:
+						location === 'settings-page',
 				},
 				className
 			)}>
 			{avatarUrl && (
-				<div
-					className={cn({
-						['size-[8.75rem]']: location === 'profile-page',
-						['size-[5.625rem]']: location === 'users-page',
-						['size-[2.5rem]']: location === 'header',
-						['size-6']: location === 'burger-menu',
-					})}>
+				<div className='relative size-full overflow-hidden'>
 					<Image
 						src={avatarUrl}
 						alt={`${t('userAvatar')} ${username}`}
+						className={cn(
+							'object-cover size-full',
+							location === 'settings-page' && 'cursor-pointer',
+							{
+								['rounded-full']:
+									location === 'profile-page' || location === 'settings-page',
+							}
+						)}
 						fill
-						className='object-cover'
+						sizes='100%'
+						loading='eager'
+						unoptimized
 					/>
 				</div>
 			)}
 			{!avatarUrl && (
 				<div
 					className={cn(
-						'uppercase flex items-center justify-center bg-[#dc5c4b] text-secondary cursor-default text-7xl',
+						'uppercase flex items-center justify-center bg-[linear-gradient(45deg,#4792c1,#aa67c2,#ea2047)] text-secondary cursor-default text-7xl size-full rounded-lg',
 						{
-							['size-[8.75rem] rounded-full']: location === 'profile-page',
-							['size-[5.625rem]']: location === 'users-page',
-							['size-[2.5rem] text-2xl']: location === 'header',
-							['size-6 text-lg']: location === 'burger-menu',
+							['rounded-full']:
+								location === 'profile-page' || location === 'settings-page',
 						}
 					)}>
 					{username && username.at(0)}

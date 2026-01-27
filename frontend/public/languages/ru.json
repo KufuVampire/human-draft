@@ -4,6 +4,8 @@
 		"createBlog": "Создать блог",
 		"editPoster": "Изменить обложку",
 		"removePoster": "Удалить обложку",
+		"editAvatar": "Изменить аватарку",
+		"removeAvatar": "Удалить аватарку",
 		"subscribe": "Подписаться",
 		"unsubscribe": "Отписаться",
 		"signIn": "Войти",
@@ -109,6 +111,8 @@
 		"needAuth": "Необходимо войти в аккаунт",
 		"removeBlog": "Удалить блог?",
 		"removePost": "Удалить пост?",
+		"removePoster": "Удалить постер?",
+		"removeAvatar": "Удалить аватар?",
 		"saveChanges": "Сохранить изменения"
 	},
 	"profilePage": {
@@ -119,7 +123,9 @@
 		"editProfile": "Редактировать профиль",
 		"notifications": {
 			"changePosterSuccess": "Обложка успешна изменена",
-			"removePosterSuccess": "Обложка успешно удалена"
+			"removePosterSuccess": "Обложка успешно удалена",
+			"changeAvatarSuccess": "Аватар успешно изменен",
+			"removeAvatarSuccess": "Аватар успешно удален"
 		}
 	},
 	"settingsPage": {
@@ -127,7 +133,12 @@
 			"title": "Настройки профиля",
 			"description": "Здесь вы можете изменить данные вашего профиля, такие как аватар, имя пользователя, почту и описание"
 		},
-		"editAvatar": "Изменить аватар"
+		"editAvatar": "Изменить аватар",
+		"notMyAcc": "Это не ваш аккаунт, зайдите в настройки вашего аккаунта",
+		"notifications": {
+			"updateSuccess": "Данные успешно изменены",
+			"updateError": "Ошибка изменения данных, попробуйте ещё раз"
+		}
 	},
 	"postPage": {
 		"metadata": {

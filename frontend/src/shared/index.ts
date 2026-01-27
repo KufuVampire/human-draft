@@ -10,6 +10,7 @@ export { FormField } from './FormField/FormField';
 export { GoToHomeButton } from './GoToHomeButton/GoToHomeButton';
 export { Header } from './Header/Header';
 export { LanguageSwitcher } from './LanguageSwitcher/LanguageSwitcher';
+export { Loader } from './Loader/Loader';
 export { Logo } from './Logo/Logo';
 export { LogoutButton } from './LogoutButton/LogoutButton';
 export { Main } from './Main/Main';
@@ -22,4 +23,3 @@ export { SubscribeButton } from './SubscribeButton/SubscribeButton';
 export { UnsubscribeButton } from './UnsubscribeButton/UnsubscribeButton';
 export { UserAvatar } from './UserAvatar/UserAvatar';
 export { UserBadge } from './UserBadge/UserBadge';
-

@@ -11,7 +11,7 @@ export class RoutesConfig {
 	signup = '/sign-up';
 	users = '/users';
 	profile = '/profile';
-	settings = '/settings'
+	settings = 'settings'
 	logout = 'logout';
 
 	privacyPolicy = 'privacy-policy';
