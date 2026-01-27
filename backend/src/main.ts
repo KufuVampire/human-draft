@@ -26,12 +26,6 @@ async function bootstrap() {
 	app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
 	const maxAge = ms(config.getOrThrow<StringValue>('SESSION_MAX_AGE'));
-
-	if (!isDev(config)) {
-		const server = app.getHttpAdapter().getInstance();
-		server.set('trust proxy', 1);
-	}
-
 	app.use(
 		session({
 			secret: config.getOrThrow<string>('SESSION_SECRET'),
@@ -43,7 +37,7 @@ async function bootstrap() {
 				maxAge,
 				httpOnly: parseBoolean(config.getOrThrow<string>('SESSION_HTTP_ONLY')),
 				secure: parseBoolean(config.getOrThrow<string>('SESSION_SECURE')),
-				sameSite: 'none',
+				sameSite: 'lax',
 			},
 			store: new RedisStore({
 				client: redis.client,

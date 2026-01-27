@@ -15,6 +15,26 @@ export class UserService {
 			where: {
 				username,
 			},
+			include: {
+				blogs: {
+					include: {
+						posts: true,
+					},
+				},
+				posts: true,
+				subscribers: {
+					select: {
+						fromUserId: true,
+						id: true,
+					},
+				},
+				subscriptions: {
+					select: {
+						toUserId: true,
+						id: true,
+					},
+				},
+			},
 		});
 
 		if (!user) {
@@ -38,6 +58,26 @@ export class UserService {
 		const user = await this.prismaService.user.findFirst({
 			where: {
 				OR: fields,
+			},
+			include: {
+				blogs: {
+					include: {
+						posts: true,
+					},
+				},
+				posts: true,
+				subscribers: {
+					select: {
+						fromUserId: true,
+						id: true,
+					},
+				},
+				subscriptions: {
+					select: {
+						toUserId: true,
+						id: true,
+					},
+				},
 			},
 		});
 
@@ -86,14 +126,14 @@ export class UserService {
 				take: perPage,
 				skip,
 				where,
-				orderBy: { id: 'asc' },
+				orderBy: { username: 'asc' },
 			}),
 			this.prismaService.user.count(),
 		]);
 
 		return {
 			data: users,
-			totalCount,
+			totalCount: userId ? totalCount - 1 : totalCount,
 			page,
 			perPage,
 			totalPages: Math.ceil(totalCount / perPage),

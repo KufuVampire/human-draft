@@ -27,8 +27,8 @@ export class BlogModel {
 	@Field(() => UserModel)
 	author: UserModel;
 
-	@Field(() => [PostModel])
-	posts: PostModel[];
+	@Field(() => [PostModel], {nullable: true})
+	posts?: PostModel[];
 
 	@Field(() => [TagModel])
 	tags: TagModel[];

@@ -53,8 +53,7 @@ export class AccountService {
 			throw new UnprocessableEntityException('Unable to create account');
 		}
 
-		await this.sessionService.signUp(req, newUser);
-		return true;
+		return this.sessionService.signUp(req, newUser);
 	}
 
 	public async signIn(req: Request, input: SignInInput) {
@@ -72,8 +71,7 @@ export class AccountService {
 			throw new UnauthorizedException('Unable to sign in to your account');
 		}
 
-		await this.sessionService.saveSession(req, user);
-		return true;
+		return this.sessionService.saveSession(req, user);
 	}
 
 	public async signOut(req: Request) {
@@ -185,7 +183,7 @@ export class AccountService {
 		}
 
 		const processesBuffer = await sharp(buffer)
-			.resize(950, 250)
+			.resize(170, 170)
 			.webp()
 			.toBuffer();
 

@@ -8,7 +8,7 @@ type BlogModel {
   description: String!
   id: ID!
   posterUrl: String
-  posts: [PostModel!]!
+  posts: [PostModel!]
   tags: [TagModel!]!
   title: String!
   updatedAt: DateTime!
@@ -68,9 +68,9 @@ type Mutation {
   pinPostToBlog(blogId: String!, postId: String!): PostModel!
   removeProfileAvatar: UserModel!
   removeProfilePoster: UserModel!
-  signIn(data: SignInInput!): Boolean!
+  signIn(data: SignInInput!): UserModel!
   signOutAccount: Boolean!
-  signUp(data: SignUpInput!): Boolean!
+  signUp(data: SignUpInput!): UserModel!
   subscribeToUser(toId: String!): Boolean!
   unPinPostFromBlog(blogId: String!, postId: String!): PostModel!
   unsubscribeFromUser(toId: String!): Boolean!

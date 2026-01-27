@@ -14,7 +14,7 @@ import { AccountService } from './account.service';
 export class AccountResolver {
 	public constructor(private readonly accountService: AccountService, private readonly userService: UserService) {}
 
-	@Mutation(() => Boolean, { name: 'signUp' })
+	@Mutation(() => UserModel, { name: 'signUp' })
 	public async signUp(
 		@Context() { req }: IGQLContext,
 		@Args('data') input: SignUpInput
@@ -22,7 +22,7 @@ export class AccountResolver {
 		return await this.accountService.signUp(req, input);
 	}
 
-	@Mutation(() => Boolean, { name: 'signIn' })
+	@Mutation(() => UserModel, { name: 'signIn' })
 	public async signIn(
 		@Context() { req }: IGQLContext,
 		@Args('data') input: SignInInput
@@ -30,6 +30,7 @@ export class AccountResolver {
 		return await this.accountService.signIn(req, input);
 	}
 
+	@Auth()
 	@Mutation(() => Boolean, { name: 'signOutAccount' })
 	public async signOut(@Context() { req }: IGQLContext) {
 		return await this.accountService.signOut(req);
