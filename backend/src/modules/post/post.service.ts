@@ -161,6 +161,26 @@ export class PostService {
 		});
 	}
 
+	async getPostById(id: string) {
+		const post = await this.prismaService.post.findUnique({
+			where: {
+				id
+			},
+			include: {
+				author: true,
+				blog: true,
+				comments: true,
+				tags: true
+			}
+		})
+
+		if (!post) {
+			throw new NotFoundException('Post was not found');
+		}
+
+		return post;
+	}
+
 	async getAllPosts(searchParams: SearchParamsInput) {
 		const { page = PAGINATION_PAGE, perPage = PAGINATION_PER_PAGE } =
 			searchParams;

@@ -62,6 +62,11 @@ export class PostResolver {
 		return this.postService.unPinPostFromBlog(authorId, postId, blogId);
 	}
 
+	@Query(() => PostModel, { name: 'getPostById' })
+	async getPostById(@Args('postId') postId: string) {
+		return this.postService.getPostById(postId);
+	}
+
 	@Query(() => PostPagination, { name: 'getAllPostsPagination' })
 	async getAllPosts(
 		@Args('searchParams', {
