@@ -192,6 +192,9 @@ export class PostService {
 				take: perPage,
 				skip,
 				orderBy: { id: 'asc' },
+				include: {
+					author: true
+				}
 			}),
 			this.prismaService.post.count(),
 		]);

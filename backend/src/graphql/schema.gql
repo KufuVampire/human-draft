@@ -90,7 +90,7 @@ type PostModel {
   createdAt: DateTime!
   id: ID!
   likesCount: Int!
-  tags: [TagModel!]!
+  tags: [TagModel!]
   updatedAt: DateTime!
   viewsCount: Int!
 }
