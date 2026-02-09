@@ -21,7 +21,11 @@ export class UserService {
 						posts: true,
 					},
 				},
-				posts: true,
+				posts: {
+					include: {
+						author: true,
+					},
+				},
 				subscribers: {
 					select: {
 						fromUserId: true,
@@ -41,7 +45,13 @@ export class UserService {
 			throw new NotFoundException(`User not found by ${username}`);
 		}
 
-		return user;
+		return {
+			...user,
+			posts: user.posts ?? [],
+			blogs: user.blogs ?? [],
+			subscribers: user.subscribers.map((s) => s.fromUserId),
+			subscriptions: user.subscriptions.map((s) => s.toUserId),
+		};
 	}
 
 	public async findById(id: string) {

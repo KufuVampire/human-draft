@@ -22,7 +22,7 @@ export class RoutesConfig {
 
 	postCreate = () => `${this.post}/${this.create}`;
 	postUpdate = (id: number) => `${this.post}/${id}/${this.edit}`;
-	postById = (id: number) => `${this.post}/${id}`;
+	postById = (id: string) => `${this.post}/${id}`;
 
 	blogCreate = () => `${this.blog}/${this.create}`;
 	blogUpdate = (id: number) => `${this.blog}/${id}/${this.edit}`;

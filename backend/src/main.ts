@@ -5,12 +5,12 @@ import { RedisStore } from 'connect-redis';
 import * as cookieParser from 'cookie-parser';
 import * as session from 'express-session';
 
-import { AppModule } from './app.module';
-import { RedisService } from './modules';
-import { isDev, ms, StringValue } from './utils';
 import { parseBoolean } from '@/src/utils';
 import { graphqlUploadExpress } from 'graphql-upload-ts';
+import { AppModule } from './app.module';
 import { MAX_FILE_SIZE } from './consts';
+import { RedisService } from './modules';
+import { ms, StringValue } from './utils';
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);

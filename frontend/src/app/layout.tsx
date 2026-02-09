@@ -9,6 +9,7 @@ import { Toaster } from 'sonner';
 
 import { fetchMe } from '@/api';
 import { ApolloClientProvider, AuthProvider } from '@/providers';
+import { MilkdownProvider } from '@/providers';
 import { cn } from '@/utils';
 
 import './globals.css';
@@ -59,16 +60,18 @@ export default async function RootLayout({
 							themes={['light', 'dark']}
 							enableSystem={false}>
 							<AuthProvider user={user} />
-							<LazyMotion
-								features={domAnimation}
-								strict>
-								{children}
-								<Toaster
-									position='bottom-right'
-									duration={5000}
-									closeButton
-								/>
-							</LazyMotion>
+							<MilkdownProvider>
+								<LazyMotion
+									features={domAnimation}
+									strict>
+									{children}
+									<Toaster
+										position='bottom-right'
+										duration={4999}
+										closeButton
+									/>
+								</LazyMotion>
+							</MilkdownProvider>
 						</ThemeProvider>
 					</NextIntlClientProvider>
 				</ApolloClientProvider>

@@ -18,8 +18,6 @@ export class FileValidationPipe implements PipeTransform {
 
 		const { filename, createReadStream } = value;
 
-		const fileStream = createReadStream() as ReadStream;
-
 		const allowedFormats = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
 		const isFileFormatValid = validateFileFormat(filename, allowedFormats);
 
@@ -27,7 +25,10 @@ export class FileValidationPipe implements PipeTransform {
 			throw new BadRequestException('Unsupported file type');
 		}
 
+		const fileStream = createReadStream() as ReadStream;
 		const isFileSizeValid = await validateFileSize(fileStream, MAX_FILE_SIZE);
+
+		fileStream.destroy();
 
 		if (!isFileSizeValid) {
 			throw new BadRequestException('File size more than 10 mb');

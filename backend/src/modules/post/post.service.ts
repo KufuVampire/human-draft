@@ -5,6 +5,7 @@ import {
 	NotFoundException,
 } from '@nestjs/common';
 
+import { AwsStorageService } from '../aws-storage/aws-storage.service';
 import { PrismaService } from '../prisma/prisma.service';
 
 import { PAGINATION_PAGE, PAGINATION_PER_PAGE } from '@/src/consts';
@@ -16,22 +17,42 @@ import {
 
 @Injectable()
 export class PostService {
-	constructor(private readonly prismaService: PrismaService) {}
+	constructor(
+		private readonly prismaService: PrismaService,
+		private readonly storage: AwsStorageService
+	) {}
 
 	async create(authorId: string, input: CreatePostInput, blogId?: string) {
+		const { content, title, tags, id } = input;
+
 		return this.prismaService.post.create({
 			data: {
-				...input,
+				...(id && { id }),
+				title,
+				content,
 				author: {
 					connect: {
 						id: authorId,
 					},
 				},
+				...(tags && {
+					tags: {
+						connectOrCreate: tags.map((tag) => ({
+							where: { name: tag },
+							create: { name: tag },
+						})),
+					},
+				}),
 				...(blogId && {
 					blog: {
 						connect: { id: blogId },
 					},
 				}),
+			},
+			include: {
+				author: true,
+				blog: true,
+				tags: true,
 			},
 		});
 	}
@@ -66,6 +87,25 @@ export class PostService {
 
 		if (!post || post.authorId !== authorId) {
 			throw new NotFoundException('Post not found or you are not the author');
+		}
+
+		const removeImages = async (nodes: any[]) => {
+			for (const node of nodes) {
+				if (node.type === 'image' && node.attrs?.src) {
+					await this.storage.remove(node.attrs.src);
+				}
+				if (Array.isArray(node.content)) {
+					await removeImages(node.content);
+				}
+			}
+		};
+
+		if (post.content && typeof post.content === 'object') {
+			if (Array.isArray((post.content as any).content)) {
+				await removeImages((post.content as any).content);
+			} else if (Array.isArray(post.content)) {
+				await removeImages(post.content);
+			}
 		}
 
 		await this.prismaService.post.delete({
@@ -164,15 +204,15 @@ export class PostService {
 	async getPostById(id: string) {
 		const post = await this.prismaService.post.findUnique({
 			where: {
-				id
+				id,
 			},
 			include: {
 				author: true,
 				blog: true,
 				comments: true,
-				tags: true
-			}
-		})
+				tags: true,
+			},
+		});
 
 		if (!post) {
 			throw new NotFoundException('Post was not found');
@@ -193,8 +233,9 @@ export class PostService {
 				skip,
 				orderBy: { id: 'asc' },
 				include: {
-					author: true
-				}
+					author: true,
+					tags: true,
+				},
 			}),
 			this.prismaService.post.count(),
 		]);

@@ -3,6 +3,7 @@ export { ConfirmationChangesModal } from './ConfirmationChangesModal/Confirmatio
 export { ConfirmationDeletionModal } from './ConfirmationDeletionModal/ConfirmationDeletionModal';
 export { CropperModal } from './CropperModal/CropperModal';
 export { Dashboard } from './Dashboard/Dashboard';
+export { NeedAuthModal } from './NeedAuthModal/NeedAuthModal';
 export { SignInForm } from './SignInForm/SignInForm';
 export { SignUpForm } from './SignUpForm/SignUpForm';
 export { SubscribeUnsubscribeButtons } from './SubscribeUnsubscribeButtons/SubscribeUnsubscribeButtons';

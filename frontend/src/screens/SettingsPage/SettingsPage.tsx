@@ -147,24 +147,6 @@ export const SettingsPage = () => {
 						username={profile?.username}
 						location='settings-page'
 					/>
-					{/* {profile?.avatarUrl && (
-						<div className='size-full rounded-full relative'>
-							<Image
-								src={profile.avatarUrl}
-								alt={`${t('userAvatar')} ${username}`}
-								fill
-								sizes='100%'
-								className='rounded-full object-cover'
-								loading='eager'
-								unoptimized
-							/>
-						</div>
-					)}
-					{!profile?.avatarUrl && (
-						<div className='uppercase flex items-center justify-center bg-[linear-gradient(45deg,#4792c1,#aa67c2,#ea2047)] text-secondary text-7xl size-full rounded-full'>
-							{profile && profile.username.at(0)}
-						</div>
-					)} */}
 				</label>
 				<form
 					id={formId}

@@ -2,15 +2,24 @@
 
 import { EllipsisVertical } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import Image from 'next/image';
 import { redirect } from 'next/navigation';
 import { MouseEvent, useMemo, useState } from 'react';
 
+import { ProfilePoster } from './ProfilePoster/ProfilePoster';
 import { routesConfig } from '@/config';
+import { SEARCH_PARAMS } from '@/consts';
 import { useGetUserByUsernameQuery } from '@/graphql/generated/output';
 import { useProfile } from '@/hooks';
 import { SubscribeUnsubscribeButtons } from '@/modules';
-import { Button, CustomLink, Dropdown, Section, UserAvatar } from '@/shared';
+import {
+	Button,
+	CreatePostBlogLinks,
+	CustomLink,
+	Dropdown,
+	PostCard,
+	Section,
+	UserAvatar,
+} from '@/shared';
 
 interface Props {
 	username: string;
@@ -179,36 +188,21 @@ export const ProfilePage = ({ username }: Props) => {
 		}
 	};
 
+	const sortedPosts = user?.posts
+		?.slice()
+		.sort(
+			(a, b) =>
+				new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+		);
+
 	return (
-		<>
+		<div className='flex flex-col w-full gap-y-6'>
 			<Section className='flex flex-col w-full py-0 md:py-0 bg-[var(--background-color-card)] rounded-xl overflow-hidden transition-colors'>
-				<div className='min-h-50 md:min-h-62.5 max-h-50 md:max-h-62.5 bg-placeholder relative'>
-					{!isOwner && user?.posterUrl && (
-						<Image
-							src={user.posterUrl}
-							alt='poster'
-							fill
-							sizes='100%'
-							className='object-cover'
-							priority
-							loading='eager'
-							unoptimized
-						/>
-					)}
-					{isOwner && profile?.posterUrl && (
-						<Image
-							src={profile.posterUrl}
-							alt='poster'
-							fill
-							sizes='100%'
-							className='object-cover'
-							priority
-							loading='eager'
-							unoptimized
-						/>
-					)}
-					<div className='flex justify-end absolute top-0 left-0 right-0 w-full p-2 md:py-3 md:px-6'>
-						{isOwner && (
+				<ProfilePoster
+					isOwner={isOwner}
+					user={{ posterUrl: user?.posterUrl }}>
+					{isOwner && (
+						<div className='flex justify-end absolute top-0 left-0 right-0 w-full p-2 md:py-3 md:px-6'>
 							<Dropdown
 								isOpen={isOpen}
 								setOpen={setOpen}
@@ -223,14 +217,14 @@ export const ProfilePage = ({ username }: Props) => {
 									<EllipsisVertical className='stroke-secondary group-hover:stroke-primary-hover transition-colors' />
 								</Button>
 							</Dropdown>
-						)}
-					</div>
-				</div>
+						</div>
+					)}
+				</ProfilePoster>
 				<div className='flex lg:flex-row flex-col items-center gap-y-2 lg:items-stretch justify-between px-6 pb-6 md:py-3 min-h-[7.188rem]'>
 					<div className='flex lg:flex-row flex-col items-center lg:items-stretch gap-x-3 gap-y-2'>
 						{isOwner && (
 							<UserAvatar
-								username={user?.username}
+								username={profile?.username}
 								avatarUrl={profile?.avatarUrl}
 								location='profile-page'
 							/>
@@ -255,7 +249,7 @@ export const ProfilePage = ({ username }: Props) => {
 					</div>
 					{isOwner && profile && (
 						<CustomLink
-							href={`${profile.username}/${routesConfig.settings}`}
+							href={`/${profile.username}/${routesConfig.settings}`}
 							variant='secondary'
 							className='py-2 px-3 font-bold leading-6 lg:self-start rounded-lg dark:text-secondary text-center self-center'>
 							{t('navigation.settings')}
@@ -270,6 +264,25 @@ export const ProfilePage = ({ username }: Props) => {
 					)}
 				</div>
 			</Section>
-		</>
+			<CreatePostBlogLinks />
+			{sortedPosts && (
+				<ul className='columns-1 lg:columns-2 gap-6'>
+					{sortedPosts.map((post) => {
+						return (
+							<PostCard
+								key={post.id}
+								author={post.author}
+								createdAt={post.createdAt}
+								id={post.id}
+								title={post.title}
+								content={post.content}
+								tags={post.tags}
+								isOwner={isOwner}
+							/>
+						);
+					})}
+				</ul>
+			)}
+		</div>
 	);
 };

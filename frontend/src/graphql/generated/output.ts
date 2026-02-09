@@ -63,6 +63,9 @@ export type CreateBlogInput = {
 
 export type CreatePostInput = {
   content: Scalars['JSON']['input'];
+  id?: InputMaybe<Scalars['String']['input']>;
+  tags: Array<Scalars['String']['input']>;
+  title: Scalars['String']['input'];
 };
 
 export type Mutation = {
@@ -91,6 +94,7 @@ export type Mutation = {
   updatePost: PostModel;
   updatePostOrBlogTags: Scalars['Boolean']['output'];
   updateUser: UserModel;
+  uploadImage: UploadImageModel;
 };
 
 
@@ -207,6 +211,11 @@ export type MutationUpdateUserArgs = {
   data: UpdateUserInput;
 };
 
+
+export type MutationUploadImageArgs = {
+  image: Scalars['Upload']['input'];
+};
+
 export type PostModel = {
   __typename?: 'PostModel';
   author: UserModel;
@@ -217,7 +226,8 @@ export type PostModel = {
   createdAt: Scalars['DateTime']['output'];
   id: Scalars['ID']['output'];
   likesCount: Scalars['Int']['output'];
-  tags: Array<TagModel>;
+  tags?: Maybe<Array<TagModel>>;
+  title: Scalars['String']['output'];
   updatedAt: Scalars['DateTime']['output'];
   viewsCount: Scalars['Int']['output'];
 };
@@ -233,11 +243,18 @@ export type PostPagination = {
 
 export type Query = {
   __typename?: 'Query';
+  findTagsBySearchString: Array<TagModel>;
   getAllBlogsPagination: BlogPagination;
   getAllPostsPagination: PostPagination;
   getAllUsersPagination: UserPagination;
+  getPostById: PostModel;
   getUserByUsername: UserModel;
   userProfile: UserModel;
+};
+
+
+export type QueryFindTagsBySearchStringArgs = {
+  search: Scalars['String']['input'];
 };
 
 
@@ -253,6 +270,11 @@ export type QueryGetAllPostsPaginationArgs = {
 
 export type QueryGetAllUsersPaginationArgs = {
   searchParams?: InputMaybe<SearchParamsInput>;
+};
+
+
+export type QueryGetPostByIdArgs = {
+  postId: Scalars['String']['input'];
 };
 
 
@@ -309,6 +331,11 @@ export type UpdateUserInput = {
   username?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type UploadImageModel = {
+  __typename?: 'UploadImageModel';
+  url: Scalars['String']['output'];
+};
+
 export type UserModel = {
   __typename?: 'UserModel';
   avatarUrl?: Maybe<Scalars['String']['output']>;
@@ -350,6 +377,20 @@ export type ChangeProfilePosterMutationVariables = Exact<{
 
 
 export type ChangeProfilePosterMutation = { __typename?: 'Mutation', changeProfilePoster: { __typename?: 'UserModel', posterUrl?: string | null } };
+
+export type CreatePostMutationVariables = Exact<{
+  data: CreatePostInput;
+}>;
+
+
+export type CreatePostMutation = { __typename?: 'Mutation', createPost: { __typename?: 'PostModel', id: string, content: any, createdAt: any, updatedAt: any, likesCount: number, viewsCount: number, commentsCount: number, author: { __typename?: 'UserModel', id: string }, blog?: { __typename?: 'BlogModel', id: string } | null } };
+
+export type DeletePostMutationVariables = Exact<{
+  postId: Scalars['String']['input'];
+}>;
+
+
+export type DeletePostMutation = { __typename?: 'Mutation', deletePost: boolean };
 
 export type RemoveProfileAvatarMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -401,6 +442,20 @@ export type UpdateProfileMutationVariables = Exact<{
 
 export type UpdateProfileMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'UserModel', email: string, username: string, description?: string | null } };
 
+export type GetTagsBySearchStringQueryVariables = Exact<{
+  search: Scalars['String']['input'];
+}>;
+
+
+export type GetTagsBySearchStringQuery = { __typename?: 'Query', findTagsBySearchString: Array<{ __typename?: 'TagModel', id: string, name: string }> };
+
+export type GetAllPostsQueryVariables = Exact<{
+  searchParams: SearchParamsInput;
+}>;
+
+
+export type GetAllPostsQuery = { __typename?: 'Query', getAllPostsPagination: { __typename?: 'PostPagination', page: number, perPage: number, totalCount: number, totalPages: number, data: Array<{ __typename?: 'PostModel', id: string, title: string, content: any, createdAt: any, updatedAt: any, likesCount: number, viewsCount: number, commentsCount: number, tags?: Array<{ __typename?: 'TagModel', id: string, name: string }> | null, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null } }> } };
+
 export type GetAllUsersQueryVariables = Exact<{
   searchParams: SearchParamsInput;
 }>;
@@ -408,12 +463,19 @@ export type GetAllUsersQueryVariables = Exact<{
 
 export type GetAllUsersQuery = { __typename?: 'Query', getAllUsersPagination: { __typename?: 'UserPagination', page: number, perPage: number, totalCount: number, totalPages: number, data: Array<{ __typename?: 'UserModel', id: string, avatarUrl?: string | null, username: string, description?: string | null }> } };
 
+export type GetPostByIdQueryVariables = Exact<{
+  postId: Scalars['String']['input'];
+}>;
+
+
+export type GetPostByIdQuery = { __typename?: 'Query', getPostById: { __typename?: 'PostModel', id: string, title: string, content: any, createdAt: any, updatedAt: any, likesCount: number, viewsCount: number, commentsCount: number, blog?: { __typename?: 'BlogModel', id: string } | null, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null }, comments: Array<{ __typename?: 'CommentModel', id: string, author: { __typename?: 'UserModel', id: string } }>, tags?: Array<{ __typename?: 'TagModel', id: string, name: string }> | null } };
+
 export type GetUserByUsernameQueryVariables = Exact<{
   username: Scalars['String']['input'];
 }>;
 
 
-export type GetUserByUsernameQuery = { __typename?: 'Query', getUserByUsername: { __typename?: 'UserModel', id: string, username: string, description?: string | null, avatarUrl?: string | null, posterUrl?: string | null } };
+export type GetUserByUsernameQuery = { __typename?: 'Query', getUserByUsername: { __typename?: 'UserModel', id: string, username: string, description?: string | null, avatarUrl?: string | null, posterUrl?: string | null, posts?: Array<{ __typename?: 'PostModel', id: string, title: string, content: any, createdAt: any, updatedAt: any, likesCount: number, viewsCount: number, commentsCount: number, tags?: Array<{ __typename?: 'TagModel', id: string, name: string }> | null, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null } }> | null, blogs?: Array<{ __typename?: 'BlogModel', id: string, title: string, description: string, posterUrl?: string | null, createdAt: any, updatedAt: any, tags: Array<{ __typename?: 'TagModel', id: string, name: string }>, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null } }> | null } };
 
 export const AuthUserFragmentFragmentDoc = gql`
     fragment AuthUserFragment on UserModel {
@@ -495,6 +557,82 @@ export function useChangeProfilePosterMutation(baseOptions?: Apollo.MutationHook
 export type ChangeProfilePosterMutationHookResult = ReturnType<typeof useChangeProfilePosterMutation>;
 export type ChangeProfilePosterMutationResult = Apollo.MutationResult<ChangeProfilePosterMutation>;
 export type ChangeProfilePosterMutationOptions = Apollo.BaseMutationOptions<ChangeProfilePosterMutation, ChangeProfilePosterMutationVariables>;
+export const CreatePostDocument = gql`
+    mutation createPost($data: CreatePostInput!) {
+  createPost(data: $data) {
+    id
+    author {
+      id
+    }
+    blog {
+      id
+    }
+    content
+    createdAt
+    updatedAt
+    likesCount
+    viewsCount
+    commentsCount
+  }
+}
+    `;
+export type CreatePostMutationFn = Apollo.MutationFunction<CreatePostMutation, CreatePostMutationVariables>;
+
+/**
+ * __useCreatePostMutation__
+ *
+ * To run a mutation, you first call `useCreatePostMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreatePostMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createPostMutation, { data, loading, error }] = useCreatePostMutation({
+ *   variables: {
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useCreatePostMutation(baseOptions?: Apollo.MutationHookOptions<CreatePostMutation, CreatePostMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreatePostMutation, CreatePostMutationVariables>(CreatePostDocument, options);
+      }
+export type CreatePostMutationHookResult = ReturnType<typeof useCreatePostMutation>;
+export type CreatePostMutationResult = Apollo.MutationResult<CreatePostMutation>;
+export type CreatePostMutationOptions = Apollo.BaseMutationOptions<CreatePostMutation, CreatePostMutationVariables>;
+export const DeletePostDocument = gql`
+    mutation DeletePost($postId: String!) {
+  deletePost(postId: $postId)
+}
+    `;
+export type DeletePostMutationFn = Apollo.MutationFunction<DeletePostMutation, DeletePostMutationVariables>;
+
+/**
+ * __useDeletePostMutation__
+ *
+ * To run a mutation, you first call `useDeletePostMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeletePostMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deletePostMutation, { data, loading, error }] = useDeletePostMutation({
+ *   variables: {
+ *      postId: // value for 'postId'
+ *   },
+ * });
+ */
+export function useDeletePostMutation(baseOptions?: Apollo.MutationHookOptions<DeletePostMutation, DeletePostMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeletePostMutation, DeletePostMutationVariables>(DeletePostDocument, options);
+      }
+export type DeletePostMutationHookResult = ReturnType<typeof useDeletePostMutation>;
+export type DeletePostMutationResult = Apollo.MutationResult<DeletePostMutation>;
+export type DeletePostMutationOptions = Apollo.BaseMutationOptions<DeletePostMutation, DeletePostMutationVariables>;
 export const RemoveProfileAvatarDocument = gql`
     mutation RemoveProfileAvatar {
   removeProfileAvatar {
@@ -770,6 +908,114 @@ export function useUpdateProfileMutation(baseOptions?: Apollo.MutationHookOption
 export type UpdateProfileMutationHookResult = ReturnType<typeof useUpdateProfileMutation>;
 export type UpdateProfileMutationResult = Apollo.MutationResult<UpdateProfileMutation>;
 export type UpdateProfileMutationOptions = Apollo.BaseMutationOptions<UpdateProfileMutation, UpdateProfileMutationVariables>;
+export const GetTagsBySearchStringDocument = gql`
+    query getTagsBySearchString($search: String!) {
+  findTagsBySearchString(search: $search) {
+    id
+    name
+  }
+}
+    `;
+
+/**
+ * __useGetTagsBySearchStringQuery__
+ *
+ * To run a query within a React component, call `useGetTagsBySearchStringQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetTagsBySearchStringQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetTagsBySearchStringQuery({
+ *   variables: {
+ *      search: // value for 'search'
+ *   },
+ * });
+ */
+export function useGetTagsBySearchStringQuery(baseOptions: Apollo.QueryHookOptions<GetTagsBySearchStringQuery, GetTagsBySearchStringQueryVariables> & ({ variables: GetTagsBySearchStringQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetTagsBySearchStringQuery, GetTagsBySearchStringQueryVariables>(GetTagsBySearchStringDocument, options);
+      }
+export function useGetTagsBySearchStringLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetTagsBySearchStringQuery, GetTagsBySearchStringQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetTagsBySearchStringQuery, GetTagsBySearchStringQueryVariables>(GetTagsBySearchStringDocument, options);
+        }
+// @ts-ignore
+export function useGetTagsBySearchStringSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GetTagsBySearchStringQuery, GetTagsBySearchStringQueryVariables>): Apollo.UseSuspenseQueryResult<GetTagsBySearchStringQuery, GetTagsBySearchStringQueryVariables>;
+export function useGetTagsBySearchStringSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetTagsBySearchStringQuery, GetTagsBySearchStringQueryVariables>): Apollo.UseSuspenseQueryResult<GetTagsBySearchStringQuery | undefined, GetTagsBySearchStringQueryVariables>;
+export function useGetTagsBySearchStringSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetTagsBySearchStringQuery, GetTagsBySearchStringQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetTagsBySearchStringQuery, GetTagsBySearchStringQueryVariables>(GetTagsBySearchStringDocument, options);
+        }
+export type GetTagsBySearchStringQueryHookResult = ReturnType<typeof useGetTagsBySearchStringQuery>;
+export type GetTagsBySearchStringLazyQueryHookResult = ReturnType<typeof useGetTagsBySearchStringLazyQuery>;
+export type GetTagsBySearchStringSuspenseQueryHookResult = ReturnType<typeof useGetTagsBySearchStringSuspenseQuery>;
+export type GetTagsBySearchStringQueryResult = Apollo.QueryResult<GetTagsBySearchStringQuery, GetTagsBySearchStringQueryVariables>;
+export const GetAllPostsDocument = gql`
+    query getAllPosts($searchParams: SearchParamsInput!) {
+  getAllPostsPagination(searchParams: $searchParams) {
+    data {
+      id
+      title
+      content
+      createdAt
+      updatedAt
+      tags {
+        id
+        name
+      }
+      likesCount
+      viewsCount
+      commentsCount
+      author {
+        username
+        avatarUrl
+      }
+    }
+    page
+    perPage
+    totalCount
+    totalPages
+  }
+}
+    `;
+
+/**
+ * __useGetAllPostsQuery__
+ *
+ * To run a query within a React component, call `useGetAllPostsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAllPostsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAllPostsQuery({
+ *   variables: {
+ *      searchParams: // value for 'searchParams'
+ *   },
+ * });
+ */
+export function useGetAllPostsQuery(baseOptions: Apollo.QueryHookOptions<GetAllPostsQuery, GetAllPostsQueryVariables> & ({ variables: GetAllPostsQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetAllPostsQuery, GetAllPostsQueryVariables>(GetAllPostsDocument, options);
+      }
+export function useGetAllPostsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAllPostsQuery, GetAllPostsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetAllPostsQuery, GetAllPostsQueryVariables>(GetAllPostsDocument, options);
+        }
+// @ts-ignore
+export function useGetAllPostsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GetAllPostsQuery, GetAllPostsQueryVariables>): Apollo.UseSuspenseQueryResult<GetAllPostsQuery, GetAllPostsQueryVariables>;
+export function useGetAllPostsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetAllPostsQuery, GetAllPostsQueryVariables>): Apollo.UseSuspenseQueryResult<GetAllPostsQuery | undefined, GetAllPostsQueryVariables>;
+export function useGetAllPostsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetAllPostsQuery, GetAllPostsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetAllPostsQuery, GetAllPostsQueryVariables>(GetAllPostsDocument, options);
+        }
+export type GetAllPostsQueryHookResult = ReturnType<typeof useGetAllPostsQuery>;
+export type GetAllPostsLazyQueryHookResult = ReturnType<typeof useGetAllPostsLazyQuery>;
+export type GetAllPostsSuspenseQueryHookResult = ReturnType<typeof useGetAllPostsSuspenseQuery>;
+export type GetAllPostsQueryResult = Apollo.QueryResult<GetAllPostsQuery, GetAllPostsQueryVariables>;
 export const GetAllUsersDocument = gql`
     query getAllUsers($searchParams: SearchParamsInput!) {
   getAllUsersPagination(searchParams: $searchParams) {
@@ -822,6 +1068,73 @@ export type GetAllUsersQueryHookResult = ReturnType<typeof useGetAllUsersQuery>;
 export type GetAllUsersLazyQueryHookResult = ReturnType<typeof useGetAllUsersLazyQuery>;
 export type GetAllUsersSuspenseQueryHookResult = ReturnType<typeof useGetAllUsersSuspenseQuery>;
 export type GetAllUsersQueryResult = Apollo.QueryResult<GetAllUsersQuery, GetAllUsersQueryVariables>;
+export const GetPostByIdDocument = gql`
+    query getPostById($postId: String!) {
+  getPostById(postId: $postId) {
+    id
+    title
+    content
+    createdAt
+    updatedAt
+    blog {
+      id
+    }
+    author {
+      username
+      avatarUrl
+    }
+    comments {
+      id
+      author {
+        id
+      }
+    }
+    tags {
+      id
+      name
+    }
+    likesCount
+    viewsCount
+    commentsCount
+  }
+}
+    `;
+
+/**
+ * __useGetPostByIdQuery__
+ *
+ * To run a query within a React component, call `useGetPostByIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetPostByIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetPostByIdQuery({
+ *   variables: {
+ *      postId: // value for 'postId'
+ *   },
+ * });
+ */
+export function useGetPostByIdQuery(baseOptions: Apollo.QueryHookOptions<GetPostByIdQuery, GetPostByIdQueryVariables> & ({ variables: GetPostByIdQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetPostByIdQuery, GetPostByIdQueryVariables>(GetPostByIdDocument, options);
+      }
+export function useGetPostByIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetPostByIdQuery, GetPostByIdQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetPostByIdQuery, GetPostByIdQueryVariables>(GetPostByIdDocument, options);
+        }
+// @ts-ignore
+export function useGetPostByIdSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GetPostByIdQuery, GetPostByIdQueryVariables>): Apollo.UseSuspenseQueryResult<GetPostByIdQuery, GetPostByIdQueryVariables>;
+export function useGetPostByIdSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetPostByIdQuery, GetPostByIdQueryVariables>): Apollo.UseSuspenseQueryResult<GetPostByIdQuery | undefined, GetPostByIdQueryVariables>;
+export function useGetPostByIdSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetPostByIdQuery, GetPostByIdQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetPostByIdQuery, GetPostByIdQueryVariables>(GetPostByIdDocument, options);
+        }
+export type GetPostByIdQueryHookResult = ReturnType<typeof useGetPostByIdQuery>;
+export type GetPostByIdLazyQueryHookResult = ReturnType<typeof useGetPostByIdLazyQuery>;
+export type GetPostByIdSuspenseQueryHookResult = ReturnType<typeof useGetPostByIdSuspenseQuery>;
+export type GetPostByIdQueryResult = Apollo.QueryResult<GetPostByIdQuery, GetPostByIdQueryVariables>;
 export const GetUserByUsernameDocument = gql`
     query GetUserByUsername($username: String!) {
   getUserByUsername(username: $username) {
@@ -830,6 +1143,40 @@ export const GetUserByUsernameDocument = gql`
     description
     avatarUrl
     posterUrl
+    posts {
+      id
+      title
+      content
+      createdAt
+      updatedAt
+      tags {
+        id
+        name
+      }
+      likesCount
+      viewsCount
+      commentsCount
+      author {
+        username
+        avatarUrl
+      }
+    }
+    blogs {
+      id
+      title
+      description
+      posterUrl
+      tags {
+        id
+        name
+      }
+      author {
+        username
+        avatarUrl
+      }
+      createdAt
+      updatedAt
+    }
   }
 }
     `;

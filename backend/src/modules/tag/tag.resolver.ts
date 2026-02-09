@@ -1,4 +1,4 @@
-import { Args, Mutation, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 
 import { TagService } from './tag.service';
 import { Auth } from '@/src/decorators';
@@ -28,5 +28,10 @@ export class TagResolver {
 		@Args('to') to: UpdatePostOrBlogTagsInput
 	) {
 		return this.tagService.updateTags(tags, to);
+	}
+
+	@Query(() => [TagModel], { name: 'findTagsBySearchString' })
+	async findTags(@Args('search') search: string) {
+		return this.tagService.findTags(search);
 	}
 }

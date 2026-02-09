@@ -152,7 +152,8 @@
 		"pinBlog": {
 			"pin": "Закрепить блог",
 			"searchFieldPlaceholder": "Поиск блогов"
-		}
+		},
+		"postDeletedSuccess": "Пост умешно удалён"
 	},
 	"blogPage": {
 		"metadata": {
@@ -180,5 +181,12 @@
 		"goToMain": "Спасибо, Уточка, я на главную"
 	},
 	"logoutSuccess": "Вы успешно вышли из аккаунта",
-	"userAvatar": "Аватар пользователя"
+	"userAvatar": "Аватар пользователя",
+	"createPostPage": {
+		"title": "Заголовок вашего поста",
+		"defaultValue": "Начните писать ваш пост",
+		"copyCode": "Скопировать код",
+		"tagPickerPlaceholder": "Выберите теги"
+	},
+	"in": "в"
 }

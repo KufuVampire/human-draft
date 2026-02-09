@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import '@milkdown/crepe/theme/common/style.css';
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -112,4 +113,149 @@ body {
 	@apply font-text transition-colors;
 	color: var(--text-color-main);
 	background-color: var(--background-color-main);
+}
+
+[data-milkdown-root='true'] {
+	@apply w-full;
+}
+
+.ProseMirror {
+	@apply pl-16! pr-0! py-8! md:px-0!;
+}
+
+.milkdown-block-handle[data-show='false'] {
+	@apply opacity-100! md:opacity-0! left-0! md:-left-10!;
+}
+.milkdown-block-handle[data-show='true'] {
+	@apply left-0! md:-left-19!;
+}
+
+.milkdown-block-handle {
+	@apply gap-x-1! md:gap-x-0.5;
+}
+
+.milkdown-block-handle .operation-item {
+	@apply p-0! size-6! md:size-8! md:p-1!;
+}
+
+.milkdown {
+	@apply rounded-xl min-h-70 transition-colors;
+	/* Background Colors */
+	--crepe-color-background: #fffdfb; /* Main background color */
+	--crepe-color-surface: #fff8f4; /* Surface color for cards/panels */
+	--crepe-color-surface-low: #fff1e5; /* Lower surface color for depth */
+
+	/* Text Colors */
+	--crepe-color-on-background: #1f1b16; /* Text color on background */
+	--crepe-color-on-surface: #201b13; /* Text color on surface */
+	--crepe-color-on-surface-variant: #4f4539; /* Secondary text color */
+
+	/* Accent Colors */
+	--crepe-color-primary: var(--primary-color); /* Primary brand color */
+	--crepe-color-secondary: #fbdebc; /* Secondary accent color */
+	--crepe-color-on-secondary: #271904; /* Text color on secondary */
+
+	/* UI Colors */
+	--crepe-color-outline: #242424; /* Border/outline color */
+	--crepe-color-inverse: #362f27; /* Inverse color for contrast */
+	--crepe-color-on-inverse: #fcefe2; /* Text color on inverse */
+	--crepe-color-inline-code: #ba1a1a; /* Inline code color */
+	--crepe-color-error: #ba1a1a; /* Error state color */
+
+	/* Interactive Colors */
+	--crepe-color-hover: #f9ecdf; /* Hover state color */
+	--crepe-color-selected: #ede0d4; /* Selected state color */
+	--crepe-color-inline-area: #e4d8cc; /* Inline editing area color */
+
+	--crepe-shadow-1: var(--shadow-primary);
+}
+
+.dark .milkdown {
+	--crepe-color-background: var(
+		--background-color-card
+	); /* Main background color */
+	--crepe-color-surface: var(
+		--background-color-card
+	); /* Surface color for cards/panels */
+	--crepe-color-surface-low: var(
+		--background-color-card
+	); /* Lower surface color for depth */
+
+	/* Text Colors */
+	--crepe-color-on-background: var(
+		--text-color-main
+	); /* Text color on background */
+	--crepe-color-on-surface: var(--text-color-main); /* Text color on surface */
+	--crepe-color-on-surface-variant: var(
+		--text-color-main
+	); /* Secondary text color */
+
+	/* Accent Colors */
+	--crepe-color-primary: var(--color-primary); /* Primary brand color */
+	--crepe-color-secondary: var(--color-primary); /* Secondary accent color */
+	--crepe-color-on-secondary: #271904; /* Text color on secondary */
+
+	/* UI Colors */
+	--crepe-color-outline: var(--color-secondary); /* Border/outline color */
+	--crepe-color-inverse: #362f27; /* Inverse color for contrast */
+	--crepe-color-on-inverse: #fcefe2; /* Text color on inverse */
+	--crepe-color-inline-code: #ba1a1a; /* Inline code color */
+	--crepe-color-error: #ba1a1a; /* Error state color */
+
+	/* Interactive Colors */
+	--crepe-color-hover: var(--color-primary-hover); /* Hover state color */
+	--crepe-color-selected: var(--color-primary); /* Selected state color */
+	--crepe-color-inline-area: #e4d8cc; /* Inline editing area color */
+}
+
+.milkdown-content:first-child p {
+	@apply mb-0;
+}
+
+.milkdown-content:last-child {
+	@apply mb-0;
+}
+
+.milkdown-content p {
+	@apply mb-6;
+}
+
+.milkdown-content h1,
+.milkdown-content h2,
+.milkdown-content h3,
+.milkdown-content h4,
+.milkdown-content h5,
+.milkdown-content h6 {
+	@apply mb-8;
+}
+
+.milkdown-content li {
+	@apply mb-2;
+}
+
+.milkdown-content ul p,
+.milkdown-content ol p {
+	@apply mb-0;
+}
+
+.milkdown-content ul,
+.milkdown-content ol {
+	@apply my-8 pl-8 list-disc;
+}
+
+.milkdown-content pre {
+	@apply overflow-auto rounded-sm bg-[var(--background-color-main)] whitespace-pre mb-8 transition-colors;
+	tab-size: 2;
+}
+
+.milkdown-content pre:has(code) {
+	@apply p-5;
+}
+
+.milkdown-content pre code {
+	@apply text-wrap text-[var(--text-color-main)];
+}
+
+.milkdown-content img {
+	@apply rounded-lg my-6;
 }

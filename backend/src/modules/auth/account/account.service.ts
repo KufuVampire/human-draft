@@ -31,7 +31,7 @@ export class AccountService {
 
 	public async signUp(req: Request, input: SignUpInput) {
 		const { email, password, username } = input;
-		console.log(input)
+
 		const isUserExists = await this.userService.findByFields([
 			{ username },
 			{ email },
@@ -108,7 +108,7 @@ export class AccountService {
 		if (!user) {
 			throw new NotFoundException('User not found');
 		}
-
+		
 		return {
 			...user,
 			posts: user.posts ?? [],
@@ -145,7 +145,7 @@ export class AccountService {
 			.webp()
 			.toBuffer();
 
-		await this.storageService.upload(processesBuffer, fileName, 'image/webp');
+		await this.storageService.uploadForProfile(processesBuffer, fileName, 'image/webp');
 
 		const fileUrl = this.storageService.getFileUrl(fileName);
 		return await this.userService.updateUser(user.id, { posterUrl: fileUrl });
@@ -187,7 +187,7 @@ export class AccountService {
 			.webp()
 			.toBuffer();
 
-		await this.storageService.upload(processesBuffer, fileName, 'image/webp');
+		await this.storageService.uploadForProfile(processesBuffer, fileName, 'image/webp');
 
 		const fileUrl = this.storageService.getFileUrl(fileName);
 		return await this.userService.updateUser(user.id, { avatarUrl: fileUrl });

@@ -152,7 +152,8 @@
 		"pinBlog": {
 			"pin": "Pin blog",
 			"searchFieldPlaceholder": "Search blogs"
-		}
+		},
+		"postDeletedSuccess": "Post successfully deleted"
 	},
 	"blogPage": {
 		"metadata": {
@@ -180,5 +181,12 @@
 		"goToMain": "Thank you, Duck, take me to the home page"
 	},
 	"logoutSuccess": "You have successfully logged out of your account.",
-	"userAvatar": "User avatar"
+	"userAvatar": "User avatar",
+	"createPostPage": {
+		"title": "Title of your post",
+		"defaultValue": "Start writing your post",
+		"copyCode": "Copy code",
+		"tagPickerPlaceholder": "Select tags"
+	},
+	"in": "in"
 }

@@ -23,6 +23,9 @@ export class PostModel {
 	@Field(() => GraphQLISODateTime)
 	updatedAt: Date;
 
+	@Field()
+	title: string
+
 	@Field(() => GraphQLJSON)
 	content: any;
 

@@ -42,6 +42,9 @@ input CreateBlogInput {
 
 input CreatePostInput {
   content: JSON!
+  id: String
+  tags: [String!]!
+  title: String!
 }
 
 """
@@ -79,6 +82,7 @@ type Mutation {
   updatePost(data: UpdatePostInput!, postId: String!): PostModel!
   updatePostOrBlogTags(tags: [String!]!, to: UpdatePostOrBlogTagsInput!): Boolean!
   updateUser(data: UpdateUserInput!): UserModel!
+  uploadImage(image: Upload!): UploadImageModel!
 }
 
 type PostModel {
@@ -91,6 +95,7 @@ type PostModel {
   id: ID!
   likesCount: Int!
   tags: [TagModel!]
+  title: String!
   updatedAt: DateTime!
   viewsCount: Int!
 }
@@ -104,6 +109,7 @@ type PostPagination {
 }
 
 type Query {
+  findTagsBySearchString(search: String!): [TagModel!]!
   getAllBlogsPagination(searchParams: SearchParamsInput = {page: 1, perPage: 10}): BlogPagination!
   getAllPostsPagination(searchParams: SearchParamsInput = {page: 1, perPage: 10}): PostPagination!
   getAllUsersPagination(searchParams: SearchParamsInput = {page: 1, perPage: 10}): UserPagination!
@@ -162,6 +168,10 @@ input UpdateUserInput {
 
 """The `Upload` scalar type represents a file upload."""
 scalar Upload
+
+type UploadImageModel {
+  url: String!
+}
 
 type UserModel {
   avatarUrl: String

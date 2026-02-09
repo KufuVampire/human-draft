@@ -1,0 +1,6 @@
+query getTagsBySearchString($search: String!) {
+	findTagsBySearchString(search: $search) {
+		id
+		name
+	}
+}

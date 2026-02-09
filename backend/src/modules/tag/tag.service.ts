@@ -114,4 +114,15 @@ export class TagService {
 			});
 		}
 	}
+
+	async findTags(search: string) {
+		return await this.prismaService.tag.findMany({
+			where: {
+				name: {
+					contains: search,
+					mode: 'insensitive'
+				},
+			},
+		});
+	}
 }

@@ -5,6 +5,7 @@ import {
 	ConfirmationDeletionModal,
 	CropperModal,
 	Dashboard,
+	NeedAuthModal,
 } from '@/modules';
 import { Container, Footer, Header, Main } from '@/shared';
 
@@ -27,6 +28,7 @@ export default function ContentLayout({
 			<ConfirmationChangesModal />
 			<ConfirmationDeletionModal />
 			<CropperModal />
+			<NeedAuthModal />
 			<Footer />
 		</>
 	);
