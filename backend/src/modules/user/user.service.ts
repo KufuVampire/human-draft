@@ -117,25 +117,37 @@ export class UserService {
 		return updatedUser;
 	}
 
-	public async getAllUsers(searchParams: SearchParamsInput, userId?: string) {
+	public async getAllUsers(params: {
+		searchParams: SearchParamsInput;
+		searchStr?: string;
+		onlySubscriptions?: boolean;
+		userId?: string;
+	}) {
+		const { searchParams, onlySubscriptions, searchStr, userId } = params;
+
 		const { page = PAGINATION_PAGE, perPage = PAGINATION_PER_PAGE } =
 			searchParams;
 
 		const skip = (page - 1) * perPage;
 
-		const where = userId
-			? {
-					id: {
-						not: userId,
-					},
-				}
-			: undefined;
-
 		const [users, totalCount] = await this.prismaService.$transaction([
 			this.prismaService.user.findMany({
 				take: perPage,
 				skip,
-				where,
+				where: {
+					id: { not: userId },
+					username: {
+						contains: searchStr,
+						mode: 'insensitive',
+					},
+					...(onlySubscriptions && {
+						subscribers: {
+							some: {
+								fromUserId: userId,
+							},
+						},
+					}),
+				},
 				orderBy: { username: 'asc' },
 			}),
 			this.prismaService.user.count(),

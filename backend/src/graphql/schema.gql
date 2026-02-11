@@ -112,7 +112,7 @@ type Query {
   findTagsBySearchString(search: String!): [TagModel!]!
   getAllBlogsPagination(searchParams: SearchParamsInput = {page: 1, perPage: 10}): BlogPagination!
   getAllPostsPagination(searchParams: SearchParamsInput = {page: 1, perPage: 10}): PostPagination!
-  getAllUsersPagination(searchParams: SearchParamsInput = {page: 1, perPage: 10}): UserPagination!
+  getAllUsersPagination(onlySubscriptions: Boolean!, searchParams: SearchParamsInput = {page: 1, perPage: 10}, searchStr: String = ""): UserPagination!
   getPostById(postId: String!): PostModel!
   getUserByUsername(username: String!): UserModel!
   userProfile: UserModel!
