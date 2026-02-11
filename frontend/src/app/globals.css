@@ -91,6 +91,17 @@
 
 	--font-title: var(--font-ubuntu);
 	--font-text: var(--font-roboto);
+
+	--animate-shine-lines: shine-lines 3s linear 1s infinite;
+
+	@keyframes shine-lines {
+		from {
+			background-position: 100% 0;
+		}
+		to {
+			background-position: -100% 0;
+		}
+	}
 }
 
 .dark {
@@ -208,16 +219,8 @@ body {
 	--crepe-color-inline-area: #e4d8cc; /* Inline editing area color */
 }
 
-.milkdown-content:first-child p {
-	@apply mb-0;
-}
-
-.milkdown-content:last-child {
-	@apply mb-0;
-}
-
 .milkdown-content p {
-	@apply mb-6;
+	@apply mb-3;
 }
 
 .milkdown-content h1,
@@ -244,18 +247,5 @@ body {
 }
 
 .milkdown-content pre {
-	@apply overflow-auto rounded-sm bg-[var(--background-color-main)] whitespace-pre mb-8 transition-colors;
 	tab-size: 2;
-}
-
-.milkdown-content pre:has(code) {
-	@apply p-5;
-}
-
-.milkdown-content pre code {
-	@apply text-wrap text-[var(--text-color-main)];
-}
-
-.milkdown-content img {
-	@apply rounded-lg my-6;
 }

@@ -1,10 +1,10 @@
 'use client';
 
-import Prism from 'prismjs';
-import { useEffect } from 'react';
+import { useMemo } from 'react';
 
 import { CustomLink } from '../CustomLink/CustomLink';
 import { MilkdownContent } from '../MilkdownContent/MilkdownContent';
+import { TagsList } from '../TagsList/TagsList';
 import { UserBadgeWithCreatedAt } from '../UserBadgeWithCreatedAt/UserBadgeWithCreatedAt';
 
 import { routesConfig } from '@/config';
@@ -35,14 +35,14 @@ export const PostCard = ({
 	isOwner = false,
 	tags,
 }: Props) => {
-	const cuttedContent = {
-		...content,
-		content: content.content.slice(0, 2),
-	};
-
-	useEffect(() => {
-		Prism.highlightAll();
-	}, []);
+	
+	const html = useMemo(() => {
+		const cuttedContent = {
+			...content,
+			content: content.content.slice(0, 2),
+		};
+		return milkdownJsonToHtml(cuttedContent);
+	}, [content]);
 
 	return (
 		<li className='bg-[var(--background-color-card)] transition-all rounded-xl py-5 px-4 hover:shadow-primary border-t-16 border-primary self-start lg:max-w-115 min-w-85 w-full break-inside-avoid not-last:mb-6'>
@@ -62,21 +62,9 @@ export const PostCard = ({
 							createdAt={createdAt}
 						/>
 					</div>
-					{cuttedContent.content.length > 0 && (
-						<MilkdownContent content={milkdownJsonToHtml(cuttedContent)} />
-					)}
+					<MilkdownContent content={html} />
 				</div>
-				{tags && tags.length > 0 && (
-					<ul className='flex gap-2'>
-						{tags.map(({ id, name }) => (
-							<li
-								key={id}
-								className='text-xs leading-[150%] py-0.5 px-1 rounded-[0.125rem] cursor-default bg-secondary dark:bg-placeholder transition-colors'>
-								#{name}
-							</li>
-						))}
-					</ul>
-				)}
+				{tags && tags.length > 0 && <TagsList tags={tags} />}
 			</div>
 		</li>
 	);

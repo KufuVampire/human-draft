@@ -7,7 +7,6 @@ import { MouseEvent, useMemo, useState } from 'react';
 
 import { ProfilePoster } from './ProfilePoster/ProfilePoster';
 import { routesConfig } from '@/config';
-import { SEARCH_PARAMS } from '@/consts';
 import { useGetUserByUsernameQuery } from '@/graphql/generated/output';
 import { useProfile } from '@/hooks';
 import { SubscribeUnsubscribeButtons } from '@/modules';
@@ -17,6 +16,7 @@ import {
 	CustomLink,
 	Dropdown,
 	PostCard,
+	ProfilePageSkeleton,
 	Section,
 	UserAvatar,
 } from '@/shared';
@@ -165,6 +165,10 @@ export const ProfilePage = ({ username }: Props) => {
 		t,
 	]);
 
+	if (loading) {
+		return <ProfilePageSkeleton isOwner={isOwner} />;
+	}
+
 	if (!loading && !data) {
 		redirect(routesConfig.notFound);
 	}
@@ -265,24 +269,21 @@ export const ProfilePage = ({ username }: Props) => {
 				</div>
 			</Section>
 			<CreatePostBlogLinks />
-			{sortedPosts && (
-				<ul className='columns-1 lg:columns-2 gap-6'>
-					{sortedPosts.map((post) => {
-						return (
-							<PostCard
-								key={post.id}
-								author={post.author}
-								createdAt={post.createdAt}
-								id={post.id}
-								title={post.title}
-								content={post.content}
-								tags={post.tags}
-								isOwner={isOwner}
-							/>
-						);
-					})}
-				</ul>
-			)}
+			<ul className='columns-1 lg:columns-2 gap-6'>
+				{sortedPosts?.map((post) => {
+					return (
+						<PostCard
+							key={post.id}
+							author={post.author}
+							createdAt={post.createdAt}
+							id={post.id}
+							title={post.title}
+							content={post.content}
+							tags={post.tags}
+						/>
+					);
+				})}
+			</ul>
 		</div>
 	);
 };

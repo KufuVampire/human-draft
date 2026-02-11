@@ -12,7 +12,13 @@ import { routesConfig } from '@/config';
 import { useUpdateProfileMutation } from '@/graphql/generated/output';
 import { useProfile } from '@/hooks';
 import { TypeUpdateProfileSchema, updateProfileSchema } from '@/schemas';
-import { Button, FormField, Loader, Section, UserAvatar } from '@/shared';
+import {
+	Button,
+	FormField,
+	Section,
+	SettingsPageSkeleton,
+	UserAvatar,
+} from '@/shared';
 import { useConfirmationChangesModal } from '@/store';
 import { IField } from '@/types';
 
@@ -102,11 +108,7 @@ export const SettingsPage = () => {
 	}
 
 	if (isLoading) {
-		return (
-			<Section className='bg-[var(--background-color-card)] transition-colors w-full px-2 py-6 md:px-6 rounded-xl flex items-center justify-center'>
-				<Loader />
-			</Section>
-		);
+		return <SettingsPageSkeleton />;
 	}
 
 	const onSubmit: SubmitHandler<TypeUpdateProfileSchema> = (data) => {

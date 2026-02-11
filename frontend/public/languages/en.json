@@ -38,6 +38,7 @@
 	},
 	"fields": {
 		"searchInput": "Search by title, author, or tag",
+		"searchByName": "Search by username",
 		"username": "Username",
 		"email": "Email",
 		"password": "Password",

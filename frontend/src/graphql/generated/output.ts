@@ -269,7 +269,9 @@ export type QueryGetAllPostsPaginationArgs = {
 
 
 export type QueryGetAllUsersPaginationArgs = {
+  onlySubscriptions: Scalars['Boolean']['input'];
   searchParams?: InputMaybe<SearchParamsInput>;
+  searchStr?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -458,6 +460,8 @@ export type GetAllPostsQuery = { __typename?: 'Query', getAllPostsPagination: { 
 
 export type GetAllUsersQueryVariables = Exact<{
   searchParams: SearchParamsInput;
+  searchStr: Scalars['String']['input'];
+  onlySubscriptions: Scalars['Boolean']['input'];
 }>;
 
 
@@ -1017,8 +1021,12 @@ export type GetAllPostsLazyQueryHookResult = ReturnType<typeof useGetAllPostsLaz
 export type GetAllPostsSuspenseQueryHookResult = ReturnType<typeof useGetAllPostsSuspenseQuery>;
 export type GetAllPostsQueryResult = Apollo.QueryResult<GetAllPostsQuery, GetAllPostsQueryVariables>;
 export const GetAllUsersDocument = gql`
-    query getAllUsers($searchParams: SearchParamsInput!) {
-  getAllUsersPagination(searchParams: $searchParams) {
+    query getAllUsers($searchParams: SearchParamsInput!, $searchStr: String!, $onlySubscriptions: Boolean!) {
+  getAllUsersPagination(
+    searchParams: $searchParams
+    searchStr: $searchStr
+    onlySubscriptions: $onlySubscriptions
+  ) {
     data {
       id
       avatarUrl
@@ -1046,6 +1054,8 @@ export const GetAllUsersDocument = gql`
  * const { data, loading, error } = useGetAllUsersQuery({
  *   variables: {
  *      searchParams: // value for 'searchParams'
+ *      searchStr: // value for 'searchStr'
+ *      onlySubscriptions: // value for 'onlySubscriptions'
  *   },
  * });
  */

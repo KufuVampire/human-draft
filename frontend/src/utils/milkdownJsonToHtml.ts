@@ -1,23 +1,11 @@
-import { DOMSerializer, Node, NodeSpec, Schema } from 'prosemirror-model';
+import { DOMSerializer, Node, Schema } from 'prosemirror-model';
 import { schema as basicSchema } from 'prosemirror-schema-basic';
 import { addListNodes } from 'prosemirror-schema-list';
 
-const codeBlock: NodeSpec = {
-	...basicSchema.spec.nodes.get('code_block')!,
-	attrs: {
-		language: { default: null },
-	},
-	toDOM(node) {
-		const { language } = node.attrs;
-		return [
-			'pre',
-			['code', language ? { class: `language-${language}` } : {}, 0],
-		];
-	},
-};
+import { codeBlock, image } from './milkdownCustomBlocks';
 
 let nodes = addListNodes(basicSchema.spec.nodes, 'paragraph block*', 'block');
-nodes = nodes.update('code_block', codeBlock);
+nodes = nodes.update('code_block', codeBlock).update('image', image);
 
 export const schema = new Schema({
 	nodes,

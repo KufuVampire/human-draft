@@ -2,8 +2,6 @@
 
 import { useTranslations } from 'next-intl';
 import { redirect, useParams } from 'next/navigation';
-import Prism from 'prismjs';
-import { useEffect } from 'react';
 import { toast } from 'sonner';
 
 import { routesConfig } from '@/config';
@@ -11,8 +9,6 @@ import { useDeletePostMutation } from '@/graphql/generated/output';
 import { usePost } from '@/hooks';
 import { Button, MilkdownContent, UserBadgeWithCreatedAt } from '@/shared';
 import { useConfirmationDeletionModal, useProfile } from '@/store';
-
-import 'prismjs/themes/prism-tomorrow.css';
 
 export const PostPage = () => {
 	const t = useTranslations();
@@ -42,10 +38,6 @@ export const PostPage = () => {
 		});
 		setOpen(true);
 	};
-
-	useEffect(() => {
-		Prism.highlightAll();
-	}, []);
 
 	return (
 		<article className='flex flex-col gap-y-6 bg-[var(--background-color-card)] rounded-xl px-2 py-6 md:px-6 w-full transition-colors'>
