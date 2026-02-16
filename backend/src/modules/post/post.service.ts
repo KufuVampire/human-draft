@@ -23,11 +23,10 @@ export class PostService {
 	) {}
 
 	async create(authorId: string, input: CreatePostInput, blogId?: string) {
-		const { content, title, tags, id } = input;
+		const { content, title, tags } = input;
 
 		return this.prismaService.post.create({
 			data: {
-				...(id && { id }),
 				title,
 				content,
 				author: {
@@ -64,18 +63,34 @@ export class PostService {
 			},
 		});
 
-		if (!post || post.authorId !== authorId) {
+		if (!post) {
 			throw new NotFoundException('Post not found or you are not the author');
 		}
 
-		return this.prismaService.post.update({
+		const { content, title, tags, likesCount, viewsCount } = input;
+
+		await this.prismaService.post.update({
 			where: {
 				id: postId,
 			},
 			data: {
-				...input,
+				title,
+				content,
+				likesCount,
+				viewsCount,
+				...(tags && {
+					tags: {
+						set: [],
+						connectOrCreate: tags.map((tag) => ({
+							where: { name: tag },
+							create: { name: tag },
+						})),
+					},
+				}),
 			},
 		});
+
+		return true;
 	}
 
 	async delete(authorId: string, postId: string) {
@@ -209,8 +224,20 @@ export class PostService {
 			include: {
 				author: true,
 				blog: true,
-				comments: true,
+				comments: {
+					where: {
+						parentId: null,
+					},
+					include: {
+						author: true,
+					},
+				},
 				tags: true,
+				_count: {
+					select: {
+						comments: true
+					},
+				},
 			},
 		});
 
@@ -218,7 +245,10 @@ export class PostService {
 			throw new NotFoundException('Post was not found');
 		}
 
-		return post;
+		return {
+			...post,
+			commentsCount: post._count.comments,
+		};
 	}
 
 	async getAllPosts(searchParams: SearchParamsInput) {

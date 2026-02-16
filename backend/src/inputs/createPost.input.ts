@@ -3,9 +3,6 @@ import GraphQLJSON from 'graphql-type-json';
 
 @InputType()
 export class CreatePostInput {
-	@Field({ nullable: true })
-	id?: string;
-
 	@Field()
 	title: string;
 

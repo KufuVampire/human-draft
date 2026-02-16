@@ -1,15 +1,25 @@
-import { Args, Mutation, Resolver } from '@nestjs/graphql';
+import {
+	Args,
+	Mutation,
+	Parent,
+	ResolveField,
+	Resolver,
+} from '@nestjs/graphql';
 
 import { CommentService } from './comment.service';
+import { CommentsLoader } from './dataloader/CommentsLoader';
 import { Auth, Authorized } from '@/src/decorators';
 import { CommentModel } from '@/src/models';
 
-@Resolver('Comment')
+@Resolver(() => CommentModel)
 export class CommentResolver {
-	constructor(private readonly commentService: CommentService) {}
+	constructor(
+		private readonly commentService: CommentService,
+		private readonly commentsLoader: CommentsLoader
+	) {}
 
 	@Auth()
-	@Mutation(() => CommentModel, { name: 'createComment' })
+	@Mutation(() => Boolean, { name: 'createComment' })
 	async create(
 		@Authorized('id') authorId: string,
 		@Args('postId') postId: string,
@@ -20,7 +30,7 @@ export class CommentResolver {
 	}
 
 	@Auth()
-	@Mutation(() => CommentModel, { name: 'updateComment' })
+	@Mutation(() => Boolean, { name: 'updateComment' })
 	async update(
 		@Authorized('id') authorId: string,
 		@Args('commentId') commentId: string,
@@ -30,11 +40,16 @@ export class CommentResolver {
 	}
 
 	@Auth()
-	@Mutation(() => CommentModel, { name: 'deleteComment' })
+	@Mutation(() => Boolean, { name: 'deleteComment' })
 	async delete(
 		@Authorized('id') authorId: string,
 		@Args('commentId') commentId: string
 	) {
 		return this.commentService.delete(authorId, commentId);
+	}
+
+	@ResolveField(() => [CommentModel])
+	async replies(@Parent() comment: CommentModel) {
+		return await this.commentsLoader.batchReplies.load(comment.id);
 	}
 }

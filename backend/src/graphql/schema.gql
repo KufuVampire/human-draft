@@ -26,11 +26,10 @@ type CommentModel {
   author: UserModel!
   createdAt: DateTime!
   id: ID!
-  parent: CommentModel
+  parentId: String
   post: PostModel
   replies: [CommentModel!]!
   text: String!
-  updatedAt: DateTime!
 }
 
 input CreateBlogInput {
@@ -42,7 +41,6 @@ input CreateBlogInput {
 
 input CreatePostInput {
   content: JSON!
-  id: String
   tags: [String!]!
   title: String!
 }
@@ -61,11 +59,11 @@ type Mutation {
   changeProfileAvatar(file: Upload!): UserModel!
   changeProfilePoster(file: Upload!): UserModel!
   createBlog(data: CreateBlogInput!): BlogModel!
-  createComment(parentId: String, postId: String!, text: String!): CommentModel!
+  createComment(parentId: String, postId: String!, text: String!): Boolean!
   createPost(blogId: String, data: CreatePostInput!): PostModel!
   createTag(name: String!): TagModel!
   deleteBlog(blogId: String!): BlogModel!
-  deleteComment(commentId: String!): CommentModel!
+  deleteComment(commentId: String!): Boolean!
   deletePost(postId: String!): Boolean!
   deleteTag(name: String!): Boolean!
   pinPostToBlog(blogId: String!, postId: String!): PostModel!
@@ -78,8 +76,8 @@ type Mutation {
   unPinPostFromBlog(blogId: String!, postId: String!): PostModel!
   unsubscribeFromUser(toId: String!): Boolean!
   updateBlog(blogId: String!, data: UpdateBlogInput!): BlogModel!
-  updateComment(commentId: String!, text: String!): CommentModel!
-  updatePost(data: UpdatePostInput!, postId: String!): PostModel!
+  updateComment(commentId: String!, text: String!): Boolean!
+  updatePost(data: UpdatePostInput!, postId: String!): Boolean!
   updatePostOrBlogTags(tags: [String!]!, to: UpdatePostOrBlogTagsInput!): Boolean!
   updateUser(data: UpdateUserInput!): UserModel!
   uploadImage(image: Upload!): UploadImageModel!
@@ -150,7 +148,11 @@ input UpdateBlogInput {
 }
 
 input UpdatePostInput {
-  content: JSON!
+  content: JSON
+  likesCount: Int
+  tags: [String!]
+  title: String
+  viewsCount: Int
 }
 
 input UpdatePostOrBlogTagsInput {

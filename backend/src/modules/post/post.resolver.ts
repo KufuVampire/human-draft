@@ -24,7 +24,7 @@ export class PostResolver {
 	}
 
 	@Auth()
-	@Mutation(() => PostModel, { name: 'updatePost' })
+	@Mutation(() => Boolean, { name: 'updatePost' })
 	async update(
 		@Authorized('id') authorId: string,
 		@Args('postId') postId: string,
