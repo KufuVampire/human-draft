@@ -47,11 +47,10 @@ export type CommentModel = {
   author: UserModel;
   createdAt: Scalars['DateTime']['output'];
   id: Scalars['ID']['output'];
-  parent?: Maybe<CommentModel>;
+  parentId?: Maybe<Scalars['String']['output']>;
   post?: Maybe<PostModel>;
   replies: Array<CommentModel>;
   text: Scalars['String']['output'];
-  updatedAt: Scalars['DateTime']['output'];
 };
 
 export type CreateBlogInput = {
@@ -63,7 +62,6 @@ export type CreateBlogInput = {
 
 export type CreatePostInput = {
   content: Scalars['JSON']['input'];
-  id?: InputMaybe<Scalars['String']['input']>;
   tags: Array<Scalars['String']['input']>;
   title: Scalars['String']['input'];
 };
@@ -73,11 +71,11 @@ export type Mutation = {
   changeProfileAvatar: UserModel;
   changeProfilePoster: UserModel;
   createBlog: BlogModel;
-  createComment: CommentModel;
+  createComment: Scalars['Boolean']['output'];
   createPost: PostModel;
   createTag: TagModel;
   deleteBlog: BlogModel;
-  deleteComment: CommentModel;
+  deleteComment: Scalars['Boolean']['output'];
   deletePost: Scalars['Boolean']['output'];
   deleteTag: Scalars['Boolean']['output'];
   pinPostToBlog: PostModel;
@@ -90,8 +88,8 @@ export type Mutation = {
   unPinPostFromBlog: PostModel;
   unsubscribeFromUser: Scalars['Boolean']['output'];
   updateBlog: BlogModel;
-  updateComment: CommentModel;
-  updatePost: PostModel;
+  updateComment: Scalars['Boolean']['output'];
+  updatePost: Scalars['Boolean']['output'];
   updatePostOrBlogTags: Scalars['Boolean']['output'];
   updateUser: UserModel;
   uploadImage: UploadImageModel;
@@ -317,7 +315,11 @@ export type UpdateBlogInput = {
 };
 
 export type UpdatePostInput = {
-  content: Scalars['JSON']['input'];
+  content?: InputMaybe<Scalars['JSON']['input']>;
+  likesCount?: InputMaybe<Scalars['Int']['input']>;
+  tags?: InputMaybe<Array<Scalars['String']['input']>>;
+  title?: InputMaybe<Scalars['String']['input']>;
+  viewsCount?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type UpdatePostOrBlogTagsInput = {
@@ -380,12 +382,28 @@ export type ChangeProfilePosterMutationVariables = Exact<{
 
 export type ChangeProfilePosterMutation = { __typename?: 'Mutation', changeProfilePoster: { __typename?: 'UserModel', posterUrl?: string | null } };
 
+export type CreateCommentMutationVariables = Exact<{
+  text: Scalars['String']['input'];
+  postId: Scalars['String']['input'];
+  parentId?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type CreateCommentMutation = { __typename?: 'Mutation', createComment: boolean };
+
 export type CreatePostMutationVariables = Exact<{
   data: CreatePostInput;
 }>;
 
 
 export type CreatePostMutation = { __typename?: 'Mutation', createPost: { __typename?: 'PostModel', id: string, content: any, createdAt: any, updatedAt: any, likesCount: number, viewsCount: number, commentsCount: number, author: { __typename?: 'UserModel', id: string }, blog?: { __typename?: 'BlogModel', id: string } | null } };
+
+export type DeleteCommentMutationVariables = Exact<{
+  commentId: Scalars['String']['input'];
+}>;
+
+
+export type DeleteCommentMutation = { __typename?: 'Mutation', deleteComment: boolean };
 
 export type DeletePostMutationVariables = Exact<{
   postId: Scalars['String']['input'];
@@ -437,6 +455,22 @@ export type UnsubscribeMutationVariables = Exact<{
 
 export type UnsubscribeMutation = { __typename?: 'Mutation', unsubscribeFromUser: boolean };
 
+export type UpdateCommentMutationVariables = Exact<{
+  text: Scalars['String']['input'];
+  commentId: Scalars['String']['input'];
+}>;
+
+
+export type UpdateCommentMutation = { __typename?: 'Mutation', updateComment: boolean };
+
+export type UpdatePostMutationVariables = Exact<{
+  postId: Scalars['String']['input'];
+  data: UpdatePostInput;
+}>;
+
+
+export type UpdatePostMutation = { __typename?: 'Mutation', updatePost: boolean };
+
 export type UpdateProfileMutationVariables = Exact<{
   data: UpdateUserInput;
 }>;
@@ -472,7 +506,9 @@ export type GetPostByIdQueryVariables = Exact<{
 }>;
 
 
-export type GetPostByIdQuery = { __typename?: 'Query', getPostById: { __typename?: 'PostModel', id: string, title: string, content: any, createdAt: any, updatedAt: any, likesCount: number, viewsCount: number, commentsCount: number, blog?: { __typename?: 'BlogModel', id: string } | null, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null }, comments: Array<{ __typename?: 'CommentModel', id: string, author: { __typename?: 'UserModel', id: string } }>, tags?: Array<{ __typename?: 'TagModel', id: string, name: string }> | null } };
+export type GetPostByIdQuery = { __typename?: 'Query', getPostById: { __typename?: 'PostModel', id: string, title: string, content: any, createdAt: any, updatedAt: any, likesCount: number, viewsCount: number, commentsCount: number, blog?: { __typename?: 'BlogModel', id: string } | null, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null }, comments: Array<{ __typename?: 'CommentModel', id: string, text: string, parentId?: string | null, createdAt: any, replies: Array<{ __typename?: 'CommentModel', id: string, text: string, parentId?: string | null, createdAt: any, replies: Array<{ __typename?: 'CommentModel', id: string, text: string, parentId?: string | null, createdAt: any, replies: Array<{ __typename?: 'CommentModel', id: string, text: string, parentId?: string | null, createdAt: any, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null } }>, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null } }>, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null } }>, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null } }>, tags?: Array<{ __typename?: 'TagModel', id: string, name: string }> | null } };
+
+export type CommentFieldsFragment = { __typename?: 'CommentModel', id: string, text: string, parentId?: string | null, createdAt: any, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null } };
 
 export type GetUserByUsernameQueryVariables = Exact<{
   username: Scalars['String']['input'];
@@ -493,6 +529,18 @@ export const AuthUserFragmentFragmentDoc = gql`
   subscribers
   createdAt
   updatedAt
+}
+    `;
+export const CommentFieldsFragmentDoc = gql`
+    fragment CommentFields on CommentModel {
+  id
+  text
+  parentId
+  createdAt
+  author {
+    username
+    avatarUrl
+  }
 }
     `;
 export const ChangeProfileAvatarDocument = gql`
@@ -561,6 +609,39 @@ export function useChangeProfilePosterMutation(baseOptions?: Apollo.MutationHook
 export type ChangeProfilePosterMutationHookResult = ReturnType<typeof useChangeProfilePosterMutation>;
 export type ChangeProfilePosterMutationResult = Apollo.MutationResult<ChangeProfilePosterMutation>;
 export type ChangeProfilePosterMutationOptions = Apollo.BaseMutationOptions<ChangeProfilePosterMutation, ChangeProfilePosterMutationVariables>;
+export const CreateCommentDocument = gql`
+    mutation CreateComment($text: String!, $postId: String!, $parentId: String) {
+  createComment(text: $text, postId: $postId, parentId: $parentId)
+}
+    `;
+export type CreateCommentMutationFn = Apollo.MutationFunction<CreateCommentMutation, CreateCommentMutationVariables>;
+
+/**
+ * __useCreateCommentMutation__
+ *
+ * To run a mutation, you first call `useCreateCommentMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateCommentMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createCommentMutation, { data, loading, error }] = useCreateCommentMutation({
+ *   variables: {
+ *      text: // value for 'text'
+ *      postId: // value for 'postId'
+ *      parentId: // value for 'parentId'
+ *   },
+ * });
+ */
+export function useCreateCommentMutation(baseOptions?: Apollo.MutationHookOptions<CreateCommentMutation, CreateCommentMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateCommentMutation, CreateCommentMutationVariables>(CreateCommentDocument, options);
+      }
+export type CreateCommentMutationHookResult = ReturnType<typeof useCreateCommentMutation>;
+export type CreateCommentMutationResult = Apollo.MutationResult<CreateCommentMutation>;
+export type CreateCommentMutationOptions = Apollo.BaseMutationOptions<CreateCommentMutation, CreateCommentMutationVariables>;
 export const CreatePostDocument = gql`
     mutation createPost($data: CreatePostInput!) {
   createPost(data: $data) {
@@ -606,6 +687,37 @@ export function useCreatePostMutation(baseOptions?: Apollo.MutationHookOptions<C
 export type CreatePostMutationHookResult = ReturnType<typeof useCreatePostMutation>;
 export type CreatePostMutationResult = Apollo.MutationResult<CreatePostMutation>;
 export type CreatePostMutationOptions = Apollo.BaseMutationOptions<CreatePostMutation, CreatePostMutationVariables>;
+export const DeleteCommentDocument = gql`
+    mutation DeleteComment($commentId: String!) {
+  deleteComment(commentId: $commentId)
+}
+    `;
+export type DeleteCommentMutationFn = Apollo.MutationFunction<DeleteCommentMutation, DeleteCommentMutationVariables>;
+
+/**
+ * __useDeleteCommentMutation__
+ *
+ * To run a mutation, you first call `useDeleteCommentMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteCommentMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteCommentMutation, { data, loading, error }] = useDeleteCommentMutation({
+ *   variables: {
+ *      commentId: // value for 'commentId'
+ *   },
+ * });
+ */
+export function useDeleteCommentMutation(baseOptions?: Apollo.MutationHookOptions<DeleteCommentMutation, DeleteCommentMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteCommentMutation, DeleteCommentMutationVariables>(DeleteCommentDocument, options);
+      }
+export type DeleteCommentMutationHookResult = ReturnType<typeof useDeleteCommentMutation>;
+export type DeleteCommentMutationResult = Apollo.MutationResult<DeleteCommentMutation>;
+export type DeleteCommentMutationOptions = Apollo.BaseMutationOptions<DeleteCommentMutation, DeleteCommentMutationVariables>;
 export const DeletePostDocument = gql`
     mutation DeletePost($postId: String!) {
   deletePost(postId: $postId)
@@ -877,6 +989,70 @@ export function useUnsubscribeMutation(baseOptions?: Apollo.MutationHookOptions<
 export type UnsubscribeMutationHookResult = ReturnType<typeof useUnsubscribeMutation>;
 export type UnsubscribeMutationResult = Apollo.MutationResult<UnsubscribeMutation>;
 export type UnsubscribeMutationOptions = Apollo.BaseMutationOptions<UnsubscribeMutation, UnsubscribeMutationVariables>;
+export const UpdateCommentDocument = gql`
+    mutation UpdateComment($text: String!, $commentId: String!) {
+  updateComment(text: $text, commentId: $commentId)
+}
+    `;
+export type UpdateCommentMutationFn = Apollo.MutationFunction<UpdateCommentMutation, UpdateCommentMutationVariables>;
+
+/**
+ * __useUpdateCommentMutation__
+ *
+ * To run a mutation, you first call `useUpdateCommentMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateCommentMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateCommentMutation, { data, loading, error }] = useUpdateCommentMutation({
+ *   variables: {
+ *      text: // value for 'text'
+ *      commentId: // value for 'commentId'
+ *   },
+ * });
+ */
+export function useUpdateCommentMutation(baseOptions?: Apollo.MutationHookOptions<UpdateCommentMutation, UpdateCommentMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateCommentMutation, UpdateCommentMutationVariables>(UpdateCommentDocument, options);
+      }
+export type UpdateCommentMutationHookResult = ReturnType<typeof useUpdateCommentMutation>;
+export type UpdateCommentMutationResult = Apollo.MutationResult<UpdateCommentMutation>;
+export type UpdateCommentMutationOptions = Apollo.BaseMutationOptions<UpdateCommentMutation, UpdateCommentMutationVariables>;
+export const UpdatePostDocument = gql`
+    mutation UpdatePost($postId: String!, $data: UpdatePostInput!) {
+  updatePost(data: $data, postId: $postId)
+}
+    `;
+export type UpdatePostMutationFn = Apollo.MutationFunction<UpdatePostMutation, UpdatePostMutationVariables>;
+
+/**
+ * __useUpdatePostMutation__
+ *
+ * To run a mutation, you first call `useUpdatePostMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdatePostMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updatePostMutation, { data, loading, error }] = useUpdatePostMutation({
+ *   variables: {
+ *      postId: // value for 'postId'
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useUpdatePostMutation(baseOptions?: Apollo.MutationHookOptions<UpdatePostMutation, UpdatePostMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdatePostMutation, UpdatePostMutationVariables>(UpdatePostDocument, options);
+      }
+export type UpdatePostMutationHookResult = ReturnType<typeof useUpdatePostMutation>;
+export type UpdatePostMutationResult = Apollo.MutationResult<UpdatePostMutation>;
+export type UpdatePostMutationOptions = Apollo.BaseMutationOptions<UpdatePostMutation, UpdatePostMutationVariables>;
 export const UpdateProfileDocument = gql`
     mutation UpdateProfile($data: UpdateUserInput!) {
   updateUser(data: $data) {
@@ -1094,9 +1270,15 @@ export const GetPostByIdDocument = gql`
       avatarUrl
     }
     comments {
-      id
-      author {
-        id
+      ...CommentFields
+      replies {
+        ...CommentFields
+        replies {
+          ...CommentFields
+          replies {
+            ...CommentFields
+          }
+        }
       }
     }
     tags {
@@ -1108,7 +1290,7 @@ export const GetPostByIdDocument = gql`
     commentsCount
   }
 }
-    `;
+    ${CommentFieldsFragmentDoc}`;
 
 /**
  * __useGetPostByIdQuery__

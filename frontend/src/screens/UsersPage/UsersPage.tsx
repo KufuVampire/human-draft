@@ -18,6 +18,7 @@ import {
 	UserAvatar,
 	UserAvatarSkeleton,
 } from '@/shared';
+import { cn } from '@/utils';
 
 const arr = new Array(10).fill(0);
 
@@ -67,7 +68,7 @@ export const UsersPage = () => {
 		<Section className='w-full flex flex-col gap-y-6 px-2 md:px-0 md:p-6 rounded-xl md:p-0'>
 			<div className='flex gap-x-6'>
 				<FormField
-					className='w-full p-0 border-none [&:not(:placeholder-shown)]:border-none [&:not(:placeholder-shown)]:shadow-none text-xl leading-[110%]'
+					className='w-full p-0 border-none [&:not(:placeholder-shown)]:border-none [&:not(:placeholder-shown)]:shadow-none leading-[110%]'
 					wrapperClassNames='w-full'
 					inputWrapperClassName='bg-[var(--background-color-card)] transition-colors py-4 px-5 flex gap-x-2 md:gap-x-5 rounded-lg'
 					placeholder={t('fields.searchByName')}
@@ -76,7 +77,7 @@ export const UsersPage = () => {
 				</FormField>
 				<FormField
 					type='checkbox'
-					wrapperClassNames='flex-row-reverse items-center gap-x-2 bg-[var(--background-color-card)] transition-colors py-3 px-5 rounded-xl max-w-42.5 w-full'
+					wrapperClassNames='flex-row-reverse items-center gap-x-2 bg-[var(--background-color-card)] transition-colors py-3 px-5 rounded-xl text-xl leading-[110%]'
 					inputWrapperClassName='flex items-center'
 					className='p-0 border-none [&:not(:placeholder-shown)]:border-none [&:not(:placeholder-shown)]:shadow-none'
 					text={t('filters.subscriptions')}
@@ -86,35 +87,37 @@ export const UsersPage = () => {
 			</div>
 			{!loading ? (
 				<ul
-					className='grid grid-cols-1 lg:grid-cols-2 w-full gap-y-4 md:gap-6 bg-[var(--background-color-card)] px-5 py-4 rounded-xl transition-colors'
+					className={cn(
+						'grid grid-cols-1 lg:grid-cols-2 w-full gap-y-4 md:gap-6 bg-[var(--background-color-card)] px-5 py-4 rounded-xl transition-colors',
+						users && users.length < 1 && 'hidden'
+					)}
 					onClickCapture={handleClick}>
-					{users &&
-						users.map(({ id, username, description, avatarUrl }) => (
-							<li
-								key={id}
-								className='w-full border border-primary rounded-xl hover:shadow-primary transition-shadow'>
-								<CustomLink
-									href={username}
-									className='flex w-full p-2 gap-x-4 text-left hover:text-[var(--text-color-main)] focus-visible:text-[var(--text-color-main)]'>
-									<UserAvatar
-										username={username}
-										avatarUrl={avatarUrl}
-										location='users-page'
+					{users?.map(({ id, username, description, avatarUrl }) => (
+						<li
+							key={id}
+							className='w-full border border-primary rounded-xl hover:shadow-primary transition-shadow'>
+							<CustomLink
+								href={username}
+								className='flex w-full p-2 gap-x-4 text-left hover:text-[var(--text-color-main)] focus-visible:text-[var(--text-color-main)]'>
+								<UserAvatar
+									username={username}
+									avatarUrl={avatarUrl}
+									location='users-page'
+								/>
+								<div className='flex flex-col gap-y-2 w-full min-w-0'>
+									<h2 className='font-title font-bold text-xl leading-[110%]'>
+										{username}
+									</h2>
+									<p className='leading-6 truncate w-full'>{description}</p>
+									<SubscribeUnsubscribeButtons
+										toId={id}
+										className='self-start py-1 px-2 rounded-sm leading-[110%] tracking-[5%] uppercase'
+										isSubscribed={subscriptions.includes(id)}
 									/>
-									<div className='flex flex-col gap-y-2 w-full min-w-0'>
-										<h2 className='font-title font-bold text-xl leading-[110%]'>
-											{username}
-										</h2>
-										<p className='leading-6 truncate w-full'>{description}</p>
-										<SubscribeUnsubscribeButtons
-											toId={id}
-											className='self-start py-1 px-2 rounded-sm leading-[110%] tracking-[5%] uppercase'
-											isSubscribed={subscriptions.includes(id)}
-										/>
-									</div>
-								</CustomLink>
-							</li>
-						))}
+								</div>
+							</CustomLink>
+						</li>
+					))}
 				</ul>
 			) : (
 				<ul className='grid grid-cols-1 lg:grid-cols-2 w-full gap-y-4 md:gap-6 bg-[var(--background-color-card)] px-5 py-4 rounded-xl transition-colors'>

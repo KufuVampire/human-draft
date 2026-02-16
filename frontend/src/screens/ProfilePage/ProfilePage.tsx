@@ -217,7 +217,8 @@ export const ProfilePage = ({ username }: Props) => {
 								<Button
 									variant='light'
 									className='rounded-lg py-2 px-3 group'
-									onClick={() => setOpen((prev) => !prev)}>
+									onClick={() => setOpen((prev) => !prev)}
+									title={t('btns.aria.profilePage.dropdown')}>
 									<EllipsisVertical className='stroke-secondary group-hover:stroke-primary-hover transition-colors' />
 								</Button>
 							</Dropdown>

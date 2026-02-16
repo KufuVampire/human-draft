@@ -50,7 +50,7 @@ export const FormField = forwardRef<HTMLInputElement, PropsWithChildren<Props>>(
 				<div
 					className={cn(
 						'relative w-full',
-						type === 'checkbox' && 'border size-6.5 rounded-sm p-0.5 hover:border-primary shrink-0',
+						type === 'checkbox' && 'border size-6 rounded-sm p-0.5 hover:border-primary shrink-0',
 						checked && 'border-primary bg-primary transition-colors',
 						inputWrapperClassName
 					)}>

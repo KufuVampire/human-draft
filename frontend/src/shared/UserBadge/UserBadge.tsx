@@ -1,12 +1,13 @@
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 
+import { UserBadgeLocation } from '@/types';
 import { cn } from '@/utils';
 
 interface Props {
 	username?: string;
 	avatarUrl?: string | null;
-	location?: 'header' | 'burger-menu' | 'post-card';
+	location?: UserBadgeLocation;
 	className?: string;
 }
 
@@ -26,6 +27,7 @@ export const UserBadge = ({
 					{
 						['rounded-sm size-7.5']: location === 'post-card',
 						['rounded-xl size-10']: location === 'header',
+						['rounded-xl size-8']: location === 'comment-item' || location === 'comment-field',
 						['rounded-sm size-6 ']: location === 'burger-menu',
 					},
 					className
@@ -50,6 +52,7 @@ export const UserBadge = ({
 							{
 								['text-[1rem]']: location === 'post-card',
 								['text-2xl']: location === 'header',
+								['text-xl']: location === 'comment-item' || location === 'comment-field',
 								['text-lg']: location === 'burger-menu',
 							}
 						)}>
@@ -57,12 +60,15 @@ export const UserBadge = ({
 					</div>
 				)}
 			</div>
-			<span
-				className={cn('text-lg hover:text-primary-hovers', {
-					['text-secondary']: location === 'burger-menu',
-				})}>
-				{username}
-			</span>
+			{username && (
+				<span
+					className={cn('text-lg hover:text-primary-hovers', {
+						['text-secondary']: location === 'burger-menu',
+						['hidden']: location === 'comment-field',
+					})}>
+					{username}
+				</span>
+			)}
 		</div>
 	);
 };

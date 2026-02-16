@@ -16,7 +16,13 @@
 		"remove": "Удалить",
 		"ok": "Ок",
 		"showPassword": "Показать пароль",
-		"hidePassword": "Скрыть пароль"
+		"hidePassword": "Скрыть пароль",
+		"reply": "Ответить",
+		"aria": {
+			"profilePage": {
+				"dropdown": "Нажмите чтобы посмотреть больше действий с вашим профилем"
+			}
+		}
 	},
 	"dashboard": {
 		"expand": "Развернуть",
@@ -43,7 +49,7 @@
 		"email": "Почта",
 		"password": "Пароль",
 		"repeatPassword": "Повторите пароль",
-		"leaveComment": "Комментарий",
+		"comment": "Комментарий",
 		"shortDescription": "Краткое описание"
 	},
 	"authTabLinks": {
@@ -97,9 +103,10 @@
 		}
 	},
 	"comments": {
-		"leaveComment": "Сохранить комментарий",
-		"reply": "Ответа",
-		"replies": "Ответов"
+		"leaveComment": "Оставить комментарий",
+		"updateComment": "Обновить комментарий",
+		"hideReplies": "Скрыть ответы",
+		"replies": "{count, plural, one {# ответ} few {# ответа} many {# ответов} other {# ответов}}"
 	},
 	"homePage": {
 		"metadata": {
@@ -114,6 +121,7 @@
 		"removePost": "Удалить пост?",
 		"removePoster": "Удалить постер?",
 		"removeAvatar": "Удалить аватар?",
+		"removeComment": "Удалить комментарий?",
 		"saveChanges": "Сохранить изменения"
 	},
 	"profilePage": {
@@ -154,7 +162,8 @@
 			"pin": "Закрепить блог",
 			"searchFieldPlaceholder": "Поиск блогов"
 		},
-		"postDeletedSuccess": "Пост умешно удалён"
+		"postDeletedSuccess": "Пост уcпешно удалён",
+		"postUpdatedSuccess": "Пост успешно обновлён"
 	},
 	"blogPage": {
 		"metadata": {

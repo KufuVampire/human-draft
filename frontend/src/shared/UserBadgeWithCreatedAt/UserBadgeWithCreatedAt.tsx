@@ -1,7 +1,9 @@
+import { UserBadgeLocation } from '@/types';
 import { CustomLink } from '../CustomLink/CustomLink';
 import { UserBadge } from '../UserBadge/UserBadge';
 
 import { useCreateAt } from '@/hooks';
+import { cn } from '@/utils';
 
 interface Props {
 	createdAt: string;
@@ -11,6 +13,8 @@ interface Props {
 	};
 	isOwner?: boolean;
 	isShow?: boolean;
+	className?: string;
+	location?: UserBadgeLocation
 }
 
 export const UserBadgeWithCreatedAt = ({
@@ -18,15 +22,17 @@ export const UserBadgeWithCreatedAt = ({
 	author,
 	isOwner = false,
 	isShow = false,
+	className,
+	location = 'post-card'
 }: Props) => {
 	const datetime = useCreateAt(createdAt);
 
 	return (
-		<div className='flex gap-x-3 items-center'>
+		<div className={cn('flex gap-x-3 items-center', className)}>
 			{!isOwner && !isShow && (
 				<CustomLink href={`/${author.username}`}>
 					<UserBadge
-						location='post-card'
+						location={location}
 						avatarUrl={author.avatarUrl}
 						username={author.username}
 					/>
@@ -34,7 +40,7 @@ export const UserBadgeWithCreatedAt = ({
 			)}
 			{isShow && (
 				<UserBadge
-					location='post-card'
+					location={location}
 					avatarUrl={author.avatarUrl}
 					username={author.username}
 				/>

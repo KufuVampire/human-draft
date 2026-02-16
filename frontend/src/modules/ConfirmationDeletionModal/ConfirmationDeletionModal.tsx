@@ -34,10 +34,7 @@ export const ConfirmationDeletionModal = ({ className }: Props) => {
 					className
 				)}>
 				<h2 className='font-title text-[1.75rem] md:text-4xl font-bold leading-[110%]'>
-					{type === 'post' && t('modals.removePost')}
-					{type === 'blog' && t('modals.removeBlog')}
-					{type === 'poster' && t('modals.removePoster')}
-					{type === 'avatar' && t('modals.removeAvatar')}
+					{t(`modals.remove${type.charAt(0).toUpperCase() + type.slice(1)}`)}
 				</h2>
 				<div className='flex justify-between gap-x-12'>
 					<Button

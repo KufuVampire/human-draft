@@ -1,10 +1,12 @@
 import { create } from 'zustand';
 
+type ModalTextType = 'post' | 'blog' | 'avatar' | 'poster' | 'comment';
+
 interface InitialState {
 	isOpen: boolean;
 	setOpen: (isOpen: boolean) => void;
-	type: 'post' | 'blog' | 'avatar' | 'poster';
-	setType: (type: 'post' | 'blog' | 'avatar' | 'poster') => void;
+	type: ModalTextType;
+	setType: (type: ModalTextType) => void;
 	cb: () => void;
 	setCb: (cb: () => void) => void;
 }

@@ -4,3 +4,4 @@ export type {
 	LinkAndButtonVariants,
 	LinkAndButtonVariantType,
 } from './linkAndButton';
+export { type UserBadgeLocation } from './userBadgeLocation';

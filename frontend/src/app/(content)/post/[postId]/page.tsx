@@ -1,5 +1,5 @@
 import { PostPage } from '@/screens';
 
-export default function Page() {
+export default function Post() {
 	return <PostPage />;
 }

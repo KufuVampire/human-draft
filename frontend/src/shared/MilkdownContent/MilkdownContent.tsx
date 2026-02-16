@@ -2,11 +2,21 @@
 
 import { memo } from 'react';
 
+import { cn } from '@/utils';
+
+interface Props {
+	content: string;
+	className?: string;
+}
+
 export const MilkdownContent = memo(
-	({ content }: { content: string }) => {
+	({ content, className }: Props) => {
 		return (
 			<div
-				className='milkdown-content'
+				className={cn(
+					'milkdown-content',
+					className
+				)}
 				dangerouslySetInnerHTML={{ __html: content }}
 			/>
 		);

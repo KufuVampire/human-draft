@@ -1,6 +1,6 @@
 export const convertImageBlockToImage = (doc: any) => {
 	if (doc.type === 'image-block') {
-		return { type: 'image', attrs: doc.attrs };
+		return { ...doc, type: 'image' };
 	}
 	if (doc.content) {
 		return { ...doc, content: doc.content.map(convertImageBlockToImage) };

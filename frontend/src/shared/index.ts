@@ -1,7 +1,9 @@
 export { BurgerMenu } from './BurgerMenu/BurgerMenu';
 export { Button } from './Button/Button';
 export { Checkbox } from './Checkbox/Checkbox';
+export { CommentItem } from './CommentItem/CommentItem';
 export { Container } from './Container/Container';
+export { CreateCommentField } from './CreateCommentField/CreateCommentField';
 export { CreatePostBlogLinks } from './CreatePostBlogLinks/CreatePostBlogLinks';
 export { CustomLink } from './CustomLink/CustomLink';
 export { Dropdown } from './Dropdown/Dropdown';

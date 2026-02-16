@@ -9,7 +9,6 @@ export const usePost = (postId: string) => {
 			postId,
 		},
 	});
-
 	const post = data?.getPostById;
 	const postHtml = useMemo(() => {
 		if (!post?.content) return '';
@@ -19,6 +18,7 @@ export const usePost = (postId: string) => {
 	return {
 		isLoading: loading,
 		...post,
+		rawContent: post?.content,
 		content: postHtml,
 	};
 };

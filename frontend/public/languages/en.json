@@ -16,7 +16,13 @@
 		"remove": "Delete",
 		"ok": "OK",
 		"showPassword": "Show password",
-		"hidePassword": "Hide password"
+		"hidePassword": "Hide password",
+		"reply": "Reply",
+		"aria": {
+			"profilePage": {
+				"dropdown": "Click to see more actions with your profile"
+			}
+		}
 	},
 	"dashboard": {
 		"expand": "Expand",
@@ -43,7 +49,7 @@
 		"email": "Email",
 		"password": "Password",
 		"repeatPassword": "Repeat password",
-		"leaveComment": "Comment",
+		"comment": "Comment",
 		"shortDescription": "Short description"
 	},
 	"authTabLinks": {
@@ -98,8 +104,9 @@
 	},
 	"comments": {
 		"leaveComment": "Save comment",
-		"reply": "Reply",
-		"replies": "Replies"
+		"updateComment": "Update comment",
+		"hideReplies": "Hide replies",
+		"replies": "{count, plural, one {# reply} other {# replies}}"
 	},
 	"homePage": {
 		"metadata": {
@@ -114,6 +121,7 @@
 		"removePost": "Delete post?",
 		"removePoster": "Delete poster?",
 		"removeAvatar": "Delete avatar?",
+		"removeComment": "Delete comment?",
 		"saveChanges": "Save changes"
 	},
 	"profilePage": {
@@ -154,7 +162,8 @@
 			"pin": "Pin blog",
 			"searchFieldPlaceholder": "Search blogs"
 		},
-		"postDeletedSuccess": "Post successfully deleted"
+		"postDeletedSuccess": "Post successfully deleted",
+		"postUpdatedSuccess": "Post successfully updated"
 	},
 	"blogPage": {
 		"metadata": {

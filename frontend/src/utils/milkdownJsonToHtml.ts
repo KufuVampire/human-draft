@@ -28,7 +28,7 @@ export function milkdownJsonToHtml(json: unknown, title?: string) {
 	div.appendChild(fragment);
 
 	if (title) {
-		return `<h1>${title}</h1>${div.innerHTML}`;
+		return `<h1 class='font-title font-bold leading-[110%] text-4xl md:text-5xl'>${title}</h1>${div.innerHTML}`;
 	}
 
 	return div.innerHTML;

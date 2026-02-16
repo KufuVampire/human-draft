@@ -1,12 +1,16 @@
-import { cn } from '@/utils';
 import { CreatePostBlogLInksSkeleton } from '../CreatePostBlogLInksSkeleton';
+import { PostCardSkeleton } from '../PostCardSkeleton';
 import { PosterSkeleton } from '../PosterSkeleton';
 import { Skeleton } from '../Skeleton';
 import { UserAvatarSkeleton } from '../UserAvatarSkeleton';
 
+import { cn } from '@/utils';
+
 interface Props {
 	isOwner: boolean;
 }
+
+const arr = new Array(6).fill(0);
 
 export const ProfilePageSkeleton = ({ isOwner }: Props) => {
 	return (
@@ -28,6 +32,14 @@ export const ProfilePageSkeleton = ({ isOwner }: Props) => {
 				</div>
 			</div>
 			{isOwner && <CreatePostBlogLInksSkeleton />}
+			<ul className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+				{arr.map((_, index) => (
+					<PostCardSkeleton
+						isOwner={isOwner}
+						key={index}
+					/>
+				))}
+			</ul>
 		</div>
 	);
 };
