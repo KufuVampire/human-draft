@@ -60,7 +60,7 @@ export const UserProfile = () => {
 					: href;
 			const profileHref =
 				href === routesConfig.profile && profile?.username
-					? `/${profile.username}`
+					? routesConfig.profileUsername(profile.username)
 					: href;
 			const currentHref =
 				href === routesConfig.profile ? profileHref : settingsHref;

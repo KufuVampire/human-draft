@@ -9,14 +9,12 @@ import {
 	useRef,
 } from 'react';
 
-import { DropdownList } from '../DropdownList/DropdownList';
-
 import { useClickOutside } from '@/hooks';
+import { DropdownList } from '@/shared';
 import { DisplayDropdownDirection } from '@/types';
 import { cn } from '@/utils';
 
 interface Props extends HTMLAttributes<HTMLUListElement> {
-	dropdownClassName?: string;
 	listClassName?: string;
 	itemClassName?: string;
 	isOpen: boolean;

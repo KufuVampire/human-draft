@@ -1,22 +1,35 @@
-import { GetPostByIdQuery } from '@/graphql/generated/output';
-import { CommentItem, CreateCommentField } from '@/shared';
+'use client';
 
-interface Props {
-	commentsList?: GetPostByIdQuery['getPostById']['comments'];
-}
+import { useParams } from 'next/navigation';
+import { useEffect } from 'react';
 
-export const Comments = ({ commentsList }: Props) => {
+import { useComments } from '@/store/useComments';
+
+import { useGetAllPostCommentsLazyQuery } from '@/graphql/generated/output';
+import { CommentsList, CreateCommentField } from '@/shared';
+
+const Comments = () => {
+	const { postId } = useParams<{ postId: string }>();
+	const { comments, setComments } = useComments();
+	const [getComments, { data }] = useGetAllPostCommentsLazyQuery();
+
+	useEffect(() => {
+		if (!postId) return;
+		getComments({ variables: { postId } });
+	}, [postId]);
+
+	useEffect(() => {
+		if (data && data.getAllPostComments) {
+			setComments(data.getAllPostComments);
+		}
+	}, [data]);
+
 	return (
 		<>
 			<CreateCommentField />
-			<ul className='flex flex-col gap-y-3'>
-				{commentsList?.map((comment) => (
-					<CommentItem
-						key={comment.id}
-						comment={comment}
-					/>
-				))}
-			</ul>
+			{comments.length > 0 && <CommentsList data={comments} />}
 		</>
 	);
 };
+
+export default Comments;

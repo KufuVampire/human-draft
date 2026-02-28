@@ -1,6 +1,5 @@
+import { useProfileAvatar, useProfilePoster } from '@/hooks';
 import { useProfile as useProfileStore, useSubscriptions } from '@/store';
-import { useProfileAvatar } from './useProfileAvatar';
-import { useProfilePoster } from './useProfilePoster';
 
 export const useProfile = () => {
 	const profile = useProfileStore();

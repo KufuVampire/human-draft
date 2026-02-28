@@ -68,7 +68,7 @@ export const Navigation = ({
 
 					const currentHref =
 						href === routesConfig.profile && profile?.username
-							? `/${profile?.username}`
+							? routesConfig.profileUsername(profile.username)
 							: href;
 
 					return (

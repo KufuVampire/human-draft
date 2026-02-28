@@ -1,14 +1,5 @@
 mutation SignIn($data: SignInInput!) {
 	signIn(data: $data) {
-		username
-		id
-		email
-		description
-		posterUrl
-		avatarUrl
-		createdAt
-		updatedAt
-		subscribers
-		subscriptions
+		...AuthUserFragment
 	}
 }

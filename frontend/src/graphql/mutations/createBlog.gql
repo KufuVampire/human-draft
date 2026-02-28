@@ -1,0 +1,8 @@
+mutation createBlog($data: CreateBlogInput!, $poster: Upload) {
+	createBlog(data: $data, poster: $poster) {
+		...BlogFragment
+		posts {
+			...PostFragment
+		}
+	}
+}

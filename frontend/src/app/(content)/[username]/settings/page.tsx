@@ -4,11 +4,17 @@ import { getTranslations } from 'next-intl/server';
 import { AuthGuard } from '@/guards';
 import { SettingsPage } from '@/screens';
 
-export async function generateMetadata(): Promise<Metadata> {
+interface Params {
+	params: Promise<{ username: string }>;
+}
+
+export async function generateMetadata({ params }: Params): Promise<Metadata> {
 	const t = await getTranslations('settingsPage.metadata');
 
+	const { username } = await params;
+
 	return {
-		title: t('title'),
+		title: `${username} | ${t('title')}`,
 		description: t('description'),
 	};
 }

@@ -7,7 +7,7 @@ import { codeBlock, image } from './milkdownCustomBlocks';
 let nodes = addListNodes(basicSchema.spec.nodes, 'paragraph block*', 'block');
 nodes = nodes.update('code_block', codeBlock).update('image', image);
 
-export const schema = new Schema({
+const schema = new Schema({
 	nodes,
 	marks: basicSchema.spec.marks,
 });

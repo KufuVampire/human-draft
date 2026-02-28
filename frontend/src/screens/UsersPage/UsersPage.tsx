@@ -2,7 +2,7 @@
 
 import { Search } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { MouseEvent, useState } from 'react';
+import { MouseEvent, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { SEARCH_PARAMS } from '@/consts';
@@ -28,7 +28,6 @@ export const UsersPage = () => {
 	const [perPage] = useState<number>(SEARCH_PARAMS.PER_PAGE);
 	const { subscriptions } = useProfile();
 	const { register, watch } = useForm<TypeUsersSearchSchema>({
-		mode: 'onChange',
 		defaultValues: {
 			search: '',
 			onlySubscriptions: false,
@@ -64,6 +63,17 @@ export const UsersPage = () => {
 
 	const users = data?.getAllUsersPagination.data;
 
+	const filteredUsers = useMemo(() => {
+		const onlySubscribersUsers = users?.filter(
+			(u) => onlySubscriptionsValue && subscriptions.includes(u.id)
+		);
+		if (onlySubscriptionsValue) {
+			return onlySubscribersUsers;
+		}
+
+		return users;
+	}, [onlySubscriptionsValue, subscriptions, users]);
+
 	return (
 		<Section className='w-full flex flex-col gap-y-6 px-2 md:px-0 md:p-6 rounded-xl md:p-0'>
 			<div className='flex gap-x-6'>
@@ -77,22 +87,20 @@ export const UsersPage = () => {
 				</FormField>
 				<FormField
 					type='checkbox'
-					wrapperClassNames='flex-row-reverse items-center gap-x-2 bg-[var(--background-color-card)] transition-colors py-3 px-5 rounded-xl text-xl leading-[110%]'
-					inputWrapperClassName='flex items-center'
-					className='p-0 border-none [&:not(:placeholder-shown)]:border-none [&:not(:placeholder-shown)]:shadow-none'
+					wrapperClassNames='bg-[var(--background-color-card)] py-3 px-5 rounded-xl text-xl leading-[110%]'
 					text={t('filters.subscriptions')}
 					checked={onlySubscriptionsValue}
 					{...register('onlySubscriptions')}
 				/>
 			</div>
-			{!loading ? (
+			{!loading && filteredUsers && filteredUsers.length > 0 && (
 				<ul
 					className={cn(
 						'grid grid-cols-1 lg:grid-cols-2 w-full gap-y-4 md:gap-6 bg-[var(--background-color-card)] px-5 py-4 rounded-xl transition-colors',
 						users && users.length < 1 && 'hidden'
 					)}
 					onClickCapture={handleClick}>
-					{users?.map(({ id, username, description, avatarUrl }) => (
+					{filteredUsers?.map(({ id, username, description, avatarUrl }) => (
 						<li
 							key={id}
 							className='w-full border border-primary rounded-xl hover:shadow-primary transition-shadow'>
@@ -119,7 +127,8 @@ export const UsersPage = () => {
 						</li>
 					))}
 				</ul>
-			) : (
+			)}
+			{loading && (
 				<ul className='grid grid-cols-1 lg:grid-cols-2 w-full gap-y-4 md:gap-6 bg-[var(--background-color-card)] px-5 py-4 rounded-xl transition-colors'>
 					{arr.map((_, i) => (
 						<li

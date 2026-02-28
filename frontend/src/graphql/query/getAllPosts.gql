@@ -1,21 +1,10 @@
 query getAllPosts($searchParams: SearchParamsInput!) {
 	getAllPostsPagination(searchParams: $searchParams) {
 		data {
-			id
-			title
-			content
-			createdAt
-			updatedAt
+			...PostFragment
 			tags {
 				id
 				name
-			}
-			likesCount
-			viewsCount
-			commentsCount
-			author {
-				username
-				avatarUrl
 			}
 		}
 		page

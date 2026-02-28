@@ -1,0 +1,5 @@
+mutation UnPinPost($blogId: String!, $postId: String!) {
+	unPinPost(blogId: $blogId, postId: $postId) {
+		postId
+	}
+}

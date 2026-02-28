@@ -1,7 +1,6 @@
 import { NodeSpec } from 'prosemirror-model';
 
-const figureStyles = 'flex flex-col items-center w-full mb-3';
-const imgStyles = 'mb-1';
+const figureStyles = 'flex flex-col items-center w-full';
 
 export const image: NodeSpec = {
 	inline: false,
@@ -31,18 +30,20 @@ export const image: NodeSpec = {
 		const figureAttrs = { class: figureStyles };
 		const imgAttrs = {
 			src,
-			class: imgStyles,
+			fetchpriority: "high",
+			width: "auto",
+			height: "200",
 		};
 
 		if (caption) {
 			return [
 				'figure',
 				figureAttrs,
-				['img', imgAttrs],
+				['img', { ...imgAttrs, class: 'mb-1', alt: caption }],
 				['figcaption', {}, caption],
 			];
 		}
 
-		return ['img', imgAttrs];
+		return ['div', { class: 'flex justify-center w-full' }, ['img', imgAttrs]];
 	},
 };

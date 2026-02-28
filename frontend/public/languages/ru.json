@@ -150,10 +150,6 @@
 		}
 	},
 	"postPage": {
-		"metadata": {
-			"title": "",
-			"description": ""
-		},
 		"like": "Поставить лайк",
 		"commentsCount": "Количество комментариев",
 		"viewsCount": "Количество просмотров",
@@ -162,19 +158,23 @@
 			"pin": "Закрепить блог",
 			"searchFieldPlaceholder": "Поиск блогов"
 		},
-		"postDeletedSuccess": "Пост уcпешно удалён",
-		"postUpdatedSuccess": "Пост успешно обновлён"
+		"postDeletedSuccess": "Пост успешно удалён",
+		"postUpdatedSuccess": "Пост успешно обновлён",
+		"comments": {
+			"exitEditMode": "Выйти из режима редактирования комментария",
+			"enterEditMode": "Войти в режим редактирования комментария",
+			"deleteComment": "Удалить комментарий"
+		}
 	},
 	"blogPage": {
-		"metadata": {
-			"title": "",
-			"description": ""
-		},
-		"editFields": {
-			"title": "Заголовок",
+		"fields": {
+			"title": "Название блога",
 			"description": "Описание блога"
 		},
+		"blogPoster": "Обложка блога",
 		"editBlog": "Редактировать блог",
+		"blogDeletedSuccess": "Блог успешно удалён",
+		"blogUpdatedSuccess": "Блог успешно обновлён",
 		"pinPosts": {
 			"pin": "Закрепить посты",
 			"searchFieldPlaceholder": "Поиск постов"
@@ -198,5 +198,11 @@
 		"copyCode": "Скопировать код",
 		"tagPickerPlaceholder": "Выберите теги"
 	},
-	"in": "в"
+	"in": "в",
+	"tagsPickerTitle": "Выбор тэгов",
+	"usersPage": {
+		"metadata": {
+			"title": "Участники"
+		}
+	}
 }

@@ -91,12 +91,12 @@ export const BurgerMenu = ({ className }: Props) => {
 
 				const settingsHref =
 					href === routesConfig.settings && profile?.username
-						? `/${profile?.username}/${routesConfig.settings}`
+						? routesConfig.profileSettings(profile.username)
 						: href;
 
 				const profileHref =
 					href === routesConfig.profile && profile?.username
-						? `/${profile.username}`
+						? routesConfig.profileUsername(profile.username)
 						: href;
 				const currentHref =
 					href === routesConfig.profile ? profileHref : settingsHref;

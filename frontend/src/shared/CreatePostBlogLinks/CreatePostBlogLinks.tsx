@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 
+import { CreatePostLink } from '../CreatePostLink/CreatePostLink';
 import { CustomLink } from '../CustomLink/CustomLink';
 
 import { routesConfig } from '@/config';
@@ -9,10 +10,6 @@ import { useProfile } from '@/hooks';
 import { cn } from '@/utils';
 
 const linkItems = [
-	{
-		href: routesConfig.postCreate(),
-		translationKey: 'createPost',
-	},
 	{
 		href: routesConfig.blogCreate(),
 		translationKey: 'createBlog',
@@ -28,6 +25,7 @@ export const CreatePostBlogLinks = () => {
 
 	return (
 		<div className='flex flex-col md:flex-row gap-x-6 gap-y-3'>
+			<CreatePostLink />
 			{linkItems.map(({ href, translationKey, variant }) => (
 				<CustomLink
 					key={href}

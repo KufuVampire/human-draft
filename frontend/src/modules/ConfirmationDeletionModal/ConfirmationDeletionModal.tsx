@@ -12,7 +12,7 @@ interface Props {
 	className?: string;
 }
 
-const buttonStyles = 'py-3 w-full tracking-[5%] uppercase rounded-lg';
+const buttonStyles = 'p-2 md:p-3 w-full tracking-[5%] uppercase rounded-lg';
 
 export const ConfirmationDeletionModal = ({ className }: Props) => {
 	const { isOpen, setOpen, cb, type } = useConfirmationDeletionModal();
@@ -30,10 +30,10 @@ export const ConfirmationDeletionModal = ({ className }: Props) => {
 			<div
 				ref={modalRef}
 				className={cn(
-					'bg-[var(--background-color-card)] px-3 md:px-5 py-6 rounded-lg flex flex-col gap-y-[1.875rem] md:gap-y-12',
+					'bg-[var(--background-color-card)] px-3 md:px-5 py-4 md:py-6 rounded-lg flex flex-col gap-y-[1.875rem] md:gap-y-12',
 					className
 				)}>
-				<h2 className='font-title text-[1.75rem] md:text-4xl font-bold leading-[110%]'>
+				<h2 className='font-title text-[1.75rem] md:text-4xl font-bold leading-[110%] text-center'>
 					{t(`modals.remove${type.charAt(0).toUpperCase() + type.slice(1)}`)}
 				</h2>
 				<div className='flex justify-between gap-x-12'>

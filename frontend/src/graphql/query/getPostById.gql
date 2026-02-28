@@ -12,18 +12,6 @@ query getPostById($postId: String!) {
 			username
 			avatarUrl
 		}
-		comments {
-			...CommentFields
-			replies {
-				...CommentFields
-				replies {
-					...CommentFields
-					replies {
-						...CommentFields
-					}
-				}
-			}
-		}
 		tags {
 			id
 			name
@@ -31,16 +19,5 @@ query getPostById($postId: String!) {
 		likesCount
 		viewsCount
 		commentsCount
-	}
-}
-
-fragment CommentFields on CommentModel {
-	id
-	text
-	parentId
-	createdAt
-	author {
-		username
-		avatarUrl
 	}
 }

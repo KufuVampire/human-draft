@@ -1,3 +1,5 @@
 mutation DeletePost($postId: String!) {
-	deletePost(postId: $postId)
+	deletePost(postId: $postId) {
+		postId
+	}
 }

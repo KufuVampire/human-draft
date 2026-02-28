@@ -1,4 +1,4 @@
-export class RoutesConfig {
+class RoutesConfig {
 	home = '/';
 
 	private blog = '/blog';
@@ -18,9 +18,13 @@ export class RoutesConfig {
 	publicOffer = 'public-offer';
 	aboutUs = 'about-us';
 
-	notFound = '404';
+	notFound = '/404';
+
+	profileUsername = (username: string) => `/${username}`
+	profileSettings = (username: string) => `/${username}/${this.settings}`;
 
 	postCreate = () => `${this.post}/${this.create}`;
+	postCreateWithBlog = (blogId: string) => `${this.post}/${this.create}/${blogId}`;
 	postUpdate = (id: string) => `${this.post}/${id}/${this.update}`;
 	postById = (id: string) => `${this.post}/${id}`;
 

@@ -150,10 +150,6 @@
 		}
 	},
 	"postPage": {
-		"metadata": {
-			"title": "",
-			"description": ""
-		},
 		"like": "Like",
 		"commentsCount": "Number of comments",
 		"viewsCount": "Number of views",
@@ -163,18 +159,26 @@
 			"searchFieldPlaceholder": "Search blogs"
 		},
 		"postDeletedSuccess": "Post successfully deleted",
-		"postUpdatedSuccess": "Post successfully updated"
+		"postUpdatedSuccess": "Post successfully updated",
+		"comments": {
+			"exitEditMode": "Exit comment edit mode",
+			"enterEditMode": "Enter in comment edit mode",
+			"deleteComment": "Delete comment"
+		}
 	},
 	"blogPage": {
 		"metadata": {
 			"title": "",
 			"description": ""
 		},
-		"editFields": {
-			"title": "Title",
+		"fields": {
+			"title": "Blog title",
 			"description": "Blog description"
 		},
 		"editBlog": "Edit blog",
+		"blogPoster": "Poster blog",
+		"blogDeletedSuccess": "Blog successfully deleted",
+		"blogUpdatedSuccess": "Blog successfully updated",
 		"pinPosts": {
 			"pin": "Pin posts",
 			"searchFieldPlaceholder": "Search posts"
@@ -198,5 +202,11 @@
 		"copyCode": "Copy code",
 		"tagPickerPlaceholder": "Select tags"
 	},
-	"in": "in"
+	"in": "in",
+	"tagsPickerTitle": "Select tags",
+	"usersPage": {
+		"metadata": {
+			"title": "Users"
+		}
+	}
 }

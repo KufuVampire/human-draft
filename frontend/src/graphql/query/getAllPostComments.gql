@@ -1,0 +1,5 @@
+query GetAllPostComments($postId: String!) {
+	getAllPostComments(postId: $postId) {
+		...CommentFields
+	}
+}

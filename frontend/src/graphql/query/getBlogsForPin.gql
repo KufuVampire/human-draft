@@ -1,0 +1,6 @@
+query GetBlogsForPin {
+	blogsForPin {
+		id
+		title
+	}
+}

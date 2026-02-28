@@ -1,5 +1,4 @@
 export { AuthTabLinks } from './AuthTabLinks/AuthTabLinks';
-export { Comments } from './Comments/Comments';
 export { ConfirmationChangesModal } from './ConfirmationChangesModal/ConfirmationChangesModal';
 export { ConfirmationDeletionModal } from './ConfirmationDeletionModal/ConfirmationDeletionModal';
 export { CropperModal } from './CropperModal/CropperModal';

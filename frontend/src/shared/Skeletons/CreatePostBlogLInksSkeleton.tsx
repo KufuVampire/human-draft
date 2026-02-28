@@ -2,7 +2,7 @@ import { Skeleton } from './Skeleton';
 
 const arr = new Array(2).fill(0);
 
-export const CreatePostBlogLInksSkeleton = () => {
+export const CreatePostBlogLinksSkeleton = () => {
 	return (
 		<div className='flex flex-col md:flex-row gap-x-6 gap-y-3'>
 			{arr.map((_, index) => (

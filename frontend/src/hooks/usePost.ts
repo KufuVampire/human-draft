@@ -1,3 +1,5 @@
+'use client';
+
 import { useMemo } from 'react';
 
 import { useGetPostByIdQuery } from '@/graphql/generated/output';
@@ -9,11 +11,12 @@ export const usePost = (postId: string) => {
 			postId,
 		},
 	});
+
 	const post = data?.getPostById;
 	const postHtml = useMemo(() => {
-		if (!post?.content) return '';
+		if (!post) return '';
 		return milkdownJsonToHtml(post.content, post.title);
-	}, [post?.content, post?.title]);
+	}, [post]);
 
 	return {
 		isLoading: loading,

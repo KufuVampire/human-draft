@@ -1,7 +1,6 @@
 import { ButtonHTMLAttributes, PropsWithChildren } from 'react';
 
-import { Loader } from '../Loader/Loader';
-
+import { Loader } from '@/shared';
 import { LinkAndButtonVariantType, LinkAndButtonVariants } from '@/types';
 import { cn } from '@/utils';
 
@@ -40,7 +39,14 @@ export const Button = ({
 				isLoading ? styles['disabled'] : styles[variant],
 				props.className
 			)}>
-			{!isLoading ? text || children : <Loader size='24' borderSize='3' />}
+			{!isLoading ? (
+				text || children
+			) : (
+				<Loader
+					size='24'
+					borderSize='3'
+				/>
+			)}
 		</button>
 	);
 };

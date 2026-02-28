@@ -1,0 +1,10 @@
+fragment PostFragment on PostModel {
+	id
+	title
+	content
+	author {
+		username
+		avatarUrl
+	}
+	createdAt
+}

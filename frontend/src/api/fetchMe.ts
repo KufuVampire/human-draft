@@ -34,10 +34,6 @@ const profileQuery = `
 			blogs {
 				id
 				title
-				author {
-					id
-					username
-				}
 				description
 				tags {
 					id

@@ -1,6 +1,6 @@
 'use client';
 
-import { Check, Eye, EyeOff } from 'lucide-react';
+import { Check, Circle, Eye, EyeOff } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { HTMLProps, PropsWithChildren, forwardRef, useState } from 'react';
 
@@ -11,6 +11,7 @@ interface Props extends HTMLProps<HTMLInputElement> {
 	bottomText?: string;
 	wrapperClassNames?: string;
 	inputWrapperClassName?: string;
+	labelTextClassName?: string;
 }
 
 const iconStyles =
@@ -23,35 +24,46 @@ export const FormField = forwardRef<HTMLInputElement, PropsWithChildren<Props>>(
 			bottomText,
 			wrapperClassNames,
 			inputWrapperClassName,
+			labelTextClassName,
 			children,
 			...props
 		},
 		ref
 	) => {
-		const { type, checked } = props;
+		const { type } = props;
 		const [isShowPassword, setShowPassword] = useState(false);
 		const t = useTranslations('btns');
 
 		const isPasswordField = type === 'password';
-		const inputType = isPasswordField
-			? isShowPassword
-				? 'text'
-				: 'password'
-			: type;
+		const passwordField = isShowPassword ? 'text' : 'password';
+		const inputType = isPasswordField ? passwordField : type;
 
 		return (
 			<label
 				className={cn(
-					'flex flex-col gap-y-2 cursor-pointer',
-					type === 'checkbox' && 'hover:text-primary transition-colors',
+					'flex flex-col gap-y-2 cursor-pointer transition-colors',
+					(type === 'checkbox' || type === 'radio') &&
+						'hover:text-primary flex-row-reverse items-center gap-x-2 p-2',
 					wrapperClassNames
 				)}>
-				{text && <span className='text-xl'>{text}</span>}
+				{text && (
+					<span
+						className={cn(
+							'text-xl font-title font-bold leading-[110%]',
+							(type === 'checkbox' || type === 'radio') &&
+								'font-normal font-text',
+							labelTextClassName
+						)}>
+						{text}
+					</span>
+				)}
 				<div
 					className={cn(
-						'relative w-full',
-						type === 'checkbox' && 'border size-6 rounded-sm p-0.5 hover:border-primary shrink-0',
-						checked && 'border-primary bg-primary transition-colors',
+						'relative w-full transition',
+						type === 'checkbox' &&
+							'border size-6 rounded-sm p-0.5 hover:border-primary shrink-0 has-[input:checked]:border-primary has-[input:checked]:bg-primary flex items-center',
+						type === 'radio' &&
+							'border size-6 p-1 hover:border-primary shrink-0 flex justify-center items-center rounded-full has-[input:checked]:border-primary 	',
 						inputWrapperClassName
 					)}>
 					{children}
@@ -61,12 +73,24 @@ export const FormField = forwardRef<HTMLInputElement, PropsWithChildren<Props>>(
 						type={inputType}
 						className={cn(
 							'p-2.5 outline-0 border border-field hover:border-primary focus:border-primary rounded-md w-full bg-transparent [&:not(:placeholder-shown)]:border-primary [&:not(:placeholder-shown)]:shadow-[0px_0px_6px_0px_var(--color-primary)]',
-							type === 'checkbox' && 'appearance-none absolute top-0',
+							(type === 'checkbox' || type === 'radio') &&
+								'appearance-none absolute top-0 peer p-0 border-none [&:not(:placeholder-shown)]:border-none [&:not(:placeholder-shown)]:shadow-none',
 							props.className
 						)}
 					/>
 					{type === 'checkbox' && (
-						<Check className={cn('size-5 stroke-secondary opacity-0 transition-opacity duration-100 shrink-0', checked && 'opacity-100')} />
+						<Check
+							className={cn(
+								'size-5 stroke-secondary opacity-0 transition-opacity duration-100 shrink-0 peer-checked:opacity-100'
+							)}
+						/>
+					)}
+					{type === 'radio' && (
+						<Circle
+							className={cn(
+								'size-4 stroke-primary fill-primary opacity-0 transition-opacity duration-100 shrink-0 peer-checked:opacity-100'
+							)}
+						/>
 					)}
 					{type === 'password' && !isShowPassword && (
 						<Eye

@@ -17,7 +17,7 @@ export const ThemeSwitcher = () => {
 	useEffect(() => {
 		setChecked(isDark);
 		setMounted(true);
-	}, [isDark, theme]);
+	}, [theme]);
 
 	const handleChange = () => {
 		setTheme(isDark ? 'light' : 'dark');

@@ -5,7 +5,7 @@
 
 :root {
 	/* light theme */
-	--main-bg-light-theme: #e5e5e5;
+	--main-bg-light-theme: #	;
 	--card-bg-light-theme: #ffffff;
 	--tag-bg-light-theme: #e5e5e5;
 
@@ -131,7 +131,7 @@ body {
 }
 
 .ProseMirror {
-	@apply pl-16! pr-0! py-8! md:px-0!;
+	@apply pl-16! pr-0! py-0! md:py-0! md:px-0!;
 }
 
 .milkdown-block-handle[data-show='false'] {
@@ -170,13 +170,13 @@ body {
 	--crepe-color-outline: #242424; /* Border/outline color */
 	--crepe-color-inverse: #362f27; /* Inverse color for contrast */
 	--crepe-color-on-inverse: #fcefe2; /* Text color on inverse */
-	--crepe-color-inline-code: #ba1a1a; /* Inline code color */
+	--crepe-color-inline-code: var(--text-color-secondary); /* Inline code color */
 	--crepe-color-error: #ba1a1a; /* Error state color */
 
 	/* Interactive Colors */
 	--crepe-color-hover: #f9ecdf; /* Hover state color */
-	--crepe-color-selected: #ede0d4; /* Selected state color */
-	--crepe-color-inline-area: #e4d8cc; /* Inline editing area color */
+	--crepe-color-selected: var(--primary-color-hover); /* Selected state color */
+	--crepe-color-inline-area: var(--primary-color); /* Inline editing area color */
 
 	--crepe-shadow-1: var(--shadow-primary);
 }
@@ -210,17 +210,15 @@ body {
 	--crepe-color-outline: var(--color-secondary); /* Border/outline color */
 	--crepe-color-inverse: #362f27; /* Inverse color for contrast */
 	--crepe-color-on-inverse: #fcefe2; /* Text color on inverse */
-	--crepe-color-inline-code: #ba1a1a; /* Inline code color */
 	--crepe-color-error: #ba1a1a; /* Error state color */
 
 	/* Interactive Colors */
 	--crepe-color-hover: var(--color-primary-hover); /* Hover state color */
 	--crepe-color-selected: var(--color-primary); /* Selected state color */
-	--crepe-color-inline-area: #e4d8cc; /* Inline editing area color */
 }
 
 .milkdown-content p {
-	@apply mb-3;
+	@apply my-6;
 }
 
 .milkdown-content h1,
@@ -229,23 +227,25 @@ body {
 .milkdown-content h4,
 .milkdown-content h5,
 .milkdown-content h6 {
-	@apply mb-8;
-}
-
-.milkdown-content li {
-	@apply mb-2;
+	@apply my-4;
 }
 
 .milkdown-content ul p,
 .milkdown-content ol p {
-	@apply mb-0;
+	@apply m-0;
 }
 
 .milkdown-content ul,
 .milkdown-content ol {
-	@apply my-8 pl-8 list-disc;
+	@apply my-8 pl-8 list-disc flex flex-col gap-y-2;
 }
 
 .milkdown-content pre {
 	tab-size: 2;
 }
+
+.milkdown-content figure:has(+ img) {
+	@apply mb-8;
+}
+
+@media (prefers-reduced-motion: reduce) {}

@@ -29,6 +29,7 @@ export const ProfilePoster = ({
 					priority
 					loading='eager'
 					unoptimized
+					fetchPriority='high'
 				/>
 			)}
 			{isOwner && profile?.posterUrl && (
@@ -41,6 +42,7 @@ export const ProfilePoster = ({
 					priority
 					loading='eager'
 					unoptimized
+					fetchPriority='high'
 				/>
 			)}
 			{children}

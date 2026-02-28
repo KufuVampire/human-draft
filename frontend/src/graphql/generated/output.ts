@@ -27,7 +27,7 @@ export type BlogModel = {
   description: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   posterUrl?: Maybe<Scalars['String']['output']>;
-  posts?: Maybe<Array<PostModel>>;
+  posts: Array<PostModel>;
   tags: Array<TagModel>;
   title: Scalars['String']['output'];
   updatedAt: Scalars['DateTime']['output'];
@@ -54,9 +54,9 @@ export type CommentModel = {
 };
 
 export type CreateBlogInput = {
-  description: Scalars['String']['input'];
-  postIds: Array<Scalars['ID']['input']>;
-  posterUrl?: InputMaybe<Scalars['String']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  postIds: Array<Scalars['String']['input']>;
+  tags: Array<Scalars['String']['input']>;
   title: Scalars['String']['input'];
 };
 
@@ -71,13 +71,14 @@ export type Mutation = {
   changeProfileAvatar: UserModel;
   changeProfilePoster: UserModel;
   createBlog: BlogModel;
-  createComment: Scalars['Boolean']['output'];
+  createComment: CommentModel;
   createPost: PostModel;
   createTag: TagModel;
-  deleteBlog: BlogModel;
+  deleteBlog: Scalars['Boolean']['output'];
   deleteComment: Scalars['Boolean']['output'];
-  deletePost: Scalars['Boolean']['output'];
+  deletePost: PostDeleteResponse;
   deleteTag: Scalars['Boolean']['output'];
+  pinPost: PostModel;
   pinPostToBlog: PostModel;
   removeProfileAvatar: UserModel;
   removeProfilePoster: UserModel;
@@ -85,7 +86,8 @@ export type Mutation = {
   signOutAccount: Scalars['Boolean']['output'];
   signUp: UserModel;
   subscribeToUser: Scalars['Boolean']['output'];
-  unPinPostFromBlog: PostModel;
+  unPinPost: UnPinPostResponse;
+  unPinPostFromBlog: UnPinPostResponse;
   unsubscribeFromUser: Scalars['Boolean']['output'];
   updateBlog: BlogModel;
   updateComment: Scalars['Boolean']['output'];
@@ -108,6 +110,7 @@ export type MutationChangeProfilePosterArgs = {
 
 export type MutationCreateBlogArgs = {
   data: CreateBlogInput;
+  poster?: InputMaybe<Scalars['Upload']['input']>;
 };
 
 
@@ -149,6 +152,12 @@ export type MutationDeleteTagArgs = {
 };
 
 
+export type MutationPinPostArgs = {
+  blogId: Scalars['String']['input'];
+  postId: Scalars['String']['input'];
+};
+
+
 export type MutationPinPostToBlogArgs = {
   blogId: Scalars['String']['input'];
   postId: Scalars['String']['input'];
@@ -167,6 +176,12 @@ export type MutationSignUpArgs = {
 
 export type MutationSubscribeToUserArgs = {
   toId: Scalars['String']['input'];
+};
+
+
+export type MutationUnPinPostArgs = {
+  blogId: Scalars['String']['input'];
+  postId: Scalars['String']['input'];
 };
 
 
@@ -214,17 +229,21 @@ export type MutationUploadImageArgs = {
   image: Scalars['Upload']['input'];
 };
 
+export type PostDeleteResponse = {
+  __typename?: 'PostDeleteResponse';
+  postId: Scalars['String']['output'];
+};
+
 export type PostModel = {
   __typename?: 'PostModel';
   author: UserModel;
   blog?: Maybe<BlogModel>;
-  comments: Array<CommentModel>;
   commentsCount: Scalars['Int']['output'];
   content: Scalars['JSON']['output'];
   createdAt: Scalars['DateTime']['output'];
   id: Scalars['ID']['output'];
   likesCount: Scalars['Int']['output'];
-  tags?: Maybe<Array<TagModel>>;
+  tags: Array<TagModel>;
   title: Scalars['String']['output'];
   updatedAt: Scalars['DateTime']['output'];
   viewsCount: Scalars['Int']['output'];
@@ -241,10 +260,14 @@ export type PostPagination = {
 
 export type Query = {
   __typename?: 'Query';
+  blogsForPin: Array<BlogModel>;
   findTagsBySearchString: Array<TagModel>;
   getAllBlogsPagination: BlogPagination;
+  getAllPostComments: Array<CommentModel>;
   getAllPostsPagination: PostPagination;
   getAllUsersPagination: UserPagination;
+  getBlogById: BlogModel;
+  getFreePostsForPin: Array<PostModel>;
   getPostById: PostModel;
   getUserByUsername: UserModel;
   userProfile: UserModel;
@@ -261,6 +284,11 @@ export type QueryGetAllBlogsPaginationArgs = {
 };
 
 
+export type QueryGetAllPostCommentsArgs = {
+  postId: Scalars['String']['input'];
+};
+
+
 export type QueryGetAllPostsPaginationArgs = {
   searchParams?: InputMaybe<SearchParamsInput>;
 };
@@ -269,6 +297,16 @@ export type QueryGetAllPostsPaginationArgs = {
 export type QueryGetAllUsersPaginationArgs = {
   onlySubscriptions: Scalars['Boolean']['input'];
   searchParams?: InputMaybe<SearchParamsInput>;
+  searchStr?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryGetBlogByIdArgs = {
+  blogId: Scalars['String']['input'];
+};
+
+
+export type QueryGetFreePostsForPinArgs = {
   searchStr?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -308,6 +346,11 @@ export type TagModel = {
   updatedAt: Scalars['DateTime']['output'];
 };
 
+export type UnPinPostResponse = {
+  __typename?: 'UnPinPostResponse';
+  postId: Scalars['String']['output'];
+};
+
 export type UpdateBlogInput = {
   description?: InputMaybe<Scalars['String']['input']>;
   posterUrl?: InputMaybe<Scalars['String']['input']>;
@@ -343,14 +386,14 @@ export type UploadImageModel = {
 export type UserModel = {
   __typename?: 'UserModel';
   avatarUrl?: Maybe<Scalars['String']['output']>;
-  blogs?: Maybe<Array<BlogModel>>;
+  blogs: Array<BlogModel>;
   comments?: Maybe<Array<CommentModel>>;
   createdAt: Scalars['DateTime']['output'];
   description?: Maybe<Scalars['String']['output']>;
   email: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   posterUrl?: Maybe<Scalars['String']['output']>;
-  posts?: Maybe<Array<PostModel>>;
+  posts: Array<PostModel>;
   subscribers: Array<Scalars['String']['output']>;
   subscriptions: Array<Scalars['String']['output']>;
   updatedAt: Scalars['DateTime']['output'];
@@ -368,6 +411,14 @@ export type UserPagination = {
 
 export type AuthUserFragmentFragment = { __typename?: 'UserModel', id: string, username: string, email: string, description?: string | null, avatarUrl?: string | null, posterUrl?: string | null, subscriptions: Array<string>, subscribers: Array<string>, createdAt: any, updatedAt: any };
 
+export type BlogFragmentFragment = { __typename?: 'BlogModel', id: string, title: string, description: string, posterUrl?: string | null, createdAt: any, tags: Array<{ __typename?: 'TagModel', id: string, name: string }>, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null } };
+
+export type CommentFieldsFragment = { __typename?: 'CommentModel', id: string, text: string, parentId?: string | null, createdAt: any, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null }, replies: Array<{ __typename?: 'CommentModel', id: string, text: string, parentId?: string | null, createdAt: any, replies: Array<{ __typename?: 'CommentModel', id: string, text: string, parentId?: string | null, createdAt: any, replies: Array<{ __typename?: 'CommentModel', id: string, text: string, parentId?: string | null, createdAt: any, replies: Array<{ __typename?: 'CommentModel', id: string, text: string, parentId?: string | null, createdAt: any, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null } }>, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null } }>, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null } }>, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null } }> };
+
+export type RepliesFieldsFragment = { __typename?: 'CommentModel', id: string, text: string, parentId?: string | null, createdAt: any, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null } };
+
+export type PostFragmentFragment = { __typename?: 'PostModel', id: string, title: string, content: any, createdAt: any, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null } };
+
 export type ChangeProfileAvatarMutationVariables = Exact<{
   file: Scalars['Upload']['input'];
 }>;
@@ -382,6 +433,14 @@ export type ChangeProfilePosterMutationVariables = Exact<{
 
 export type ChangeProfilePosterMutation = { __typename?: 'Mutation', changeProfilePoster: { __typename?: 'UserModel', posterUrl?: string | null } };
 
+export type CreateBlogMutationVariables = Exact<{
+  data: CreateBlogInput;
+  poster?: InputMaybe<Scalars['Upload']['input']>;
+}>;
+
+
+export type CreateBlogMutation = { __typename?: 'Mutation', createBlog: { __typename?: 'BlogModel', id: string, title: string, description: string, posterUrl?: string | null, createdAt: any, posts: Array<{ __typename?: 'PostModel', id: string, title: string, content: any, createdAt: any, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null } }>, tags: Array<{ __typename?: 'TagModel', id: string, name: string }>, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null } } };
+
 export type CreateCommentMutationVariables = Exact<{
   text: Scalars['String']['input'];
   postId: Scalars['String']['input'];
@@ -389,14 +448,22 @@ export type CreateCommentMutationVariables = Exact<{
 }>;
 
 
-export type CreateCommentMutation = { __typename?: 'Mutation', createComment: boolean };
+export type CreateCommentMutation = { __typename?: 'Mutation', createComment: { __typename?: 'CommentModel', id: string, text: string, parentId?: string | null, createdAt: any, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null }, replies: Array<{ __typename?: 'CommentModel', id: string, text: string, parentId?: string | null, createdAt: any, replies: Array<{ __typename?: 'CommentModel', id: string, text: string, parentId?: string | null, createdAt: any, replies: Array<{ __typename?: 'CommentModel', id: string, text: string, parentId?: string | null, createdAt: any, replies: Array<{ __typename?: 'CommentModel', id: string, text: string, parentId?: string | null, createdAt: any, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null } }>, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null } }>, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null } }>, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null } }> } };
 
 export type CreatePostMutationVariables = Exact<{
   data: CreatePostInput;
+  blogId?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
-export type CreatePostMutation = { __typename?: 'Mutation', createPost: { __typename?: 'PostModel', id: string, content: any, createdAt: any, updatedAt: any, likesCount: number, viewsCount: number, commentsCount: number, author: { __typename?: 'UserModel', id: string }, blog?: { __typename?: 'BlogModel', id: string } | null } };
+export type CreatePostMutation = { __typename?: 'Mutation', createPost: { __typename?: 'PostModel', likesCount: number, viewsCount: number, commentsCount: number, id: string, title: string, content: any, createdAt: any, blog?: { __typename?: 'BlogModel', id: string } | null, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null } } };
+
+export type DeleteBlogMutationVariables = Exact<{
+  blogId: Scalars['String']['input'];
+}>;
+
+
+export type DeleteBlogMutation = { __typename?: 'Mutation', deleteBlog: boolean };
 
 export type DeleteCommentMutationVariables = Exact<{
   commentId: Scalars['String']['input'];
@@ -410,7 +477,15 @@ export type DeletePostMutationVariables = Exact<{
 }>;
 
 
-export type DeletePostMutation = { __typename?: 'Mutation', deletePost: boolean };
+export type DeletePostMutation = { __typename?: 'Mutation', deletePost: { __typename?: 'PostDeleteResponse', postId: string } };
+
+export type PinPostMutationVariables = Exact<{
+  blogId: Scalars['String']['input'];
+  postId: Scalars['String']['input'];
+}>;
+
+
+export type PinPostMutation = { __typename?: 'Mutation', pinPost: { __typename?: 'PostModel', id: string, title: string, content: any, createdAt: any, tags: Array<{ __typename?: 'TagModel', id: string, name: string }>, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null } } };
 
 export type RemoveProfileAvatarMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -432,14 +507,14 @@ export type SignUpMutationVariables = Exact<{
 }>;
 
 
-export type SignUpMutation = { __typename?: 'Mutation', signUp: { __typename?: 'UserModel', username: string, id: string, email: string, description?: string | null, posterUrl?: string | null, avatarUrl?: string | null, createdAt: any, updatedAt: any, subscribers: Array<string>, subscriptions: Array<string> } };
+export type SignUpMutation = { __typename?: 'Mutation', signUp: { __typename?: 'UserModel', id: string, username: string, email: string, description?: string | null, avatarUrl?: string | null, posterUrl?: string | null, subscriptions: Array<string>, subscribers: Array<string>, createdAt: any, updatedAt: any } };
 
 export type SignInMutationVariables = Exact<{
   data: SignInInput;
 }>;
 
 
-export type SignInMutation = { __typename?: 'Mutation', signIn: { __typename?: 'UserModel', username: string, id: string, email: string, description?: string | null, posterUrl?: string | null, avatarUrl?: string | null, createdAt: any, updatedAt: any, subscribers: Array<string>, subscriptions: Array<string> } };
+export type SignInMutation = { __typename?: 'Mutation', signIn: { __typename?: 'UserModel', id: string, username: string, email: string, description?: string | null, avatarUrl?: string | null, posterUrl?: string | null, subscriptions: Array<string>, subscribers: Array<string>, createdAt: any, updatedAt: any } };
 
 export type SubscribeMutationVariables = Exact<{
   toId: Scalars['String']['input'];
@@ -447,6 +522,14 @@ export type SubscribeMutationVariables = Exact<{
 
 
 export type SubscribeMutation = { __typename?: 'Mutation', subscribeToUser: boolean };
+
+export type UnPinPostMutationVariables = Exact<{
+  blogId: Scalars['String']['input'];
+  postId: Scalars['String']['input'];
+}>;
+
+
+export type UnPinPostMutation = { __typename?: 'Mutation', unPinPost: { __typename?: 'UnPinPostResponse', postId: string } };
 
 export type UnsubscribeMutationVariables = Exact<{
   toId: Scalars['String']['input'];
@@ -485,12 +568,33 @@ export type GetTagsBySearchStringQueryVariables = Exact<{
 
 export type GetTagsBySearchStringQuery = { __typename?: 'Query', findTagsBySearchString: Array<{ __typename?: 'TagModel', id: string, name: string }> };
 
+export type GetAllBlogsQueryVariables = Exact<{
+  searchParams: SearchParamsInput;
+}>;
+
+
+export type GetAllBlogsQuery = { __typename?: 'Query', getAllBlogsPagination: { __typename?: 'BlogPagination', page: number, perPage: number, totalPages: number, totalCount: number, data: Array<{ __typename?: 'BlogModel', id: string, title: string, description: string, posterUrl?: string | null, createdAt: any, tags: Array<{ __typename?: 'TagModel', id: string, name: string }>, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null } }> } };
+
+export type GetAllFreePostsForPinQueryVariables = Exact<{
+  searchStr?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type GetAllFreePostsForPinQuery = { __typename?: 'Query', getFreePostsForPin: Array<{ __typename?: 'PostModel', id: string, title: string }> };
+
+export type GetAllPostCommentsQueryVariables = Exact<{
+  postId: Scalars['String']['input'];
+}>;
+
+
+export type GetAllPostCommentsQuery = { __typename?: 'Query', getAllPostComments: Array<{ __typename?: 'CommentModel', id: string, text: string, parentId?: string | null, createdAt: any, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null }, replies: Array<{ __typename?: 'CommentModel', id: string, text: string, parentId?: string | null, createdAt: any, replies: Array<{ __typename?: 'CommentModel', id: string, text: string, parentId?: string | null, createdAt: any, replies: Array<{ __typename?: 'CommentModel', id: string, text: string, parentId?: string | null, createdAt: any, replies: Array<{ __typename?: 'CommentModel', id: string, text: string, parentId?: string | null, createdAt: any, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null } }>, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null } }>, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null } }>, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null } }> }> };
+
 export type GetAllPostsQueryVariables = Exact<{
   searchParams: SearchParamsInput;
 }>;
 
 
-export type GetAllPostsQuery = { __typename?: 'Query', getAllPostsPagination: { __typename?: 'PostPagination', page: number, perPage: number, totalCount: number, totalPages: number, data: Array<{ __typename?: 'PostModel', id: string, title: string, content: any, createdAt: any, updatedAt: any, likesCount: number, viewsCount: number, commentsCount: number, tags?: Array<{ __typename?: 'TagModel', id: string, name: string }> | null, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null } }> } };
+export type GetAllPostsQuery = { __typename?: 'Query', getAllPostsPagination: { __typename?: 'PostPagination', page: number, perPage: number, totalCount: number, totalPages: number, data: Array<{ __typename?: 'PostModel', id: string, title: string, content: any, createdAt: any, tags: Array<{ __typename?: 'TagModel', id: string, name: string }>, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null } }> } };
 
 export type GetAllUsersQueryVariables = Exact<{
   searchParams: SearchParamsInput;
@@ -501,21 +605,31 @@ export type GetAllUsersQueryVariables = Exact<{
 
 export type GetAllUsersQuery = { __typename?: 'Query', getAllUsersPagination: { __typename?: 'UserPagination', page: number, perPage: number, totalCount: number, totalPages: number, data: Array<{ __typename?: 'UserModel', id: string, avatarUrl?: string | null, username: string, description?: string | null }> } };
 
+export type GetBlogByIdQueryVariables = Exact<{
+  blogId: Scalars['String']['input'];
+}>;
+
+
+export type GetBlogByIdQuery = { __typename?: 'Query', getBlogById: { __typename?: 'BlogModel', id: string, title: string, description: string, posterUrl?: string | null, createdAt: any, posts: Array<{ __typename?: 'PostModel', id: string, title: string, content: any, createdAt: any, tags: Array<{ __typename?: 'TagModel', id: string, name: string }>, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null } }>, tags: Array<{ __typename?: 'TagModel', id: string, name: string }>, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null } } };
+
+export type GetBlogsForPinQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetBlogsForPinQuery = { __typename?: 'Query', blogsForPin: Array<{ __typename?: 'BlogModel', id: string, title: string }> };
+
 export type GetPostByIdQueryVariables = Exact<{
   postId: Scalars['String']['input'];
 }>;
 
 
-export type GetPostByIdQuery = { __typename?: 'Query', getPostById: { __typename?: 'PostModel', id: string, title: string, content: any, createdAt: any, updatedAt: any, likesCount: number, viewsCount: number, commentsCount: number, blog?: { __typename?: 'BlogModel', id: string } | null, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null }, comments: Array<{ __typename?: 'CommentModel', id: string, text: string, parentId?: string | null, createdAt: any, replies: Array<{ __typename?: 'CommentModel', id: string, text: string, parentId?: string | null, createdAt: any, replies: Array<{ __typename?: 'CommentModel', id: string, text: string, parentId?: string | null, createdAt: any, replies: Array<{ __typename?: 'CommentModel', id: string, text: string, parentId?: string | null, createdAt: any, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null } }>, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null } }>, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null } }>, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null } }>, tags?: Array<{ __typename?: 'TagModel', id: string, name: string }> | null } };
-
-export type CommentFieldsFragment = { __typename?: 'CommentModel', id: string, text: string, parentId?: string | null, createdAt: any, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null } };
+export type GetPostByIdQuery = { __typename?: 'Query', getPostById: { __typename?: 'PostModel', id: string, title: string, content: any, createdAt: any, updatedAt: any, likesCount: number, viewsCount: number, commentsCount: number, blog?: { __typename?: 'BlogModel', id: string } | null, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null }, tags: Array<{ __typename?: 'TagModel', id: string, name: string }> } };
 
 export type GetUserByUsernameQueryVariables = Exact<{
   username: Scalars['String']['input'];
 }>;
 
 
-export type GetUserByUsernameQuery = { __typename?: 'Query', getUserByUsername: { __typename?: 'UserModel', id: string, username: string, description?: string | null, avatarUrl?: string | null, posterUrl?: string | null, posts?: Array<{ __typename?: 'PostModel', id: string, title: string, content: any, createdAt: any, updatedAt: any, likesCount: number, viewsCount: number, commentsCount: number, tags?: Array<{ __typename?: 'TagModel', id: string, name: string }> | null, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null } }> | null, blogs?: Array<{ __typename?: 'BlogModel', id: string, title: string, description: string, posterUrl?: string | null, createdAt: any, updatedAt: any, tags: Array<{ __typename?: 'TagModel', id: string, name: string }>, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null } }> | null } };
+export type GetUserByUsernameQuery = { __typename?: 'Query', getUserByUsername: { __typename?: 'UserModel', id: string, username: string, description?: string | null, avatarUrl?: string | null, posterUrl?: string | null, posts: Array<{ __typename?: 'PostModel', id: string, title: string, content: any, createdAt: any, updatedAt: any, likesCount: number, viewsCount: number, commentsCount: number, tags: Array<{ __typename?: 'TagModel', id: string, name: string }>, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null } }>, blogs: Array<{ __typename?: 'BlogModel', id: string, title: string, description: string, posterUrl?: string | null, createdAt: any, tags: Array<{ __typename?: 'TagModel', id: string, name: string }>, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null } }> } };
 
 export const AuthUserFragmentFragmentDoc = gql`
     fragment AuthUserFragment on UserModel {
@@ -531,6 +645,35 @@ export const AuthUserFragmentFragmentDoc = gql`
   updatedAt
 }
     `;
+export const BlogFragmentFragmentDoc = gql`
+    fragment BlogFragment on BlogModel {
+  id
+  title
+  description
+  tags {
+    id
+    name
+  }
+  posterUrl
+  createdAt
+  author {
+    username
+    avatarUrl
+  }
+}
+    `;
+export const RepliesFieldsFragmentDoc = gql`
+    fragment RepliesFields on CommentModel {
+  id
+  text
+  parentId
+  createdAt
+  author {
+    username
+    avatarUrl
+  }
+}
+    `;
 export const CommentFieldsFragmentDoc = gql`
     fragment CommentFields on CommentModel {
   id
@@ -541,6 +684,30 @@ export const CommentFieldsFragmentDoc = gql`
     username
     avatarUrl
   }
+  replies {
+    ...RepliesFields
+    replies {
+      ...RepliesFields
+      replies {
+        ...RepliesFields
+        replies {
+          ...RepliesFields
+        }
+      }
+    }
+  }
+}
+    ${RepliesFieldsFragmentDoc}`;
+export const PostFragmentFragmentDoc = gql`
+    fragment PostFragment on PostModel {
+  id
+  title
+  content
+  author {
+    username
+    avatarUrl
+  }
+  createdAt
 }
     `;
 export const ChangeProfileAvatarDocument = gql`
@@ -609,11 +776,51 @@ export function useChangeProfilePosterMutation(baseOptions?: Apollo.MutationHook
 export type ChangeProfilePosterMutationHookResult = ReturnType<typeof useChangeProfilePosterMutation>;
 export type ChangeProfilePosterMutationResult = Apollo.MutationResult<ChangeProfilePosterMutation>;
 export type ChangeProfilePosterMutationOptions = Apollo.BaseMutationOptions<ChangeProfilePosterMutation, ChangeProfilePosterMutationVariables>;
+export const CreateBlogDocument = gql`
+    mutation createBlog($data: CreateBlogInput!, $poster: Upload) {
+  createBlog(data: $data, poster: $poster) {
+    ...BlogFragment
+    posts {
+      ...PostFragment
+    }
+  }
+}
+    ${BlogFragmentFragmentDoc}
+${PostFragmentFragmentDoc}`;
+export type CreateBlogMutationFn = Apollo.MutationFunction<CreateBlogMutation, CreateBlogMutationVariables>;
+
+/**
+ * __useCreateBlogMutation__
+ *
+ * To run a mutation, you first call `useCreateBlogMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateBlogMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createBlogMutation, { data, loading, error }] = useCreateBlogMutation({
+ *   variables: {
+ *      data: // value for 'data'
+ *      poster: // value for 'poster'
+ *   },
+ * });
+ */
+export function useCreateBlogMutation(baseOptions?: Apollo.MutationHookOptions<CreateBlogMutation, CreateBlogMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateBlogMutation, CreateBlogMutationVariables>(CreateBlogDocument, options);
+      }
+export type CreateBlogMutationHookResult = ReturnType<typeof useCreateBlogMutation>;
+export type CreateBlogMutationResult = Apollo.MutationResult<CreateBlogMutation>;
+export type CreateBlogMutationOptions = Apollo.BaseMutationOptions<CreateBlogMutation, CreateBlogMutationVariables>;
 export const CreateCommentDocument = gql`
     mutation CreateComment($text: String!, $postId: String!, $parentId: String) {
-  createComment(text: $text, postId: $postId, parentId: $parentId)
+  createComment(text: $text, postId: $postId, parentId: $parentId) {
+    ...CommentFields
+  }
 }
-    `;
+    ${CommentFieldsFragmentDoc}`;
 export type CreateCommentMutationFn = Apollo.MutationFunction<CreateCommentMutation, CreateCommentMutationVariables>;
 
 /**
@@ -643,24 +850,18 @@ export type CreateCommentMutationHookResult = ReturnType<typeof useCreateComment
 export type CreateCommentMutationResult = Apollo.MutationResult<CreateCommentMutation>;
 export type CreateCommentMutationOptions = Apollo.BaseMutationOptions<CreateCommentMutation, CreateCommentMutationVariables>;
 export const CreatePostDocument = gql`
-    mutation createPost($data: CreatePostInput!) {
-  createPost(data: $data) {
-    id
-    author {
-      id
-    }
+    mutation createPost($data: CreatePostInput!, $blogId: String) {
+  createPost(data: $data, blogId: $blogId) {
+    ...PostFragment
     blog {
       id
     }
-    content
-    createdAt
-    updatedAt
     likesCount
     viewsCount
     commentsCount
   }
 }
-    `;
+    ${PostFragmentFragmentDoc}`;
 export type CreatePostMutationFn = Apollo.MutationFunction<CreatePostMutation, CreatePostMutationVariables>;
 
 /**
@@ -677,6 +878,7 @@ export type CreatePostMutationFn = Apollo.MutationFunction<CreatePostMutation, C
  * const [createPostMutation, { data, loading, error }] = useCreatePostMutation({
  *   variables: {
  *      data: // value for 'data'
+ *      blogId: // value for 'blogId'
  *   },
  * });
  */
@@ -687,6 +889,37 @@ export function useCreatePostMutation(baseOptions?: Apollo.MutationHookOptions<C
 export type CreatePostMutationHookResult = ReturnType<typeof useCreatePostMutation>;
 export type CreatePostMutationResult = Apollo.MutationResult<CreatePostMutation>;
 export type CreatePostMutationOptions = Apollo.BaseMutationOptions<CreatePostMutation, CreatePostMutationVariables>;
+export const DeleteBlogDocument = gql`
+    mutation DeleteBlog($blogId: String!) {
+  deleteBlog(blogId: $blogId)
+}
+    `;
+export type DeleteBlogMutationFn = Apollo.MutationFunction<DeleteBlogMutation, DeleteBlogMutationVariables>;
+
+/**
+ * __useDeleteBlogMutation__
+ *
+ * To run a mutation, you first call `useDeleteBlogMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteBlogMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteBlogMutation, { data, loading, error }] = useDeleteBlogMutation({
+ *   variables: {
+ *      blogId: // value for 'blogId'
+ *   },
+ * });
+ */
+export function useDeleteBlogMutation(baseOptions?: Apollo.MutationHookOptions<DeleteBlogMutation, DeleteBlogMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteBlogMutation, DeleteBlogMutationVariables>(DeleteBlogDocument, options);
+      }
+export type DeleteBlogMutationHookResult = ReturnType<typeof useDeleteBlogMutation>;
+export type DeleteBlogMutationResult = Apollo.MutationResult<DeleteBlogMutation>;
+export type DeleteBlogMutationOptions = Apollo.BaseMutationOptions<DeleteBlogMutation, DeleteBlogMutationVariables>;
 export const DeleteCommentDocument = gql`
     mutation DeleteComment($commentId: String!) {
   deleteComment(commentId: $commentId)
@@ -720,7 +953,9 @@ export type DeleteCommentMutationResult = Apollo.MutationResult<DeleteCommentMut
 export type DeleteCommentMutationOptions = Apollo.BaseMutationOptions<DeleteCommentMutation, DeleteCommentMutationVariables>;
 export const DeletePostDocument = gql`
     mutation DeletePost($postId: String!) {
-  deletePost(postId: $postId)
+  deletePost(postId: $postId) {
+    postId
+  }
 }
     `;
 export type DeletePostMutationFn = Apollo.MutationFunction<DeletePostMutation, DeletePostMutationVariables>;
@@ -749,6 +984,44 @@ export function useDeletePostMutation(baseOptions?: Apollo.MutationHookOptions<D
 export type DeletePostMutationHookResult = ReturnType<typeof useDeletePostMutation>;
 export type DeletePostMutationResult = Apollo.MutationResult<DeletePostMutation>;
 export type DeletePostMutationOptions = Apollo.BaseMutationOptions<DeletePostMutation, DeletePostMutationVariables>;
+export const PinPostDocument = gql`
+    mutation PinPost($blogId: String!, $postId: String!) {
+  pinPost(blogId: $blogId, postId: $postId) {
+    ...PostFragment
+    tags {
+      id
+      name
+    }
+  }
+}
+    ${PostFragmentFragmentDoc}`;
+export type PinPostMutationFn = Apollo.MutationFunction<PinPostMutation, PinPostMutationVariables>;
+
+/**
+ * __usePinPostMutation__
+ *
+ * To run a mutation, you first call `usePinPostMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePinPostMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [pinPostMutation, { data, loading, error }] = usePinPostMutation({
+ *   variables: {
+ *      blogId: // value for 'blogId'
+ *      postId: // value for 'postId'
+ *   },
+ * });
+ */
+export function usePinPostMutation(baseOptions?: Apollo.MutationHookOptions<PinPostMutation, PinPostMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<PinPostMutation, PinPostMutationVariables>(PinPostDocument, options);
+      }
+export type PinPostMutationHookResult = ReturnType<typeof usePinPostMutation>;
+export type PinPostMutationResult = Apollo.MutationResult<PinPostMutation>;
+export type PinPostMutationOptions = Apollo.BaseMutationOptions<PinPostMutation, PinPostMutationVariables>;
 export const RemoveProfileAvatarDocument = gql`
     mutation RemoveProfileAvatar {
   removeProfileAvatar {
@@ -846,19 +1119,10 @@ export type SignOutMutationOptions = Apollo.BaseMutationOptions<SignOutMutation,
 export const SignUpDocument = gql`
     mutation SignUp($data: SignUpInput!) {
   signUp(data: $data) {
-    username
-    id
-    email
-    description
-    posterUrl
-    avatarUrl
-    createdAt
-    updatedAt
-    subscribers
-    subscriptions
+    ...AuthUserFragment
   }
 }
-    `;
+    ${AuthUserFragmentFragmentDoc}`;
 export type SignUpMutationFn = Apollo.MutationFunction<SignUpMutation, SignUpMutationVariables>;
 
 /**
@@ -888,19 +1152,10 @@ export type SignUpMutationOptions = Apollo.BaseMutationOptions<SignUpMutation, S
 export const SignInDocument = gql`
     mutation SignIn($data: SignInInput!) {
   signIn(data: $data) {
-    username
-    id
-    email
-    description
-    posterUrl
-    avatarUrl
-    createdAt
-    updatedAt
-    subscribers
-    subscriptions
+    ...AuthUserFragment
   }
 }
-    `;
+    ${AuthUserFragmentFragmentDoc}`;
 export type SignInMutationFn = Apollo.MutationFunction<SignInMutation, SignInMutationVariables>;
 
 /**
@@ -958,6 +1213,40 @@ export function useSubscribeMutation(baseOptions?: Apollo.MutationHookOptions<Su
 export type SubscribeMutationHookResult = ReturnType<typeof useSubscribeMutation>;
 export type SubscribeMutationResult = Apollo.MutationResult<SubscribeMutation>;
 export type SubscribeMutationOptions = Apollo.BaseMutationOptions<SubscribeMutation, SubscribeMutationVariables>;
+export const UnPinPostDocument = gql`
+    mutation UnPinPost($blogId: String!, $postId: String!) {
+  unPinPost(blogId: $blogId, postId: $postId) {
+    postId
+  }
+}
+    `;
+export type UnPinPostMutationFn = Apollo.MutationFunction<UnPinPostMutation, UnPinPostMutationVariables>;
+
+/**
+ * __useUnPinPostMutation__
+ *
+ * To run a mutation, you first call `useUnPinPostMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUnPinPostMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [unPinPostMutation, { data, loading, error }] = useUnPinPostMutation({
+ *   variables: {
+ *      blogId: // value for 'blogId'
+ *      postId: // value for 'postId'
+ *   },
+ * });
+ */
+export function useUnPinPostMutation(baseOptions?: Apollo.MutationHookOptions<UnPinPostMutation, UnPinPostMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UnPinPostMutation, UnPinPostMutationVariables>(UnPinPostDocument, options);
+      }
+export type UnPinPostMutationHookResult = ReturnType<typeof useUnPinPostMutation>;
+export type UnPinPostMutationResult = Apollo.MutationResult<UnPinPostMutation>;
+export type UnPinPostMutationOptions = Apollo.BaseMutationOptions<UnPinPostMutation, UnPinPostMutationVariables>;
 export const UnsubscribeDocument = gql`
     mutation Unsubscribe($toId: String!) {
   unsubscribeFromUser(toId: $toId)
@@ -1132,25 +1421,150 @@ export type GetTagsBySearchStringQueryHookResult = ReturnType<typeof useGetTagsB
 export type GetTagsBySearchStringLazyQueryHookResult = ReturnType<typeof useGetTagsBySearchStringLazyQuery>;
 export type GetTagsBySearchStringSuspenseQueryHookResult = ReturnType<typeof useGetTagsBySearchStringSuspenseQuery>;
 export type GetTagsBySearchStringQueryResult = Apollo.QueryResult<GetTagsBySearchStringQuery, GetTagsBySearchStringQueryVariables>;
+export const GetAllBlogsDocument = gql`
+    query GetAllBlogs($searchParams: SearchParamsInput!) {
+  getAllBlogsPagination(searchParams: $searchParams) {
+    data {
+      ...BlogFragment
+    }
+    page
+    perPage
+    totalPages
+    totalCount
+  }
+}
+    ${BlogFragmentFragmentDoc}`;
+
+/**
+ * __useGetAllBlogsQuery__
+ *
+ * To run a query within a React component, call `useGetAllBlogsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAllBlogsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAllBlogsQuery({
+ *   variables: {
+ *      searchParams: // value for 'searchParams'
+ *   },
+ * });
+ */
+export function useGetAllBlogsQuery(baseOptions: Apollo.QueryHookOptions<GetAllBlogsQuery, GetAllBlogsQueryVariables> & ({ variables: GetAllBlogsQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetAllBlogsQuery, GetAllBlogsQueryVariables>(GetAllBlogsDocument, options);
+      }
+export function useGetAllBlogsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAllBlogsQuery, GetAllBlogsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetAllBlogsQuery, GetAllBlogsQueryVariables>(GetAllBlogsDocument, options);
+        }
+// @ts-ignore
+export function useGetAllBlogsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GetAllBlogsQuery, GetAllBlogsQueryVariables>): Apollo.UseSuspenseQueryResult<GetAllBlogsQuery, GetAllBlogsQueryVariables>;
+export function useGetAllBlogsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetAllBlogsQuery, GetAllBlogsQueryVariables>): Apollo.UseSuspenseQueryResult<GetAllBlogsQuery | undefined, GetAllBlogsQueryVariables>;
+export function useGetAllBlogsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetAllBlogsQuery, GetAllBlogsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetAllBlogsQuery, GetAllBlogsQueryVariables>(GetAllBlogsDocument, options);
+        }
+export type GetAllBlogsQueryHookResult = ReturnType<typeof useGetAllBlogsQuery>;
+export type GetAllBlogsLazyQueryHookResult = ReturnType<typeof useGetAllBlogsLazyQuery>;
+export type GetAllBlogsSuspenseQueryHookResult = ReturnType<typeof useGetAllBlogsSuspenseQuery>;
+export type GetAllBlogsQueryResult = Apollo.QueryResult<GetAllBlogsQuery, GetAllBlogsQueryVariables>;
+export const GetAllFreePostsForPinDocument = gql`
+    query GetAllFreePostsForPin($searchStr: String) {
+  getFreePostsForPin(searchStr: $searchStr) {
+    id
+    title
+  }
+}
+    `;
+
+/**
+ * __useGetAllFreePostsForPinQuery__
+ *
+ * To run a query within a React component, call `useGetAllFreePostsForPinQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAllFreePostsForPinQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAllFreePostsForPinQuery({
+ *   variables: {
+ *      searchStr: // value for 'searchStr'
+ *   },
+ * });
+ */
+export function useGetAllFreePostsForPinQuery(baseOptions?: Apollo.QueryHookOptions<GetAllFreePostsForPinQuery, GetAllFreePostsForPinQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetAllFreePostsForPinQuery, GetAllFreePostsForPinQueryVariables>(GetAllFreePostsForPinDocument, options);
+      }
+export function useGetAllFreePostsForPinLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAllFreePostsForPinQuery, GetAllFreePostsForPinQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetAllFreePostsForPinQuery, GetAllFreePostsForPinQueryVariables>(GetAllFreePostsForPinDocument, options);
+        }
+// @ts-ignore
+export function useGetAllFreePostsForPinSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GetAllFreePostsForPinQuery, GetAllFreePostsForPinQueryVariables>): Apollo.UseSuspenseQueryResult<GetAllFreePostsForPinQuery, GetAllFreePostsForPinQueryVariables>;
+export function useGetAllFreePostsForPinSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetAllFreePostsForPinQuery, GetAllFreePostsForPinQueryVariables>): Apollo.UseSuspenseQueryResult<GetAllFreePostsForPinQuery | undefined, GetAllFreePostsForPinQueryVariables>;
+export function useGetAllFreePostsForPinSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetAllFreePostsForPinQuery, GetAllFreePostsForPinQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetAllFreePostsForPinQuery, GetAllFreePostsForPinQueryVariables>(GetAllFreePostsForPinDocument, options);
+        }
+export type GetAllFreePostsForPinQueryHookResult = ReturnType<typeof useGetAllFreePostsForPinQuery>;
+export type GetAllFreePostsForPinLazyQueryHookResult = ReturnType<typeof useGetAllFreePostsForPinLazyQuery>;
+export type GetAllFreePostsForPinSuspenseQueryHookResult = ReturnType<typeof useGetAllFreePostsForPinSuspenseQuery>;
+export type GetAllFreePostsForPinQueryResult = Apollo.QueryResult<GetAllFreePostsForPinQuery, GetAllFreePostsForPinQueryVariables>;
+export const GetAllPostCommentsDocument = gql`
+    query GetAllPostComments($postId: String!) {
+  getAllPostComments(postId: $postId) {
+    ...CommentFields
+  }
+}
+    ${CommentFieldsFragmentDoc}`;
+
+/**
+ * __useGetAllPostCommentsQuery__
+ *
+ * To run a query within a React component, call `useGetAllPostCommentsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAllPostCommentsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAllPostCommentsQuery({
+ *   variables: {
+ *      postId: // value for 'postId'
+ *   },
+ * });
+ */
+export function useGetAllPostCommentsQuery(baseOptions: Apollo.QueryHookOptions<GetAllPostCommentsQuery, GetAllPostCommentsQueryVariables> & ({ variables: GetAllPostCommentsQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetAllPostCommentsQuery, GetAllPostCommentsQueryVariables>(GetAllPostCommentsDocument, options);
+      }
+export function useGetAllPostCommentsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAllPostCommentsQuery, GetAllPostCommentsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetAllPostCommentsQuery, GetAllPostCommentsQueryVariables>(GetAllPostCommentsDocument, options);
+        }
+// @ts-ignore
+export function useGetAllPostCommentsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GetAllPostCommentsQuery, GetAllPostCommentsQueryVariables>): Apollo.UseSuspenseQueryResult<GetAllPostCommentsQuery, GetAllPostCommentsQueryVariables>;
+export function useGetAllPostCommentsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetAllPostCommentsQuery, GetAllPostCommentsQueryVariables>): Apollo.UseSuspenseQueryResult<GetAllPostCommentsQuery | undefined, GetAllPostCommentsQueryVariables>;
+export function useGetAllPostCommentsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetAllPostCommentsQuery, GetAllPostCommentsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetAllPostCommentsQuery, GetAllPostCommentsQueryVariables>(GetAllPostCommentsDocument, options);
+        }
+export type GetAllPostCommentsQueryHookResult = ReturnType<typeof useGetAllPostCommentsQuery>;
+export type GetAllPostCommentsLazyQueryHookResult = ReturnType<typeof useGetAllPostCommentsLazyQuery>;
+export type GetAllPostCommentsSuspenseQueryHookResult = ReturnType<typeof useGetAllPostCommentsSuspenseQuery>;
+export type GetAllPostCommentsQueryResult = Apollo.QueryResult<GetAllPostCommentsQuery, GetAllPostCommentsQueryVariables>;
 export const GetAllPostsDocument = gql`
     query getAllPosts($searchParams: SearchParamsInput!) {
   getAllPostsPagination(searchParams: $searchParams) {
     data {
-      id
-      title
-      content
-      createdAt
-      updatedAt
+      ...PostFragment
       tags {
         id
         name
-      }
-      likesCount
-      viewsCount
-      commentsCount
-      author {
-        username
-        avatarUrl
       }
     }
     page
@@ -1159,7 +1573,7 @@ export const GetAllPostsDocument = gql`
     totalPages
   }
 }
-    `;
+    ${PostFragmentFragmentDoc}`;
 
 /**
  * __useGetAllPostsQuery__
@@ -1254,6 +1668,100 @@ export type GetAllUsersQueryHookResult = ReturnType<typeof useGetAllUsersQuery>;
 export type GetAllUsersLazyQueryHookResult = ReturnType<typeof useGetAllUsersLazyQuery>;
 export type GetAllUsersSuspenseQueryHookResult = ReturnType<typeof useGetAllUsersSuspenseQuery>;
 export type GetAllUsersQueryResult = Apollo.QueryResult<GetAllUsersQuery, GetAllUsersQueryVariables>;
+export const GetBlogByIdDocument = gql`
+    query GetBlogById($blogId: String!) {
+  getBlogById(blogId: $blogId) {
+    ...BlogFragment
+    posts {
+      ...PostFragment
+      tags {
+        id
+        name
+      }
+    }
+  }
+}
+    ${BlogFragmentFragmentDoc}
+${PostFragmentFragmentDoc}`;
+
+/**
+ * __useGetBlogByIdQuery__
+ *
+ * To run a query within a React component, call `useGetBlogByIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetBlogByIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetBlogByIdQuery({
+ *   variables: {
+ *      blogId: // value for 'blogId'
+ *   },
+ * });
+ */
+export function useGetBlogByIdQuery(baseOptions: Apollo.QueryHookOptions<GetBlogByIdQuery, GetBlogByIdQueryVariables> & ({ variables: GetBlogByIdQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetBlogByIdQuery, GetBlogByIdQueryVariables>(GetBlogByIdDocument, options);
+      }
+export function useGetBlogByIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetBlogByIdQuery, GetBlogByIdQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetBlogByIdQuery, GetBlogByIdQueryVariables>(GetBlogByIdDocument, options);
+        }
+// @ts-ignore
+export function useGetBlogByIdSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GetBlogByIdQuery, GetBlogByIdQueryVariables>): Apollo.UseSuspenseQueryResult<GetBlogByIdQuery, GetBlogByIdQueryVariables>;
+export function useGetBlogByIdSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetBlogByIdQuery, GetBlogByIdQueryVariables>): Apollo.UseSuspenseQueryResult<GetBlogByIdQuery | undefined, GetBlogByIdQueryVariables>;
+export function useGetBlogByIdSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetBlogByIdQuery, GetBlogByIdQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetBlogByIdQuery, GetBlogByIdQueryVariables>(GetBlogByIdDocument, options);
+        }
+export type GetBlogByIdQueryHookResult = ReturnType<typeof useGetBlogByIdQuery>;
+export type GetBlogByIdLazyQueryHookResult = ReturnType<typeof useGetBlogByIdLazyQuery>;
+export type GetBlogByIdSuspenseQueryHookResult = ReturnType<typeof useGetBlogByIdSuspenseQuery>;
+export type GetBlogByIdQueryResult = Apollo.QueryResult<GetBlogByIdQuery, GetBlogByIdQueryVariables>;
+export const GetBlogsForPinDocument = gql`
+    query GetBlogsForPin {
+  blogsForPin {
+    id
+    title
+  }
+}
+    `;
+
+/**
+ * __useGetBlogsForPinQuery__
+ *
+ * To run a query within a React component, call `useGetBlogsForPinQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetBlogsForPinQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetBlogsForPinQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetBlogsForPinQuery(baseOptions?: Apollo.QueryHookOptions<GetBlogsForPinQuery, GetBlogsForPinQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetBlogsForPinQuery, GetBlogsForPinQueryVariables>(GetBlogsForPinDocument, options);
+      }
+export function useGetBlogsForPinLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetBlogsForPinQuery, GetBlogsForPinQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetBlogsForPinQuery, GetBlogsForPinQueryVariables>(GetBlogsForPinDocument, options);
+        }
+// @ts-ignore
+export function useGetBlogsForPinSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GetBlogsForPinQuery, GetBlogsForPinQueryVariables>): Apollo.UseSuspenseQueryResult<GetBlogsForPinQuery, GetBlogsForPinQueryVariables>;
+export function useGetBlogsForPinSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetBlogsForPinQuery, GetBlogsForPinQueryVariables>): Apollo.UseSuspenseQueryResult<GetBlogsForPinQuery | undefined, GetBlogsForPinQueryVariables>;
+export function useGetBlogsForPinSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetBlogsForPinQuery, GetBlogsForPinQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetBlogsForPinQuery, GetBlogsForPinQueryVariables>(GetBlogsForPinDocument, options);
+        }
+export type GetBlogsForPinQueryHookResult = ReturnType<typeof useGetBlogsForPinQuery>;
+export type GetBlogsForPinLazyQueryHookResult = ReturnType<typeof useGetBlogsForPinLazyQuery>;
+export type GetBlogsForPinSuspenseQueryHookResult = ReturnType<typeof useGetBlogsForPinSuspenseQuery>;
+export type GetBlogsForPinQueryResult = Apollo.QueryResult<GetBlogsForPinQuery, GetBlogsForPinQueryVariables>;
 export const GetPostByIdDocument = gql`
     query getPostById($postId: String!) {
   getPostById(postId: $postId) {
@@ -1269,18 +1777,6 @@ export const GetPostByIdDocument = gql`
       username
       avatarUrl
     }
-    comments {
-      ...CommentFields
-      replies {
-        ...CommentFields
-        replies {
-          ...CommentFields
-          replies {
-            ...CommentFields
-          }
-        }
-      }
-    }
     tags {
       id
       name
@@ -1290,7 +1786,7 @@ export const GetPostByIdDocument = gql`
     commentsCount
   }
 }
-    ${CommentFieldsFragmentDoc}`;
+    `;
 
 /**
  * __useGetPostByIdQuery__
@@ -1354,24 +1850,11 @@ export const GetUserByUsernameDocument = gql`
       }
     }
     blogs {
-      id
-      title
-      description
-      posterUrl
-      tags {
-        id
-        name
-      }
-      author {
-        username
-        avatarUrl
-      }
-      createdAt
-      updatedAt
+      ...BlogFragment
     }
   }
 }
-    `;
+    ${BlogFragmentFragmentDoc}`;
 
 /**
  * __useGetUserByUsernameQuery__

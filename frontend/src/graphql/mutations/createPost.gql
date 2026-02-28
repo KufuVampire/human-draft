@@ -1,15 +1,9 @@
-mutation createPost($data: CreatePostInput!) {
-	createPost(data: $data) {
-		id
-		author {
-			id
-		}
+mutation createPost($data: CreatePostInput!, $blogId: String) {
+	createPost(data: $data, blogId: $blogId) {
+		...PostFragment
 		blog {
 			id
 		}
-		content
-		createdAt
-		updatedAt
 		likesCount
 		viewsCount
 		commentsCount

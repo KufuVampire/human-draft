@@ -2,20 +2,16 @@ export {
 	createAccountSchema,
 	signInAccountSchema,
 	type TypeCreateAccountSchema,
-	type TypeSignInAccount,
+	type TypeSignInAccount
 } from './auth';
+export { createBlogSchema, type TypeCreateBlogSchema } from './blog';
 export {
-	CreateCommentSchema,
-	UpdateCommentSchema,
 	type TypeCreateCommentSchema,
-	type TypeUpdateCommentSchema,
+	type TypeUpdateCommentSchema
 } from './comment';
-export {
-	CreatePostSchema,
-	UpdatePostSchema,
-	type TypeCreatePostSchema,
-	type TypeUpdatePostSchema,
-} from './post';
+export { type TypeCreatePostSchema, type TypeUpdatePostSchema } from './post';
+export { type TypeSearchSchema } from './search';
 export { updateProfileSchema, type TypeUpdateProfileSchema } from './settings';
-export { SearchTagsSchema, type TypeSearchTagsSchema } from './tags';
-export { UsersSearchSchema, type TypeUsersSearchSchema } from './usersSearch';
+export { type TypeSearchTagsSchema } from './tags';
+export { type TypeUsersSearchSchema } from './usersSearch';
+

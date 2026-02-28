@@ -2,31 +2,27 @@
 
 import { Check, ChevronDown, Pencil, Reply, Trash } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useParams } from 'next/navigation';
 import { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
-import { Button } from '../Button/Button';
-import { CreateCommentField } from '../CreateCommentField/CreateCommentField';
-import { FormField } from '../FormField/FormField';
-import { UserBadgeWithCreatedAt } from '../UserBadgeWithCreatedAt/UserBadgeWithCreatedAt';
-
 import {
 	CommentFieldsFragment,
-	GetPostByIdDocument,
 	useDeleteCommentMutation,
 	useUpdateCommentMutation,
 } from '@/graphql/generated/output';
 import { TypeUpdateCommentSchema } from '@/schemas';
-import { useConfirmationDeletionModal, useProfile } from '@/store';
+import {
+	Button,
+	CommentsList,
+	CreateCommentField,
+	FormField,
+	UserBadgeWithCreatedAt,
+} from '@/shared';
+import { useComments, useConfirmationDeletionModal, useProfile } from '@/store';
 import { cn } from '@/utils';
 
-type CommentWithReplies = CommentFieldsFragment & {
-	replies?: CommentWithReplies[] | null;
-};
-
 interface Props {
-	comment: CommentWithReplies;
+	comment: CommentFieldsFragment;
 	className?: string;
 }
 
@@ -34,20 +30,21 @@ const buttonStyles =
 	'px-2 py-1.5 leading-[110%] tracking-[5%] uppercase rounded-sm';
 
 export const CommentItem = ({ comment, className }: Props) => {
-	const { postId } = useParams<{ postId: string }>();
 	const { profile } = useProfile();
 	const { setCb, setOpen, setType } = useConfirmationDeletionModal();
 	const [isReply, setReply] = useState(false);
 	const [isEditMode, setEditMode] = useState(false);
 	const [isShowReplies, setShowReplies] = useState(false);
 	const t = useTranslations();
+	const { deleteComment: deleteComm } = useComments();
 
 	const {
 		register,
 		formState: { isValid, isDirty },
 		handleSubmit,
 		setValue,
-		watch
+		watch,
+		setFocus,
 	} = useForm<TypeUpdateCommentSchema>();
 
 	const [updateComment, { loading: isUpdating }] = useUpdateCommentMutation();
@@ -63,18 +60,13 @@ export const CommentItem = ({ comment, className }: Props) => {
 
 	const isOwner = profile?.username === username;
 
-	const [deleteComment] = useDeleteCommentMutation({
-		refetchQueries: [
-			{
-				query: GetPostByIdDocument,
-				variables: { postId },
-			},
-		],
-	});
+	const [deleteComment] = useDeleteCommentMutation();
 
 	const handleDeleteComment = (commentId: string) => {
 		setType('comment');
 		setCb(() => {
+			console.log(commentId);
+			deleteComm(commentId);
 			deleteComment({
 				variables: {
 					commentId,
@@ -94,8 +86,7 @@ export const CommentItem = ({ comment, className }: Props) => {
 				text,
 			},
 		});
-
-		setEditMode(false)
+		setEditMode(false);
 	};
 
 	return (
@@ -122,12 +113,16 @@ export const CommentItem = ({ comment, className }: Props) => {
 					<div className='flex items-center gap-x-2'>
 						<Button
 							variant='clear'
+							title={isEditMode ? t('postPage.comments.exitEditMode') : t('postPage.comments.enterEditMode')}
 							onClick={() => {
 								if (!watch('text')) {
 									setValue('text', text);
 								}
 
 								setEditMode((prev) => !prev);
+								if (isEditMode) {
+									setFocus('text');
+								}
 							}}>
 							{isEditMode ? (
 								<Check className='size-4' />
@@ -137,6 +132,7 @@ export const CommentItem = ({ comment, className }: Props) => {
 						</Button>
 						<Button
 							variant='clear'
+							title={t('postPage.comments.deleteComment')}
 							onClick={() => handleDeleteComment(id)}>
 							<Trash className='size-4' />
 						</Button>
@@ -167,7 +163,9 @@ export const CommentItem = ({ comment, className }: Props) => {
 						</div>
 					</form>
 				) : (
-					<p className='leading-[150% tracking-[2%]'>{isDirty ? watch('text') : text}</p>
+					<p className='leading-[150% tracking-[2%]'>
+						{isDirty ? watch('text') : text}
+					</p>
 				)}
 				{!isReply && (
 					<Button
@@ -196,14 +194,7 @@ export const CommentItem = ({ comment, className }: Props) => {
 					/>
 				)}
 				{isShowReplies && replies && replies.length > 0 && (
-					<ul className='flex flex-col gap-y-3'>
-						{replies.map((comment) => (
-							<CommentItem
-								key={comment.id}
-								comment={comment}
-							/>
-						))}
-					</ul>
+					<CommentsList data={replies} />
 				)}
 				{replies && replies.length > 0 && (
 					<Button

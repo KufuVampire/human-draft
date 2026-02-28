@@ -3,7 +3,7 @@
 import { Eye, Heart, MessageSquare } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { redirect, useParams } from 'next/navigation';
-import { useEffect } from 'react';
+import { lazy, useEffect } from 'react';
 import { toast } from 'sonner';
 
 import { routesConfig } from '@/config';
@@ -13,7 +13,6 @@ import {
 	useUpdatePostMutation,
 } from '@/graphql/generated/output';
 import { useLocalStorage, usePost } from '@/hooks';
-import { Comments } from '@/modules';
 import {
 	Button,
 	CustomLink,
@@ -21,7 +20,12 @@ import {
 	TagsList,
 	UserBadgeWithCreatedAt,
 } from '@/shared';
-import { useConfirmationDeletionModal, useProfile } from '@/store';
+import {
+	useComments,
+	useConfirmationDeletionModal,
+	useNeedAuthModal,
+	useProfile,
+} from '@/store';
 import { cn } from '@/utils';
 
 const isLikeExpired = (date: number) => {
@@ -34,11 +38,13 @@ const isLikeExpired = (date: number) => {
 };
 
 interface ILikedAt {
-	postId: string,
-	date: number,
-	isLiked: boolean,
-	userId: string | null
+	postId: string;
+	date: number;
+	isLiked: boolean;
+	userId: string | null;
 }
+
+const CommentsLazy = lazy(() => import('@/modules/Comments/Comments'));
 
 export const PostPage = () => {
 	const t = useTranslations();
@@ -51,12 +57,12 @@ export const PostPage = () => {
 		author,
 		createdAt,
 		tags,
-		commentsCount,
-		comments,
 		likesCount,
 		viewsCount,
 	} = usePost(postId);
+	const { getCommentsCount } = useComments();
 	const { setOpen, setType, setCb } = useConfirmationDeletionModal();
+	const { setOpen: setNeedAuthOpen } = useNeedAuthModal();
 
 	const isOwner = profile?.username === author?.username;
 
@@ -111,12 +117,19 @@ export const PostPage = () => {
 
 	const handleLike = () => {
 		if (!isAuth) {
+			setNeedAuthOpen(true);
 			return;
 		}
 
-		const likedAtObj = likedAt.find((el) => el.userId === profile?.id)
+		const likedAtObj = likedAt.find((el) => el.postId === postId);
 
-		if (likedAtObj?.isLiked && !isLikeExpired(likedAtObj.date) && likedAtObj.postId === postId && likedAtObj.userId === profile?.id) {
+		if (
+			likedAtObj &&
+			likedAtObj.isLiked &&
+			!isLikeExpired(likedAtObj.date) &&
+			likedAtObj.postId === postId &&
+			likedAtObj.userId === profile?.id
+		) {
 			return;
 		}
 
@@ -128,13 +141,24 @@ export const PostPage = () => {
 				},
 			},
 		});
-		setLikedAt(prev => [...prev, { postId, date: Date.now(), isLiked: true, userId: profile ? profile.id : null }]);
+
+		setLikedAt((prev) => {
+			const filteredPrev = prev.filter((o) => o.postId !== postId);
+			return [
+				...filteredPrev,
+				{
+					postId,
+					date: Date.now(),
+					isLiked: true,
+					userId: profile ? profile.id : null,
+				},
+			];
+		});
 	};
 
-	const likedAtObj = likedAt.find((el) => el.userId === profile?.id)
-
+	const likedAtObj = likedAt.find((el) => el.postId === postId);
 	return (
-		<div className='flex flex-col gap-y-8 bg-[var(--background-color-card)] rounded-xl transition-colors px-2 py-6 md:px-6'>
+		<div className='flex flex-col gap-y-8 bg-[var(--background-color-card)] rounded-xl transition-colors px-2 py-6 md:px-6 w-full'>
 			<article className='flex flex-col gap-y-6 w-full'>
 				<div className='flex flex-col md:flex-row gap-y-2 md:items-center justify-between'>
 					{author && (
@@ -181,13 +205,18 @@ export const PostPage = () => {
 								)}
 								disabled={
 									isUpdating ||
-									(likedAtObj?.isLiked && !isLikeExpired(likedAtObj?.date))
+									(likedAtObj?.isLiked &&
+										!isLikeExpired(likedAtObj.date) &&
+										likedAtObj.userId === profile?.id &&
+										likedAtObj.postId === postId)
 								}
 								onClick={handleLike}>
 								<Heart
 									className={cn(
 										likedAtObj?.isLiked &&
-											!isLikeExpired(likedAtObj?.date) && likedAtObj?.userId === profile?.id &&
+											!isLikeExpired(likedAtObj.date) &&
+											likedAtObj.userId === profile?.id &&
+											likedAtObj.postId === postId &&
 											'stroke-red-500 fill-red-500'
 									)}
 								/>
@@ -196,7 +225,7 @@ export const PostPage = () => {
 						</li>
 						<li className='flex items-center gap-x-2'>
 							<MessageSquare />
-							<span className='text-xs font-medium'>{commentsCount}</span>
+							<span className='text-xs font-medium'>{getCommentsCount()}</span>
 						</li>
 						<li className='flex items-center gap-x-2'>
 							<Eye />
@@ -205,7 +234,7 @@ export const PostPage = () => {
 					</ul>
 				</div>
 			</article>
-			<Comments commentsList={comments} />
+			<CommentsLazy />
 		</div>
 	);
 };

@@ -15,7 +15,7 @@ import {
 	CreatePostBlogLinks,
 	CustomLink,
 	Dropdown,
-	PostCard,
+	PostsAndBlogsList,
 	ProfilePageSkeleton,
 	Section,
 	UserAvatar,
@@ -156,24 +156,12 @@ export const ProfilePage = ({ username }: Props) => {
 		return inputs;
 	}, [
 		changePosterLoading,
-		handleChangeAvatar,
-		handleLoadPoster,
 		isAvatarChanging,
 		isAvatarRemoving,
 		profile,
 		removePosterLoading,
 		t,
 	]);
-
-	if (loading) {
-		return <ProfilePageSkeleton isOwner={isOwner} />;
-	}
-
-	if (!loading && !data) {
-		redirect(routesConfig.notFound);
-	}
-
-	const user = data?.getUserByUsername;
 
 	const handleClick = (e: MouseEvent<HTMLUListElement>) => {
 		const target = e.target as HTMLElement;
@@ -192,8 +180,23 @@ export const ProfilePage = ({ username }: Props) => {
 		}
 	};
 
-	const sortedPosts = user?.posts
-		?.slice()
+	if (loading) {
+		return <ProfilePageSkeleton isOwner={isOwner} />;
+	}
+
+	if (!loading && !data) {
+		redirect(routesConfig.notFound);
+	}
+
+	const user = data?.getUserByUsername;
+
+	if (!user) {
+		redirect(routesConfig.notFound);
+	}
+
+	const userBlogsAndPosts = [...user.posts, ...user.blogs];
+	const sortedUserBlogsAndPosts = userBlogsAndPosts
+		.slice()
 		.sort(
 			(a, b) =>
 				new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -204,7 +207,7 @@ export const ProfilePage = ({ username }: Props) => {
 			<Section className='flex flex-col w-full py-0 md:py-0 bg-[var(--background-color-card)] rounded-xl overflow-hidden transition-colors'>
 				<ProfilePoster
 					isOwner={isOwner}
-					user={{ posterUrl: user?.posterUrl }}>
+					user={{ posterUrl: user.posterUrl }}>
 					{isOwner && (
 						<div className='flex justify-end absolute top-0 left-0 right-0 w-full p-2 md:py-3 md:px-6'>
 							<Dropdown
@@ -236,16 +239,16 @@ export const ProfilePage = ({ username }: Props) => {
 						)}
 						{!isOwner && (
 							<UserAvatar
-								username={user?.username}
-								avatarUrl={user?.avatarUrl}
+								username={user.username}
+								avatarUrl={user.avatarUrl}
 								location='profile-page'
 							/>
 						)}
 						<div className='flex flex-col gap-y-2 items-center lg:items-stretch'>
 							<h1 className='font-title font-bold text-4xl leading-[110%] text-center lg:text-left'>
-								{user?.username}
+								{user.username}
 							</h1>
-							{user?.description && (
+							{user.description && (
 								<p className='leading-6 text-center lg:text-left'>
 									{user.description}
 								</p>
@@ -254,13 +257,13 @@ export const ProfilePage = ({ username }: Props) => {
 					</div>
 					{isOwner && profile && (
 						<CustomLink
-							href={`/${profile.username}/${routesConfig.settings}`}
+							href={routesConfig.profileSettings(profile.username)}
 							variant='secondary'
 							className='py-2 px-3 font-bold leading-6 lg:self-start rounded-lg dark:text-secondary text-center self-center'>
 							{t('navigation.settings')}
 						</CustomLink>
 					)}
-					{!isOwner && user?.id && (
+					{!isOwner && (
 						<SubscribeUnsubscribeButtons
 							toId={user.id}
 							className='py-2 px-3 font-bold leading-6 lg:self-start rounded-lg self-center'
@@ -270,21 +273,9 @@ export const ProfilePage = ({ username }: Props) => {
 				</div>
 			</Section>
 			<CreatePostBlogLinks />
-			<ul className='columns-1 lg:columns-2 gap-6'>
-				{sortedPosts?.map((post) => {
-					return (
-						<PostCard
-							key={post.id}
-							author={post.author}
-							createdAt={post.createdAt}
-							id={post.id}
-							title={post.title}
-							content={post.content}
-							tags={post.tags}
-						/>
-					);
-				})}
-			</ul>
+			{sortedUserBlogsAndPosts.length > 0 && (
+				<PostsAndBlogsList data={sortedUserBlogsAndPosts} />
+			)}
 		</div>
 	);
 };

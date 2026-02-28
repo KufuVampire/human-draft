@@ -9,12 +9,10 @@ import { Button } from '../Button/Button';
 import { FormField } from '../FormField/FormField';
 import { UserBadge } from '../UserBadge/UserBadge';
 
-import {
-	GetPostByIdDocument,
-	useCreateCommentMutation,
-} from '@/graphql/generated/output';
+import { useCreateCommentMutation } from '@/graphql/generated/output';
 import { useProfile } from '@/hooks';
 import { TypeCreateCommentSchema } from '@/schemas';
+import { useComments } from '@/store';
 import { cn } from '@/utils';
 
 const buttonStyles =
@@ -34,6 +32,7 @@ export const CreateCommentField = ({
 	const { postId } = useParams<{ postId: string }>();
 	const t = useTranslations();
 	const { profile, isAuth } = useProfile();
+	const { addComment } = useComments();
 
 	const {
 		register,
@@ -51,16 +50,10 @@ export const CreateCommentField = ({
 	};
 
 	const [createComment, { loading: isCreating }] = useCreateCommentMutation({
-		onCompleted() {
-			console.log('success');
+		onCompleted(data) {
+			addComment(data.createComment);
 			handleCancel();
 		},
-		refetchQueries: [
-			{
-				query: GetPostByIdDocument,
-				variables: { postId },
-			},
-		],
 	});
 
 	if (!isAuth) {

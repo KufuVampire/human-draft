@@ -1,0 +1,15 @@
+fragment BlogFragment on BlogModel {
+	id
+	title
+	description
+	tags {
+		id
+		name
+	}
+	posterUrl
+	createdAt
+	author {
+		username
+		avatarUrl
+	}
+}

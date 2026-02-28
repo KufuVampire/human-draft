@@ -1,13 +1,16 @@
 'use client';
 
+import { Trash } from 'lucide-react';
 import { useMemo } from 'react';
 
+import { Button } from '../Button/Button';
 import { CustomLink } from '../CustomLink/CustomLink';
 import { MilkdownContent } from '../MilkdownContent/MilkdownContent';
 import { TagsList } from '../TagsList/TagsList';
 import { UserBadgeWithCreatedAt } from '../UserBadgeWithCreatedAt/UserBadgeWithCreatedAt';
 
 import { routesConfig } from '@/config';
+import { useProfile } from '@/store';
 import { milkdownJsonToHtml } from '@/utils';
 
 interface Props {
@@ -22,8 +25,8 @@ interface Props {
 		content: unknown[];
 	};
 	createdAt: string;
-	isOwner?: boolean;
 	tags?: { id: string; name: string }[] | null;
+	isBlogPage?: boolean;
 }
 
 export const PostCard = ({
@@ -32,10 +35,10 @@ export const PostCard = ({
 	content,
 	author,
 	createdAt,
-	isOwner = false,
 	tags,
+	isBlogPage = false,
 }: Props) => {
-	
+	const { profile } = useProfile();
 	const html = useMemo(() => {
 		const cuttedContent = {
 			...content,
@@ -44,8 +47,10 @@ export const PostCard = ({
 		return milkdownJsonToHtml(cuttedContent);
 	}, [content]);
 
+	const isOwner = profile?.username === author.username;
+
 	return (
-		<li className='bg-[var(--background-color-card)] transition-all rounded-xl py-5 px-4 hover:shadow-primary border-t-16 border-primary self-start lg:max-w-115 min-w-85 w-full break-inside-avoid not-last:mb-6'>
+		<li className='bg-[var(--background-color-card)] transition-all rounded-xl py-5 px-4 hover:shadow-primary border-t-16 border-primary self-start lg:max-w-115 min-w-85 w-full break-inside-avoid not-last:mb-6 relative'>
 			<div className='flex flex-col gap-y-5 transition-colors hover:text-[var(--text-color-main)]'>
 				<div className='flex flex-col gap-y-3'>
 					<h2>
@@ -66,6 +71,13 @@ export const PostCard = ({
 				</div>
 				{tags && tags.length > 0 && <TagsList tags={tags} />}
 			</div>
+			{isBlogPage && (
+				<Button
+					className='p-1 rounded-sm absolute top-1 right-1'
+					data-post={id}>
+					<Trash />
+				</Button>
+			)}
 		</li>
 	);
 };

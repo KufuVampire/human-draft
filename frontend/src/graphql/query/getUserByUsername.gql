@@ -24,20 +24,7 @@ query GetUserByUsername($username: String!) {
 			}
 		}
 		blogs {
-			id
-			title
-			description
-			posterUrl
-			tags {
-				id
-				name
-			}
-			author {
-				username
-				avatarUrl
-			}
-			createdAt
-			updatedAt
+			...BlogFragment
 		}
 	}
 }

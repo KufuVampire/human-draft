@@ -1,4 +1,4 @@
-import { CreatePostBlogLInksSkeleton } from '../CreatePostBlogLInksSkeleton';
+import { CreatePostBlogLinksSkeleton } from '../CreatePostBlogLinksSkeleton';
 import { PostCardSkeleton } from '../PostCardSkeleton';
 import { PosterSkeleton } from '../PosterSkeleton';
 import { Skeleton } from '../Skeleton';
@@ -31,7 +31,7 @@ export const ProfilePageSkeleton = ({ isOwner }: Props) => {
 					/>
 				</div>
 			</div>
-			{isOwner && <CreatePostBlogLInksSkeleton />}
+			{isOwner && <CreatePostBlogLinksSkeleton />}
 			<ul className='grid grid-cols-1 md:grid-cols-2 gap-6'>
 				{arr.map((_, index) => (
 					<PostCardSkeleton
