@@ -33,7 +33,7 @@ export class CommentService {
 			}
 		}
 
-		await this.prismaService.comment.create({
+		return this.prismaService.comment.create({
 			data: {
 				text,
 				author: {
@@ -58,8 +58,6 @@ export class CommentService {
 				author: true,
 			},
 		});
-
-		return true;
 	}
 
 	async update(authorId: string, commentId: string, text: string) {
@@ -105,5 +103,18 @@ export class CommentService {
 		});
 
 		return true;
+	}
+
+	async allPostComments(postId: string) {
+		const comments = await this.prismaService.comment.findMany({
+			where: {
+				postId,
+			},
+			include: {
+				author: true,
+			},
+		});
+
+		return comments;
 	}
 }

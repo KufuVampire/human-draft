@@ -128,8 +128,6 @@ export class PostService {
 				id: postId,
 			},
 		});
-
-		return true;
 	}
 
 	async pinPostToBlog(authorId: string, postId: string, blogId: string) {
@@ -176,6 +174,10 @@ export class PostService {
 					},
 				},
 			},
+			include: {
+				author: true,
+				tags: true,
+			},
 		});
 	}
 
@@ -204,7 +206,7 @@ export class PostService {
 			throw new NotFoundException('Blog not found');
 		}
 
-		return this.prismaService.post.update({
+		await this.prismaService.post.update({
 			where: {
 				id: postId,
 			},
@@ -224,18 +226,10 @@ export class PostService {
 			include: {
 				author: true,
 				blog: true,
-				comments: {
-					where: {
-						parentId: null,
-					},
-					include: {
-						author: true,
-					},
-				},
 				tags: true,
 				_count: {
 					select: {
-						comments: true
+						comments: true,
 					},
 				},
 			},
@@ -277,5 +271,22 @@ export class PostService {
 			perPage,
 			totalPages: Math.ceil(totalCount / perPage),
 		};
+	}
+
+	async getAllFreeUserPostsForPin(userId: string, searchStr?: string) {
+		const posts = await this.prismaService.post.findMany({
+			where: {
+				author: {
+					id: userId,
+				},
+				blogId: null,
+				title: {
+					contains: searchStr,
+					mode: 'insensitive',
+				},
+			},
+		});
+
+		return posts;
 	}
 }

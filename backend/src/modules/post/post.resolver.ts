@@ -7,7 +7,7 @@ import {
 	SearchParamsInput,
 	UpdatePostInput,
 } from '@/src/inputs';
-import { PostModel, PostPagination } from '@/src/models';
+import { PostDeleteResponse, PostModel, PostPagination, UnPinPostResponse } from '@/src/models';
 
 @Resolver('Post')
 export class PostResolver {
@@ -34,12 +34,13 @@ export class PostResolver {
 	}
 
 	@Auth()
-	@Mutation(() => Boolean, { name: 'deletePost' })
+	@Mutation(() => PostDeleteResponse, { name: 'deletePost' })
 	async delete(
 		@Authorized('id') authorId: string,
 		@Args('postId') postId: string
 	) {
-		return this.postService.delete(authorId, postId);
+		await this.postService.delete(authorId, postId);
+		return {postId}
 	}
 
 	@Auth()
@@ -53,13 +54,17 @@ export class PostResolver {
 	}
 
 	@Auth()
-	@Mutation(() => PostModel, { name: 'unPinPostFromBlog' })
+	@Mutation(() => UnPinPostResponse, { name: 'unPinPostFromBlog' })
 	async unPinPostFromBlog(
 		@Authorized('id') authorId: string,
 		@Args('postId') postId: string,
 		@Args('blogId') blogId: string
 	) {
-		return this.postService.unPinPostFromBlog(authorId, postId, blogId);
+		await this.postService.unPinPostFromBlog(authorId, postId, blogId);
+
+		return {
+			postId,
+		};
 	}
 
 	@Query(() => PostModel, { name: 'getPostById' })
@@ -76,5 +81,14 @@ export class PostResolver {
 		searchParams: SearchParamsInput
 	) {
 		return this.postService.getAllPosts(searchParams);
+	}
+
+	@Auth()
+	@Query(() => [PostModel], { name: 'getFreePostsForPin' })
+	async getFreePostsForPin(
+		@Authorized('id') userId: string,
+		@Args('searchStr', { nullable: true }) searchStr?: string
+	) {
+		return this.postService.getAllFreeUserPostsForPin(userId, searchStr);
 	}
 }

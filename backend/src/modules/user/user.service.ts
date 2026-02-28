@@ -18,12 +18,14 @@ export class UserService {
 			include: {
 				blogs: {
 					include: {
-						posts: true,
-					},
+						author: true,
+						tags: true
+					}
 				},
 				posts: {
 					include: {
 						author: true,
+						tags: true
 					},
 				},
 				subscribers: {

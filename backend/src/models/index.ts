@@ -9,3 +9,5 @@ export { TagModel } from './tag.model';
 export { UserModel } from './user.model';
 export { UserPagination } from './userPagination.model';
 export { UploadImageModel } from './uploadPostImage.model';
+export { UnPinPostResponse } from './unpinResponse.model';
+export { PostDeleteResponse } from './postDeleteResponse.model';

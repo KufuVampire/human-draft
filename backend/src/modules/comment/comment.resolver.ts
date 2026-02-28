@@ -2,6 +2,7 @@ import {
 	Args,
 	Mutation,
 	Parent,
+	Query,
 	ResolveField,
 	Resolver,
 } from '@nestjs/graphql';
@@ -19,7 +20,7 @@ export class CommentResolver {
 	) {}
 
 	@Auth()
-	@Mutation(() => Boolean, { name: 'createComment' })
+	@Mutation(() => CommentModel, { name: 'createComment' })
 	async create(
 		@Authorized('id') authorId: string,
 		@Args('postId') postId: string,
@@ -51,5 +52,10 @@ export class CommentResolver {
 	@ResolveField(() => [CommentModel])
 	async replies(@Parent() comment: CommentModel) {
 		return await this.commentsLoader.batchReplies.load(comment.id);
+	}
+	
+	@Query(() => [CommentModel], { name: "getAllPostComments"})
+	async allPostComments(@Args('postId') postId: string) {
+		return this.commentService.allPostComments(postId);
 	}
 }

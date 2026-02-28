@@ -1,4 +1,5 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { FileUpload, GraphQLUpload } from 'graphql-upload-ts';
 
 import { BlogService } from './blog.service';
 import { Auth, Authorized } from '@/src/decorators';
@@ -7,7 +8,8 @@ import {
 	SearchParamsInput,
 	UpdateBlogInput,
 } from '@/src/inputs';
-import { BlogModel, BlogPagination } from '@/src/models';
+import { BlogModel, BlogPagination, PostModel, UnPinPostResponse } from '@/src/models';
+import { FileValidationPipe } from '@/src/pipes/fileValidation.pipe';
 
 @Resolver('Blog')
 export class BlogResolver {
@@ -17,9 +19,15 @@ export class BlogResolver {
 	@Mutation(() => BlogModel, { name: 'createBlog' })
 	async createBlog(
 		@Authorized('id') authorId: string,
-		@Args('data') input: CreateBlogInput
+		@Args('data') input: CreateBlogInput,
+		@Args(
+			'poster',
+			{ type: () => GraphQLUpload, nullable: true },
+			FileValidationPipe
+		)
+		posterFile?: FileUpload
 	) {
-		return this.blogService.create(authorId, input);
+		return this.blogService.create(authorId, input, posterFile);
 	}
 
 	@Auth()
@@ -33,7 +41,7 @@ export class BlogResolver {
 	}
 
 	@Auth()
-	@Mutation(() => BlogModel, { name: 'deleteBlog' })
+	@Mutation(() => Boolean, { name: 'deleteBlog' })
 	async deleteBlog(
 		@Authorized('id') authorId: string,
 		@Args('blogId') blogId: string
@@ -42,22 +50,27 @@ export class BlogResolver {
 	}
 
 	@Auth()
-	@Mutation(() => BlogModel, { name: 'pinPostToBlog' })
-	async pinPostsToBlog(
+	@Mutation(() => PostModel, { name: 'pinPost' })
+	async pinPostToBlog(
 		@Authorized('id') authorId: string,
 		@Args('blogId') blogId: string,
-		@Args('postIds', { type: () => [String] }) postIds: string[]
+		@Args('postId') postId: string
 	) {
-		return this.blogService.pinPostsToBlog(authorId, blogId, postIds);
+		return this.blogService.pinPostToBlog(authorId, blogId, postId);
 	}
+
 	@Auth()
-	@Mutation(() => BlogModel, { name: 'unPinPostFromBlog' })
-	async unPinPostsFromBlog(
+	@Mutation(() => UnPinPostResponse, { name: 'unPinPost' })
+	async unPinPostFromBlog(
 		@Authorized('id') authorId: string,
 		@Args('blogId') blogId: string,
-		@Args('postIds', { type: () => [String] }) postIds: string[]
+		@Args('postId') postId: string
 	) {
-		return this.blogService.unPinPostsFromBlog(authorId, blogId, postIds);
+		await this.blogService.unPinPostFromBlog(authorId, blogId, postId);
+
+		return {
+			postId
+		}
 	}
 
 	@Query(() => BlogPagination, { name: 'getAllBlogsPagination' })
@@ -69,5 +82,16 @@ export class BlogResolver {
 		searchParams: SearchParamsInput
 	) {
 		return this.blogService.getAllBlogs(searchParams);
+	}
+
+	@Query(() => BlogModel, { name: 'getBlogById' })
+	async getBlog(@Args('blogId') blogId: string) {
+		return this.blogService.getBlog(blogId);
+	}
+
+	@Auth()
+	@Query(() => [BlogModel], {name: "blogsForPin"})
+	async blogsForPin(@Authorized('id') userId: string) {
+		return this.blogService.blogsForPin(userId)
 	}
 }

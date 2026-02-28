@@ -2,8 +2,12 @@ import {
 	BadRequestException,
 	Injectable,
 	NotFoundException,
+	UnsupportedMediaTypeException,
 } from '@nestjs/common';
+import { FileUpload } from 'graphql-upload-ts';
+import * as sharp from 'sharp';
 
+import { AwsStorageService } from '../aws-storage/aws-storage.service';
 import { PostService } from '../post/post.service';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -18,7 +22,8 @@ import {
 export class BlogService {
 	constructor(
 		private readonly prismaService: PrismaService,
-		private readonly postService: PostService
+		private readonly postService: PostService,
+		private readonly storageService: AwsStorageService
 	) {}
 
 	private async findBlogById(id: string) {
@@ -35,20 +40,82 @@ export class BlogService {
 		return blog;
 	}
 
-	async create(authorId: string, input: CreateBlogInput) {
+	async create(
+		authorId: string,
+		input: CreateBlogInput,
+		posterFile?: FileUpload
+	) {
+		const { postIds, tags, title, description } = input;
+
+		const freePosts = await this.prismaService.post.findMany({
+			where: {
+				id: { in: postIds },
+				blogId: null,
+			},
+			select: { id: true },
+		});
+
 		const blog = await this.prismaService.blog.create({
 			data: {
-				...input,
+				title,
+				description,
 				author: {
 					connect: {
 						id: authorId,
 					},
 				},
-				posts: input.postIds.length
-					? { connect: input.postIds.map((id) => ({ id })) }
-					: undefined,
+				...(postIds.length && {
+					posts: { connect: freePosts.map(({ id }) => ({ id })) },
+				}),
+				...(tags && {
+					tags: {
+						connectOrCreate: tags.map((tag) => ({
+							where: { name: tag },
+							create: { name: tag },
+						})),
+					},
+				}),
+			},
+			include: {
+				author: true,
+				tags: true,
+				posts: {
+					include: {
+						author: true,
+					},
+				},
 			},
 		});
+
+		let posterUrl: string | undefined;
+
+		if (posterFile) {
+			const chunks: Buffer[] = [];
+
+			for await (const chunk of posterFile.createReadStream()) {
+				chunks.push(chunk);
+			}
+
+			const buffer = Buffer.concat(chunks);
+
+			const fileName = `blogs/${blog.id}-poster.webp`;
+			if (posterFile.filename && posterFile.filename.startsWith('.gif')) {
+				throw new UnsupportedMediaTypeException('Unsupported file type');
+			}
+
+			const processesBuffer = await sharp(buffer)
+				.resize(950, 350)
+				.webp()
+				.toBuffer();
+
+			await this.storageService.uploadForProfile(
+				processesBuffer,
+				fileName,
+				'image/webp'
+			);
+			posterUrl = this.storageService.getFileUrl(fileName);
+			return { ...blog, posterUrl };
+		}
 
 		return blog;
 	}
@@ -86,32 +153,12 @@ export class BlogService {
 		return true;
 	}
 
-	async pinPostsToBlog(authorId: string, blogId: string, postIds: string[]) {
-		if (postIds.length === 0) {
-			throw new BadRequestException('No posts provided to pin');
-		}
-
-		for (const postId of postIds) {
-			await this.postService.pinPostToBlog(authorId, postId, blogId);
-		}
-
-		return this.findBlogById(blogId);
+	async pinPostToBlog(authorId: string, blogId: string, postId: string) {
+		return this.postService.pinPostToBlog(authorId, postId, blogId);
 	}
 
-	async unPinPostsFromBlog(
-		authorId: string,
-		blogId: string,
-		postIds: string[]
-	) {
-		if (postIds.length === 0) {
-			throw new BadRequestException('No posts provided to unpin');
-		}
-
-		for (const postId of postIds) {
-			await this.postService.unPinPostFromBlog(authorId, postId, blogId);
-		}
-
-		return this.findBlogById(blogId);
+	async unPinPostFromBlog(authorId: string, blogId: string, postId: string) {
+		await this.postService.unPinPostFromBlog(authorId, postId, blogId);
 	}
 
 	async getAllBlogs(searchParams: SearchParamsInput) {
@@ -125,6 +172,10 @@ export class BlogService {
 				take: perPage,
 				skip,
 				orderBy: { id: 'asc' },
+				include: {
+					author: true,
+					tags: true,
+				},
 			}),
 			this.prismaService.blog.count(),
 		]);
@@ -136,5 +187,39 @@ export class BlogService {
 			perPage,
 			totalPages: Math.ceil(totalCount / perPage),
 		};
+	}
+
+	async getBlog(blogId: string) {
+		const blog = await this.prismaService.blog.findUnique({
+			where: {
+				id: blogId,
+			},
+			include: {
+				author: true,
+				tags: true,
+				posts: {
+					include: {
+						author: true,
+						tags: true,
+					},
+				},
+			},
+		});
+
+		if (!blog) {
+			throw new NotFoundException('Blog was not found');
+		}
+
+		return blog;
+	}
+	
+	async blogsForPin(userId: string) {
+		return this.prismaService.blog.findMany({
+			where: {
+				author: {
+					id: userId
+				}
+			}
+		})
 	}
 }

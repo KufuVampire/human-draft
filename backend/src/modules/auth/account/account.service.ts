@@ -86,10 +86,14 @@ export class AccountService {
 			include: {
 				blogs: {
 					include: {
-						posts: true,
-					},
+						tags: true
+					}
 				},
-				posts: true,
+				posts: {
+					include: {
+						tags: true
+					}
+				},
 				subscribers: {
 					select: {
 						fromUserId: true,

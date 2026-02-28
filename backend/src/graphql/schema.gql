@@ -8,7 +8,7 @@ type BlogModel {
   description: String!
   id: ID!
   posterUrl: String
-  posts: [PostModel!]
+  posts: [PostModel!]!
   tags: [TagModel!]!
   title: String!
   updatedAt: DateTime!
@@ -33,9 +33,9 @@ type CommentModel {
 }
 
 input CreateBlogInput {
-  description: String!
-  postIds: [ID!]!
-  posterUrl: String
+  description: String
+  postIds: [String!]!
+  tags: [String!]!
   title: String!
 }
 
@@ -58,14 +58,15 @@ scalar JSON
 type Mutation {
   changeProfileAvatar(file: Upload!): UserModel!
   changeProfilePoster(file: Upload!): UserModel!
-  createBlog(data: CreateBlogInput!): BlogModel!
-  createComment(parentId: String, postId: String!, text: String!): Boolean!
+  createBlog(data: CreateBlogInput!, poster: Upload): BlogModel!
+  createComment(parentId: String, postId: String!, text: String!): CommentModel!
   createPost(blogId: String, data: CreatePostInput!): PostModel!
   createTag(name: String!): TagModel!
-  deleteBlog(blogId: String!): BlogModel!
+  deleteBlog(blogId: String!): Boolean!
   deleteComment(commentId: String!): Boolean!
-  deletePost(postId: String!): Boolean!
+  deletePost(postId: String!): PostDeleteResponse!
   deleteTag(name: String!): Boolean!
+  pinPost(blogId: String!, postId: String!): PostModel!
   pinPostToBlog(blogId: String!, postId: String!): PostModel!
   removeProfileAvatar: UserModel!
   removeProfilePoster: UserModel!
@@ -73,7 +74,8 @@ type Mutation {
   signOutAccount: Boolean!
   signUp(data: SignUpInput!): UserModel!
   subscribeToUser(toId: String!): Boolean!
-  unPinPostFromBlog(blogId: String!, postId: String!): PostModel!
+  unPinPost(blogId: String!, postId: String!): UnPinPostResponse!
+  unPinPostFromBlog(blogId: String!, postId: String!): UnPinPostResponse!
   unsubscribeFromUser(toId: String!): Boolean!
   updateBlog(blogId: String!, data: UpdateBlogInput!): BlogModel!
   updateComment(commentId: String!, text: String!): Boolean!
@@ -83,16 +85,19 @@ type Mutation {
   uploadImage(image: Upload!): UploadImageModel!
 }
 
+type PostDeleteResponse {
+  postId: String!
+}
+
 type PostModel {
   author: UserModel!
   blog: BlogModel
-  comments: [CommentModel!]!
   commentsCount: Int!
   content: JSON!
   createdAt: DateTime!
   id: ID!
   likesCount: Int!
-  tags: [TagModel!]
+  tags: [TagModel!]!
   title: String!
   updatedAt: DateTime!
   viewsCount: Int!
@@ -107,10 +112,14 @@ type PostPagination {
 }
 
 type Query {
+  blogsForPin: [BlogModel!]!
   findTagsBySearchString(search: String!): [TagModel!]!
   getAllBlogsPagination(searchParams: SearchParamsInput = {page: 1, perPage: 10}): BlogPagination!
+  getAllPostComments(postId: String!): [CommentModel!]!
   getAllPostsPagination(searchParams: SearchParamsInput = {page: 1, perPage: 10}): PostPagination!
   getAllUsersPagination(onlySubscriptions: Boolean!, searchParams: SearchParamsInput = {page: 1, perPage: 10}, searchStr: String = ""): UserPagination!
+  getBlogById(blogId: String!): BlogModel!
+  getFreePostsForPin(searchStr: String): [PostModel!]!
   getPostById(postId: String!): PostModel!
   getUserByUsername(username: String!): UserModel!
   userProfile: UserModel!
@@ -139,6 +148,10 @@ type TagModel {
   name: String!
   posts: [PostModel!]!
   updatedAt: DateTime!
+}
+
+type UnPinPostResponse {
+  postId: String!
 }
 
 input UpdateBlogInput {
@@ -177,14 +190,14 @@ type UploadImageModel {
 
 type UserModel {
   avatarUrl: String
-  blogs: [BlogModel!]
+  blogs: [BlogModel!]!
   comments: [CommentModel!]
   createdAt: DateTime!
   description: String
   email: String!
   id: ID!
   posterUrl: String
-  posts: [PostModel!]
+  posts: [PostModel!]!
   subscribers: [String!]!
   subscriptions: [String!]!
   updatedAt: DateTime!
