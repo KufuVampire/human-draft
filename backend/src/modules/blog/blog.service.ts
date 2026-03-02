@@ -212,14 +212,99 @@ export class BlogService {
 
 		return blog;
 	}
-	
+
 	async blogsForPin(userId: string) {
 		return this.prismaService.blog.findMany({
 			where: {
 				author: {
-					id: userId
+					id: userId,
+				},
+			},
+		});
+	}
+
+	async changePoster(authorId: string, blogId: string, newPoster: FileUpload) {
+		const blog = await this.prismaService.blog.findUnique({
+			where: {
+				id: blogId,
+				author: {
+					id: authorId
 				}
-			}
-		})
+			},
+		});
+
+		if (!blog) {
+			throw new NotFoundException('Blog was not found');
+		}
+
+		if (blog.posterUrl) {
+			await this.storageService.remove(`blogs/${blog.id}-poster.webp`);
+		}
+
+		if (!newPoster) {
+			throw new BadRequestException('The file was not transferred');
+		}
+
+		const chunks: Buffer[] = [];
+
+		for await (const chunk of newPoster.createReadStream()) {
+			chunks.push(chunk);
+		}
+
+		const buffer = Buffer.concat(chunks);
+
+		const newPosterKey = `blogs/${blog.id}-poster.webp`;
+		if (newPoster.filename && newPoster.filename.startsWith('.gif')) {
+			throw new UnsupportedMediaTypeException('Unsupported file type');
+		}
+
+		const processesBuffer = await sharp(buffer)
+			.resize(950, 330)
+			.webp()
+			.toBuffer();
+
+		await this.storageService.uploadForProfile(
+			processesBuffer,
+			newPosterKey,
+			'image/webp'
+		);
+
+		const newPosterUrl = this.storageService.getFileUrl(newPosterKey);
+		await this.prismaService.blog.update({
+			where: {
+				id: blogId,
+			},
+			data: {
+				posterUrl: newPosterUrl,
+			},
+		});
+
+		return true;
+	}
+
+	async deletePoster(authorId: string, blogId: string) {
+		const blog = await this.prismaService.blog.findUnique({
+			where: {
+				id: blogId,
+				author: {
+					id: authorId
+				}
+			},
+		});
+
+		if (!blog) {
+			throw new NotFoundException('Blog was not found');
+		}
+
+		await this.storageService.remove(`blogs/${blog.id}-poster.webp`);
+		await this.prismaService.blog.update({
+			where: {
+				id: blogId,
+			},
+			data: {
+				posterUrl: null,
+			},
+		});
+		return true;
 	}
 }

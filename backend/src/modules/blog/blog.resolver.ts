@@ -8,7 +8,12 @@ import {
 	SearchParamsInput,
 	UpdateBlogInput,
 } from '@/src/inputs';
-import { BlogModel, BlogPagination, PostModel, UnPinPostResponse } from '@/src/models';
+import {
+	BlogModel,
+	BlogPagination,
+	PostModel,
+	UnPinPostResponse,
+} from '@/src/models';
 import { FileValidationPipe } from '@/src/pipes/fileValidation.pipe';
 
 @Resolver('Blog')
@@ -69,8 +74,8 @@ export class BlogResolver {
 		await this.blogService.unPinPostFromBlog(authorId, blogId, postId);
 
 		return {
-			postId
-		}
+			postId,
+		};
 	}
 
 	@Query(() => BlogPagination, { name: 'getAllBlogsPagination' })
@@ -90,8 +95,28 @@ export class BlogResolver {
 	}
 
 	@Auth()
-	@Query(() => [BlogModel], {name: "blogsForPin"})
+	@Query(() => [BlogModel], { name: 'blogsForPin' })
 	async blogsForPin(@Authorized('id') userId: string) {
-		return this.blogService.blogsForPin(userId)
+		return this.blogService.blogsForPin(userId);
+	}
+
+	@Auth()
+	@Mutation(() => Boolean, { name: 'changeBlogPoster' })
+	async changePoster(
+		@Authorized('id') userId: string,
+		@Args('blogId') blogId: string,
+		@Args('posterFile', { type: () => GraphQLUpload }, FileValidationPipe)
+		posterFile: FileUpload
+	) {
+		return this.blogService.changePoster(userId, blogId, posterFile);
+	}
+
+	@Auth()
+	@Mutation(() => Boolean, { name: 'deleteBlogPoster' })
+	async deletePoster(
+		@Authorized('id') userId: string,
+		@Args('blogId') blogId: string
+	) {
+		return this.blogService.deletePoster(userId, blogId);
 	}
 }

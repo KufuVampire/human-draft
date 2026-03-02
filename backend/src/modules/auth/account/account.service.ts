@@ -152,7 +152,7 @@ export class AccountService {
 		await this.storageService.uploadForProfile(processesBuffer, fileName, 'image/webp');
 
 		const fileUrl = this.storageService.getFileUrl(fileName);
-		return await this.userService.updateUser(user.id, { posterUrl: fileUrl });
+		return this.userService.updateUser(user.id, { posterUrl: fileUrl });
 	}
 
 	public async removePoster(user: UserModel) {
@@ -194,7 +194,7 @@ export class AccountService {
 		await this.storageService.uploadForProfile(processesBuffer, fileName, 'image/webp');
 
 		const fileUrl = this.storageService.getFileUrl(fileName);
-		return await this.userService.updateUser(user.id, { avatarUrl: fileUrl });
+		return this.userService.updateUser(user.id, { avatarUrl: fileUrl });
 	}
 
 	public async removeAvatar(user: UserModel) {
