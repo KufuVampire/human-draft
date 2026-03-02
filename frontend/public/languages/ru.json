@@ -175,6 +175,10 @@
 		"editBlog": "Редактировать блог",
 		"blogDeletedSuccess": "Блог успешно удалён",
 		"blogUpdatedSuccess": "Блог успешно обновлён",
+		"poster": {
+			"deleted": "Постер успешно удален",
+			"updated": "Постер успешно обновлён"
+		},
 		"pinPosts": {
 			"pin": "Закрепить посты",
 			"searchFieldPlaceholder": "Поиск постов"

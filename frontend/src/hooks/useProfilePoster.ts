@@ -42,6 +42,7 @@ export const useProfilePoster = () => {
 				file,
 			},
 		});
+		e.target.value = ''
 	};
 
 	const handleRemovePoster = () => {

@@ -1,0 +1,3 @@
+mutation ChangeBlogPoster($blogId: String!, $posterFile: Upload!) {
+	changeBlogPoster(blogId: $blogId, posterFile: $posterFile) 
+}

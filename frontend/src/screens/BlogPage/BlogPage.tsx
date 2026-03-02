@@ -1,23 +1,25 @@
 'use client';
 
-import { ChevronDown, Search } from 'lucide-react';
+import { ChevronDown, Search, Trash } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { redirect, useParams } from 'next/navigation';
-import { MouseEvent, useEffect, useState } from 'react';
+import { ChangeEvent, MouseEvent, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
 import { routesConfig } from '@/config';
 import {
 	GetBlogByIdQuery,
+	useChangeBlogPosterMutation,
 	useDeleteBlogMutation,
+	useDeleteBlogPosterMutation,
 	useDeletePostMutation,
 	useGetAllFreePostsForPinQuery,
 	useGetBlogByIdQuery,
 	usePinPostMutation,
 	useUnPinPostMutation,
 } from '@/graphql/generated/output';
-import { useDebounce } from '@/hooks';
+import { useDebounce, useProfile } from '@/hooks';
 import { TypeSearchSchema } from '@/schemas';
 import {
 	Button,
@@ -36,12 +38,13 @@ const btnStyles = 'px-3 py-2 leading-[150%] font-bold rounded-lg';
 
 export const BlogPage = () => {
 	const { blogId } = useParams<{ blogId: string }>();
-
+	const [posterFile, setPosterFile] = useState<File | null>(null);
+	const [posterUrl, setPosterUrl] = useState<string | null>(null);
 	const [isOpen, setOpen] = useState(false);
 	const [blogPosts, setBlogPosts] = useState<
 		GetBlogByIdQuery['getBlogById']['posts']
 	>([]);
-
+	const { isAuth, profile } = useProfile();
 	const t = useTranslations();
 
 	const {
@@ -68,6 +71,9 @@ export const BlogPage = () => {
 	useEffect(() => {
 		if (data && data.getBlogById) {
 			setBlogPosts(data.getBlogById.posts);
+		}
+		if (data && data.getBlogById.posterUrl) {
+			setPosterUrl(data.getBlogById.posterUrl);
 		}
 	}, [data]);
 
@@ -104,6 +110,24 @@ export const BlogPage = () => {
 			redirect(routesConfig.home);
 		},
 	});
+	const [updatePoster, { loading: isPosterUpdating }] =
+		useChangeBlogPosterMutation({
+			onCompleted() {
+				if (posterFile) {
+					setPosterUrl(URL.createObjectURL(posterFile));
+					toast.success(t('blogPage.poster.updated'));
+				}
+			},
+			onError(err) {
+				console.error(err);
+			},
+		});
+	const [deletePoster, { loading: isPosterDeleting }] =
+		useDeleteBlogPosterMutation({
+			onCompleted() {
+				toast.success(t('blogPage.poster.deleted'));
+			},
+		});
 
 	if (!blogId || (!isBlogLoading && !data)) {
 		redirect(routesConfig.notFound);
@@ -206,28 +230,81 @@ export const BlogPage = () => {
 		setModalOpen(true);
 	};
 
+	const handleChangePoster = (e: ChangeEvent<HTMLInputElement>) => {
+		const file = e.target.files?.[0];
+		console.log(e.target.files);
+		if (!file) return;
+		setPosterFile(file);
+		updatePoster({
+			variables: {
+				blogId,
+				posterFile: file,
+			},
+		});
+		e.target.value = '';
+	};
+
+	const handleDeletePoster = () => {
+		setType('poster');
+		setCb(() => {
+			setPosterUrl(null);
+			deletePoster({
+				variables: {
+					blogId,
+				},
+			});
+			setModalOpen(false);
+		});
+		setModalOpen(true);
+	};
+
 	return (
 		<div className='flex flex-col gap-y-6 w-full'>
 			<Section
-				className='py-0 md:py-0 relative overflow-hidden rounded-xl bg-placeholder before:absolute before:inset-0 before:bg-[rgba(0,0,0,0.4)] before:z-0'
+				className='py-0 md:py-0 relative overflow-hidden rounded-xl bg-placeholder before:absolute before:inset-0 before:bg-[rgba(0,0,0,0.4)] before:z-0 bg-no-repeat bg-size-[100%_330px]'
 				style={
-					blog.posterUrl
-						? { backgroundImage: `url(${blog.posterUrl})` }
+					posterUrl
+						? {
+								backgroundImage: `url(${posterUrl})`,
+							}
 						: undefined
 				}>
-				<div className='w-full p-3 pt-16 md:p-6 md:pt-10 z-10 relative'>
-					<h1 className='font-title font-bold text-[1.75rem] md:text-5xl leading-[110%] w-full text-center mb-7.5 md:mb-12 text-secondary'>
-						{blog.title}
-					</h1>
-					<div className='flex flex-col gap-y-4'>
-						<p className='leading-[150%] tracking-[2%] text-secondary'>
-							{blog.description}
-						</p>
-						<TagsList
-							tags={blog.tags}
-							location='blog'
-						/>
+				<div className='w-full p-3 pt-16 md:p-6 md:pt-10 z-10 relative min-h-82.5 flex flex-col justify-between'>
+					<div className='w-full flex flex-col gap-y-7.5 md:gap-y-12'>
+						<h1 className='font-title font-bold text-[1.75rem] md:text-5xl leading-[110%] w-full text-center text-secondary'>
+							{blog.title}
+						</h1>
+						<div className='flex flex-col gap-y-4'>
+							<p className='leading-[150%] tracking-[2%] text-secondary'>
+								{blog.description}
+							</p>
+							<TagsList
+								tags={blog.tags}
+								location='blog'
+							/>
+						</div>
 					</div>
+					{isAuth && profile?.username === blog.author.username && (
+						<div className='flex gap-x-2 self-end'>
+							<label className='text-secondary px-3 rounded-lg leading-6 backdrop-blur-disabled hover:text-primary-hover focus-visible:text-primary-hover cursor-pointer transition-colors text-left z-10 relative bg-disabled py-2'>
+								{t('btns.editPoster')}
+								<input
+									type='file'
+									className='hidden'
+									onChange={handleChangePoster}
+									disabled={isPosterDeleting || isPosterUpdating}
+								/>
+							</label>
+							{posterUrl && (
+								<Button
+									variant='light'
+									className='p-2 rounded-lg'
+									onClick={handleDeletePoster}>
+									<Trash />
+								</Button>
+							)}
+						</div>
+					)}
 				</div>
 			</Section>
 			<div className='flex flex-col-reverse md:flex-row gap-2'>

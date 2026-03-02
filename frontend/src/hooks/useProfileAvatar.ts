@@ -77,6 +77,7 @@ export const useProfileAvatar = () => {
 		const imageUrl = URL.createObjectURL(file);
 
 		setOpenCropper(imageUrl);
+		e.target.value = ''
 	};
 
 	const handleSaveCroppedAvatar = async () => {

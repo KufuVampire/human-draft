@@ -154,14 +154,7 @@ export const ProfilePage = ({ username }: Props) => {
 		}
 
 		return inputs;
-	}, [
-		changePosterLoading,
-		isAvatarChanging,
-		isAvatarRemoving,
-		profile,
-		removePosterLoading,
-		t,
-	]);
+	}, [changePosterLoading, handleChangeAvatar, handleLoadPoster, isAvatarChanging, isAvatarRemoving, profile, removePosterLoading, t]);
 
 	const handleClick = (e: MouseEvent<HTMLUListElement>) => {
 		const target = e.target as HTMLElement;

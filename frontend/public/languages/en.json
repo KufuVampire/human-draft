@@ -167,10 +167,6 @@
 		}
 	},
 	"blogPage": {
-		"metadata": {
-			"title": "",
-			"description": ""
-		},
 		"fields": {
 			"title": "Blog title",
 			"description": "Blog description"
@@ -179,6 +175,10 @@
 		"blogPoster": "Poster blog",
 		"blogDeletedSuccess": "Blog successfully deleted",
 		"blogUpdatedSuccess": "Blog successfully updated",
+		"poster": {
+			"deleted": "Poster successfully deleted",
+			"updated": "Poster successfully updated"
+		},
 		"pinPosts": {
 			"pin": "Pin posts",
 			"searchFieldPlaceholder": "Search posts"

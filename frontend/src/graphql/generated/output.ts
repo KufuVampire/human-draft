@@ -68,6 +68,7 @@ export type CreatePostInput = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  changeBlogPoster: Scalars['Boolean']['output'];
   changeProfileAvatar: UserModel;
   changeProfilePoster: UserModel;
   createBlog: BlogModel;
@@ -75,6 +76,7 @@ export type Mutation = {
   createPost: PostModel;
   createTag: TagModel;
   deleteBlog: Scalars['Boolean']['output'];
+  deleteBlogPoster: Scalars['Boolean']['output'];
   deleteComment: Scalars['Boolean']['output'];
   deletePost: PostDeleteResponse;
   deleteTag: Scalars['Boolean']['output'];
@@ -95,6 +97,12 @@ export type Mutation = {
   updatePostOrBlogTags: Scalars['Boolean']['output'];
   updateUser: UserModel;
   uploadImage: UploadImageModel;
+};
+
+
+export type MutationChangeBlogPosterArgs = {
+  blogId: Scalars['String']['input'];
+  posterFile: Scalars['Upload']['input'];
 };
 
 
@@ -133,6 +141,11 @@ export type MutationCreateTagArgs = {
 
 
 export type MutationDeleteBlogArgs = {
+  blogId: Scalars['String']['input'];
+};
+
+
+export type MutationDeleteBlogPosterArgs = {
   blogId: Scalars['String']['input'];
 };
 
@@ -418,6 +431,21 @@ export type CommentFieldsFragment = { __typename?: 'CommentModel', id: string, t
 export type RepliesFieldsFragment = { __typename?: 'CommentModel', id: string, text: string, parentId?: string | null, createdAt: any, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null } };
 
 export type PostFragmentFragment = { __typename?: 'PostModel', id: string, title: string, content: any, createdAt: any, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null } };
+
+export type ChangeBlogPosterMutationVariables = Exact<{
+  blogId: Scalars['String']['input'];
+  posterFile: Scalars['Upload']['input'];
+}>;
+
+
+export type ChangeBlogPosterMutation = { __typename?: 'Mutation', changeBlogPoster: boolean };
+
+export type DeleteBlogPosterMutationVariables = Exact<{
+  blogId: Scalars['String']['input'];
+}>;
+
+
+export type DeleteBlogPosterMutation = { __typename?: 'Mutation', deleteBlogPoster: boolean };
 
 export type ChangeProfileAvatarMutationVariables = Exact<{
   file: Scalars['Upload']['input'];
@@ -710,6 +738,69 @@ export const PostFragmentFragmentDoc = gql`
   createdAt
 }
     `;
+export const ChangeBlogPosterDocument = gql`
+    mutation ChangeBlogPoster($blogId: String!, $posterFile: Upload!) {
+  changeBlogPoster(blogId: $blogId, posterFile: $posterFile)
+}
+    `;
+export type ChangeBlogPosterMutationFn = Apollo.MutationFunction<ChangeBlogPosterMutation, ChangeBlogPosterMutationVariables>;
+
+/**
+ * __useChangeBlogPosterMutation__
+ *
+ * To run a mutation, you first call `useChangeBlogPosterMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useChangeBlogPosterMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [changeBlogPosterMutation, { data, loading, error }] = useChangeBlogPosterMutation({
+ *   variables: {
+ *      blogId: // value for 'blogId'
+ *      posterFile: // value for 'posterFile'
+ *   },
+ * });
+ */
+export function useChangeBlogPosterMutation(baseOptions?: Apollo.MutationHookOptions<ChangeBlogPosterMutation, ChangeBlogPosterMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ChangeBlogPosterMutation, ChangeBlogPosterMutationVariables>(ChangeBlogPosterDocument, options);
+      }
+export type ChangeBlogPosterMutationHookResult = ReturnType<typeof useChangeBlogPosterMutation>;
+export type ChangeBlogPosterMutationResult = Apollo.MutationResult<ChangeBlogPosterMutation>;
+export type ChangeBlogPosterMutationOptions = Apollo.BaseMutationOptions<ChangeBlogPosterMutation, ChangeBlogPosterMutationVariables>;
+export const DeleteBlogPosterDocument = gql`
+    mutation DeleteBlogPoster($blogId: String!) {
+  deleteBlogPoster(blogId: $blogId)
+}
+    `;
+export type DeleteBlogPosterMutationFn = Apollo.MutationFunction<DeleteBlogPosterMutation, DeleteBlogPosterMutationVariables>;
+
+/**
+ * __useDeleteBlogPosterMutation__
+ *
+ * To run a mutation, you first call `useDeleteBlogPosterMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteBlogPosterMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteBlogPosterMutation, { data, loading, error }] = useDeleteBlogPosterMutation({
+ *   variables: {
+ *      blogId: // value for 'blogId'
+ *   },
+ * });
+ */
+export function useDeleteBlogPosterMutation(baseOptions?: Apollo.MutationHookOptions<DeleteBlogPosterMutation, DeleteBlogPosterMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteBlogPosterMutation, DeleteBlogPosterMutationVariables>(DeleteBlogPosterDocument, options);
+      }
+export type DeleteBlogPosterMutationHookResult = ReturnType<typeof useDeleteBlogPosterMutation>;
+export type DeleteBlogPosterMutationResult = Apollo.MutationResult<DeleteBlogPosterMutation>;
+export type DeleteBlogPosterMutationOptions = Apollo.BaseMutationOptions<DeleteBlogPosterMutation, DeleteBlogPosterMutationVariables>;
 export const ChangeProfileAvatarDocument = gql`
     mutation ChangeProfileAvatar($file: Upload!) {
   changeProfileAvatar(file: $file) {
