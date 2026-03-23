@@ -7,3 +7,4 @@ export { UpdateBlogInput } from './updateBlog.input';
 export { UpdatePostInput } from './updatePost.input';
 export { UpdatePostOrBlogTagsInput } from './updatePostOrBlogTags.input';
 export { UpdateUserInput } from './updateUser.input';
+export { FiltersInput } from './filtersInput';

@@ -50,6 +50,11 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+input FiltersInput {
+  onlySubscriptions: Boolean
+  search: String
+}
+
 """
 The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
 """
@@ -79,7 +84,7 @@ type Mutation {
   unPinPost(blogId: String!, postId: String!): UnPinPostResponse!
   unPinPostFromBlog(blogId: String!, postId: String!): UnPinPostResponse!
   unsubscribeFromUser(toId: String!): Boolean!
-  updateBlog(blogId: String!, data: UpdateBlogInput!): BlogModel!
+  updateBlog(blogId: String!, data: UpdateBlogInput!, poster: Upload): Boolean!
   updateComment(commentId: String!, text: String!): Boolean!
   updatePost(data: UpdatePostInput!, postId: String!): Boolean!
   updatePostOrBlogTags(tags: [String!]!, to: UpdatePostOrBlogTagsInput!): Boolean!
@@ -116,9 +121,9 @@ type PostPagination {
 type Query {
   blogsForPin: [BlogModel!]!
   findTagsBySearchString(search: String!): [TagModel!]!
-  getAllBlogsPagination(searchParams: SearchParamsInput = {page: 1, perPage: 10}): BlogPagination!
+  getAllBlogsPagination(filters: FiltersInput, searchParams: SearchParamsInput = {page: 1, perPage: 10}): BlogPagination!
   getAllPostComments(postId: String!): [CommentModel!]!
-  getAllPostsPagination(searchParams: SearchParamsInput = {page: 1, perPage: 10}): PostPagination!
+  getAllPostsPagination(filters: FiltersInput, searchParams: SearchParamsInput = {page: 1, perPage: 10}): PostPagination!
   getAllUsersPagination(onlySubscriptions: Boolean!, searchParams: SearchParamsInput = {page: 1, perPage: 10}, searchStr: String = ""): UserPagination!
   getBlogById(blogId: String!): BlogModel!
   getFreePostsForPin(searchStr: String): [PostModel!]!
@@ -158,7 +163,8 @@ type UnPinPostResponse {
 
 input UpdateBlogInput {
   description: String
-  posterUrl: String
+  postIds: [String!]
+  tags: [String!]
   title: String
 }
 

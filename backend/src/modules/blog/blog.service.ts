@@ -1,5 +1,6 @@
 import {
 	BadRequestException,
+	ConflictException,
 	Injectable,
 	NotFoundException,
 	UnsupportedMediaTypeException,
@@ -11,12 +12,15 @@ import { AwsStorageService } from '../aws-storage/aws-storage.service';
 import { PostService } from '../post/post.service';
 import { PrismaService } from '../prisma/prisma.service';
 
+import { BlogWhereInput } from '@/prisma/generated/models';
 import { PAGINATION_PAGE, PAGINATION_PER_PAGE } from '@/src/consts';
 import {
 	CreateBlogInput,
+	FiltersInput,
 	SearchParamsInput,
 	UpdateBlogInput,
 } from '@/src/inputs';
+import { UserModel } from '@/src/models';
 
 @Injectable()
 export class BlogService {
@@ -25,20 +29,6 @@ export class BlogService {
 		private readonly postService: PostService,
 		private readonly storageService: AwsStorageService
 	) {}
-
-	private async findBlogById(id: string) {
-		const blog = await this.prismaService.blog.findUnique({
-			where: {
-				id,
-			},
-		});
-
-		if (!blog) {
-			throw new NotFoundException(`Blog not found - ${id}`);
-		}
-
-		return blog;
-	}
 
 	async create(
 		authorId: string,
@@ -76,60 +66,113 @@ export class BlogService {
 					},
 				}),
 			},
-			include: {
-				author: true,
-				tags: true,
-				posts: {
-					include: {
-						author: true,
-					},
-				},
-			},
 		});
 
-		let posterUrl: string | undefined;
+		if (!posterFile) {
+			return blog;
+		}
+		const chunks: Buffer[] = [];
 
-		if (posterFile) {
-			const chunks: Buffer[] = [];
-
-			for await (const chunk of posterFile.createReadStream()) {
-				chunks.push(chunk);
-			}
-
-			const buffer = Buffer.concat(chunks);
-
-			const fileName = `blogs/${blog.id}-poster.webp`;
-			if (posterFile.filename && posterFile.filename.startsWith('.gif')) {
-				throw new UnsupportedMediaTypeException('Unsupported file type');
-			}
-
-			const processesBuffer = await sharp(buffer)
-				.resize(950, 350)
-				.webp()
-				.toBuffer();
-
-			await this.storageService.uploadForProfile(
-				processesBuffer,
-				fileName,
-				'image/webp'
-			);
-			posterUrl = this.storageService.getFileUrl(fileName);
-			return { ...blog, posterUrl };
+		for await (const chunk of posterFile.createReadStream()) {
+			chunks.push(chunk);
 		}
 
-		return blog;
+		const buffer = Buffer.concat(chunks);
+		const fileName = `blogs/${blog.id}-poster.webp`;
+		if (posterFile.filename && posterFile.filename.startsWith('.gif')) {
+			throw new UnsupportedMediaTypeException('Unsupported file type');
+		}
+
+		const processesBuffer = await sharp(buffer)
+			.resize(950, 330)
+			.webp()
+			.toBuffer();
+
+		await this.storageService.uploadForProfile(
+			processesBuffer,
+			fileName,
+			'image/webp'
+		);
+		const posterUrl = this.storageService.getFileUrl(fileName);
+		return this.prismaService.blog.update({
+			where: {
+				id: blog.id,
+			},
+			data: {
+				posterUrl,
+			},
+		});
 	}
 
-	async update(authorId: string, blogId: string, input: UpdateBlogInput) {
+	async update(
+		authorId: string,
+		blogId: string,
+		input: UpdateBlogInput,
+		posterFile?: FileUpload
+	) {
+		const { description, postIds, title, tags } = input;
+
 		const blog = await this.prismaService.blog.update({
 			where: {
 				id: blogId,
 				authorId,
 			},
-			data: input,
+			data: {
+				description,
+				title,
+				...(postIds &&
+					postIds.length && {
+						posts: { connect: postIds.map((id) => ({ id })) },
+					}),
+				...(tags && {
+					tags: {
+						set: [],
+						connectOrCreate: tags.map((tag) => ({
+							where: { name: tag },
+							create: { name: tag },
+						})),
+					},
+				}),
+			},
 		});
 
-		return blog;
+		if (!posterFile) {
+			return true;
+		}
+
+		const chunks: Buffer[] = [];
+
+		for await (const chunk of posterFile.createReadStream()) {
+			chunks.push(chunk);
+		}
+
+		const buffer = Buffer.concat(chunks);
+		const fileName = `blogs/${blog.id}-poster.webp`;
+		if (posterFile.filename && posterFile.filename.startsWith('.gif')) {
+			throw new UnsupportedMediaTypeException('Unsupported file type');
+		}
+
+		const processesBuffer = await sharp(buffer)
+			.resize(950, 330)
+			.webp()
+			.toBuffer();
+
+		await this.storageService.uploadForProfile(
+			processesBuffer,
+			fileName,
+			'image/webp'
+		);
+		const posterUrl = this.storageService.getFileUrl(fileName);
+		await this.prismaService.blog.update({
+			where: {
+				id: blog.id,
+			},
+			data: {
+				posterUrl,
+			},
+		});
+
+		return true;
 	}
 
 	async delete(authorId: string, blogId: string) {
@@ -143,10 +186,16 @@ export class BlogService {
 			throw new NotFoundException('Blog was not found');
 		}
 
+		if (isExists.authorId !== authorId) {
+			throw new ConflictException('You are not an author of this blog');
+		}
+
 		await this.prismaService.blog.delete({
 			where: {
 				id: blogId,
-				authorId,
+				author: {
+					id: authorId,
+				},
 			},
 		});
 
@@ -161,14 +210,38 @@ export class BlogService {
 		await this.postService.unPinPostFromBlog(authorId, postId, blogId);
 	}
 
-	async getAllBlogs(searchParams: SearchParamsInput) {
+	async getAllBlogs(
+		searchParams: SearchParamsInput,
+		filters?: FiltersInput,
+		user?: UserModel
+	) {
 		const { page = PAGINATION_PAGE, perPage = PAGINATION_PER_PAGE } =
 			searchParams;
 
 		const skip = (page - 1) * perPage;
 
+		const where: BlogWhereInput = {
+			...(filters?.search && {
+				title: {
+					contains: filters?.search,
+					mode: 'insensitive',
+				},
+			}),
+			...(filters?.onlySubscriptions &&
+				user && {
+					author: {
+						subscribers: {
+							some: {
+								fromUserId: user.id,
+							},
+						},
+					},
+				}),
+		};
+
 		const [blogs, totalCount] = await this.prismaService.$transaction([
 			this.prismaService.blog.findMany({
+				where,
 				take: perPage,
 				skip,
 				orderBy: { id: 'asc' },
@@ -228,8 +301,8 @@ export class BlogService {
 			where: {
 				id: blogId,
 				author: {
-					id: authorId
-				}
+					id: authorId,
+				},
 			},
 		});
 
@@ -287,8 +360,8 @@ export class BlogService {
 			where: {
 				id: blogId,
 				author: {
-					id: authorId
-				}
+					id: authorId,
+				},
 			},
 		});
 

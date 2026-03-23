@@ -4,10 +4,17 @@ import { PostService } from './post.service';
 import { Auth, Authorized } from '@/src/decorators';
 import {
 	CreatePostInput,
+	FiltersInput,
 	SearchParamsInput,
 	UpdatePostInput,
 } from '@/src/inputs';
-import { PostDeleteResponse, PostModel, PostPagination, UnPinPostResponse } from '@/src/models';
+import {
+	PostDeleteResponse,
+	PostModel,
+	PostPagination,
+	UnPinPostResponse,
+	UserModel,
+} from '@/src/models';
 
 @Resolver('Post')
 export class PostResolver {
@@ -40,7 +47,7 @@ export class PostResolver {
 		@Args('postId') postId: string
 	) {
 		await this.postService.delete(authorId, postId);
-		return {postId}
+		return { postId };
 	}
 
 	@Auth()
@@ -78,9 +85,11 @@ export class PostResolver {
 			nullable: true,
 			defaultValue: { page: 1, perPage: 10 },
 		})
-		searchParams: SearchParamsInput
+		searchParams: SearchParamsInput,
+		@Args('filters', { nullable: true }) filters: FiltersInput,
+		@Authorized() user?: UserModel
 	) {
-		return this.postService.getAllPosts(searchParams);
+		return this.postService.getAllPosts(searchParams, filters, user);
 	}
 
 	@Auth()

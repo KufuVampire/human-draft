@@ -8,12 +8,15 @@ import {
 import { AwsStorageService } from '../aws-storage/aws-storage.service';
 import { PrismaService } from '../prisma/prisma.service';
 
+import { PostWhereInput } from '@/prisma/generated/models';
 import { PAGINATION_PAGE, PAGINATION_PER_PAGE } from '@/src/consts';
 import {
 	CreatePostInput,
+	FiltersInput,
 	SearchParamsInput,
 	UpdatePostInput,
 } from '@/src/inputs';
+import { UserModel } from '@/src/models';
 
 @Injectable()
 export class PostService {
@@ -47,11 +50,6 @@ export class PostService {
 						connect: { id: blogId },
 					},
 				}),
-			},
-			include: {
-				author: true,
-				blog: true,
-				tags: true,
 			},
 		});
 	}
@@ -245,14 +243,38 @@ export class PostService {
 		};
 	}
 
-	async getAllPosts(searchParams: SearchParamsInput) {
+	async getAllPosts(
+		searchParams: SearchParamsInput,
+		filters?: FiltersInput,
+		user?: UserModel
+	) {
 		const { page = PAGINATION_PAGE, perPage = PAGINATION_PER_PAGE } =
 			searchParams;
 
 		const skip = (page - 1) * perPage;
 
+		const where: PostWhereInput = {
+			...(filters?.search && {
+					title: {
+						contains: filters?.search,
+						mode: 'insensitive',
+					},
+				}),
+			...(filters?.onlySubscriptions &&
+				user && {
+					author: {
+						subscribers: {
+							some: {
+								fromUserId: user.id,
+							},
+						},
+					},
+				}),
+		};
+
 		const [posts, totalCount] = await this.prismaService.$transaction([
 			this.prismaService.post.findMany({
+				where,
 				take: perPage,
 				skip,
 				orderBy: { id: 'asc' },

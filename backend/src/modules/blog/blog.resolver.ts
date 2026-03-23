@@ -5,6 +5,7 @@ import { BlogService } from './blog.service';
 import { Auth, Authorized } from '@/src/decorators';
 import {
 	CreateBlogInput,
+	FiltersInput,
 	SearchParamsInput,
 	UpdateBlogInput,
 } from '@/src/inputs';
@@ -13,6 +14,7 @@ import {
 	BlogPagination,
 	PostModel,
 	UnPinPostResponse,
+	UserModel,
 } from '@/src/models';
 import { FileValidationPipe } from '@/src/pipes/fileValidation.pipe';
 
@@ -36,13 +38,19 @@ export class BlogResolver {
 	}
 
 	@Auth()
-	@Mutation(() => BlogModel, { name: 'updateBlog' })
+	@Mutation(() => Boolean, { name: 'updateBlog' })
 	async updateBlog(
 		@Authorized('id') authorId: string,
 		@Args('blogId') blogId: string,
-		@Args('data') input: UpdateBlogInput
+		@Args('data') input: UpdateBlogInput,
+		@Args(
+			'poster',
+			{ type: () => GraphQLUpload, nullable: true },
+			FileValidationPipe
+		)
+		posterFile?: FileUpload
 	) {
-		return this.blogService.update(authorId, blogId, input);
+		return this.blogService.update(authorId, blogId, input, posterFile);
 	}
 
 	@Auth()
@@ -84,9 +92,11 @@ export class BlogResolver {
 			nullable: true,
 			defaultValue: { page: 1, perPage: 10 },
 		})
-		searchParams: SearchParamsInput
+		searchParams: SearchParamsInput,
+		@Args('filters', { nullable: true }) filters?: FiltersInput,
+		@Authorized() user?: UserModel
 	) {
-		return this.blogService.getAllBlogs(searchParams);
+		return this.blogService.getAllBlogs(searchParams, filters, user);
 	}
 
 	@Query(() => BlogModel, { name: 'getBlogById' })
