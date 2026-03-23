@@ -43,7 +43,7 @@ export const FormField = forwardRef<HTMLInputElement, PropsWithChildren<Props>>(
 				className={cn(
 					'flex flex-col gap-y-2 cursor-pointer transition-colors',
 					(type === 'checkbox' || type === 'radio') &&
-						'hover:text-primary flex-row-reverse items-center gap-x-2 p-2',
+						'hover:text-primary flex-row-reverse items-center justify-end gap-x-2 p-2',
 					wrapperClassNames
 				)}>
 				{text && (

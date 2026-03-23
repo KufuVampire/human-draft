@@ -3,7 +3,7 @@
 import { Moon, Sun } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useTheme } from 'next-themes';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { cn } from '@/utils';
 
@@ -17,12 +17,12 @@ export const ThemeSwitcher = () => {
 	useEffect(() => {
 		setChecked(isDark);
 		setMounted(true);
-	}, [theme]);
+	}, [isDark]);
 
-	const handleChange = () => {
+	const handleChange = useCallback(() => {
 		setTheme(isDark ? 'light' : 'dark');
 		setChecked(isDark);
-	};
+	}, [isDark, setTheme]);
 
 	if (!mounted) return null;
 

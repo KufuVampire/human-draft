@@ -2,7 +2,7 @@
 
 import { Search } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { MouseEvent, useMemo, useState } from 'react';
+import { MouseEvent, useCallback, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { SEARCH_PARAMS } from '@/consts';
@@ -47,10 +47,9 @@ export const UsersPage = () => {
 			searchStr: debouncedSearchValue,
 			onlySubscriptions: onlySubscriptionsValue,
 		},
-		skip: !debouncedSearchValue && !subscriptions.length,
 	});
 
-	const handleClick = (e: MouseEvent<HTMLUListElement>) => {
+	const handleClick = useCallback((e: MouseEvent<HTMLUListElement>) => {
 		const target = e.target as HTMLElement;
 		const button = target.closest('button');
 		const a = target.closest('a');
@@ -59,7 +58,7 @@ export const UsersPage = () => {
 			e.preventDefault();
 			return;
 		}
-	};
+	}, []);
 
 	const users = data?.getAllUsersPagination.data;
 

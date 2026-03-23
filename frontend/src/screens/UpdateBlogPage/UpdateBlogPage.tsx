@@ -4,33 +4,38 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { ChevronDown, Plus, Search } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
-import { redirect } from 'next/navigation';
-import { ChangeEvent, MouseEvent, useMemo, useState } from 'react';
+import { redirect, useParams } from 'next/navigation';
+import { ChangeEvent, MouseEvent, useEffect, useMemo, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
-import { routesConfig } from '@/config';
 import {
-	useCreateBlogMutation,
 	useGetAllFreePostsForPinQuery,
+	useUpdateBlogMutation,
 } from '@/graphql/generated/output';
-import { useDebounce } from '@/hooks';
-import { TypeCreateBlogSchema, createBlogSchema } from '@/schemas';
+import { useBlog, useDebounce } from '@/hooks';
+import { TypeUpdateBlogSchema, createBlogSchema } from '@/schemas';
 import { Button, Dropdown, FormField, Section, TagsPicker } from '@/shared';
 import { cn } from '@/utils';
+import { toast } from 'sonner';
+import { routesConfig } from '@/config';
 
-export const CreateBlogPage = () => {
+export const UpdateBlogPage = () => {
+	const { blogId } = useParams<{ blogId: string }>();
+	const { data, loading: isBlogLoading } = useBlog(blogId);
 	const [tags, setTags] = useState<string[]>([]);
 	const [poster, setPoster] = useState<File | null>(null);
+	const [posterUrl, setPosterUrl] = useState<string | null | undefined>(null);
 	const [postIds, setPostIds] = useState<string[]>([]);
 	const [isDropdownOpen, setDropdownOpen] = useState(false);
 	const t = useTranslations();
 	const {
 		register,
-		formState: { isValid },
+		formState: { isValid, isDirty },
 		handleSubmit,
 		setFocus,
 		watch,
-	} = useForm<TypeCreateBlogSchema>({
+		reset,
+	} = useForm<TypeUpdateBlogSchema>({
 		resolver: zodResolver(createBlogSchema),
 		defaultValues: {
 			title: '',
@@ -39,12 +44,12 @@ export const CreateBlogPage = () => {
 		},
 	});
 
-	const [createBlog, { loading: isCreating }] = useCreateBlogMutation({
+	const [updateBlog, { loading: isUpdating }] = useUpdateBlogMutation({
 		onCompleted(data) {
-			redirect(routesConfig.blogById(data.createBlog.id));
-		},
-		onError(err) {
-			console.error(err);
+			if (data.updateBlog) {
+				toast.success(t('blogPage.blogUpdatedSuccess'));
+				redirect(routesConfig.blogById(blogId));
+			}
 		},
 	});
 
@@ -56,10 +61,10 @@ export const CreateBlogPage = () => {
 		e.target.value = '';
 	};
 
-	const onSubmit: SubmitHandler<TypeCreateBlogSchema> = (data) => {
+	const onSubmit: SubmitHandler<TypeUpdateBlogSchema> = (data) => {
 		const { title, description } = data;
 
-		createBlog({
+		updateBlog({
 			variables: {
 				data: {
 					title,
@@ -67,20 +72,24 @@ export const CreateBlogPage = () => {
 					postIds,
 					tags,
 				},
+				blogId,
 				poster: poster,
 			},
 		});
 	};
 
-	const drodownSearchField = (
-		<FormField
-			{...register('postSearchStr')}
-			placeholder={t('blogPage.pinPosts.searchFieldPlaceholder')}
-			className='border-none [&:not(:placeholder-shown)]:shadow-none p-0 rounded-none'
-			wrapperClassNames='w-full border border-primary p-2 rounded-sm'
-			inputWrapperClassName='flex items-center justify-between flex-row-reverse'>
-			<Search />
-		</FormField>
+	const drodownSearchField = useMemo(
+		() => (
+			<FormField
+				{...register('postSearchStr')}
+				placeholder={t('blogPage.pinPosts.searchFieldPlaceholder')}
+				className='border-none [&:not(:placeholder-shown)]:shadow-none p-0 rounded-none'
+				wrapperClassNames='w-full border border-primary p-2 rounded-sm'
+				inputWrapperClassName='flex items-center justify-between flex-row-reverse'>
+				<Search />
+			</FormField>
+		),
+		[register, t]
 	);
 
 	const postSearchStr = watch('postSearchStr');
@@ -95,9 +104,9 @@ export const CreateBlogPage = () => {
 
 	const posts = postsData.data?.getFreePostsForPin;
 
-	const dropdownItems =
-		useMemo(() => {
-			return posts?.map(({ id, title }) => (
+	const dropdownItems = useMemo(() => {
+		return (
+			posts?.map(({ id, title }) => (
 				<FormField
 					key={id}
 					type='checkbox'
@@ -105,8 +114,9 @@ export const CreateBlogPage = () => {
 					text={title}
 					wrapperClassNames='w-full justify-end bg-[var(--background-color-card)]'
 				/>
-			));
-		}, [posts]) || [];
+			)) || []
+		);
+	}, [posts]);
 
 	const handleClick = (e: MouseEvent<HTMLUListElement>) => {
 		const target = e.target as HTMLElement;
@@ -127,10 +137,24 @@ export const CreateBlogPage = () => {
 		});
 	};
 
+	useEffect(() => {
+		if (isBlogLoading) return;
+		const blog = data?.getBlogById;
+
+		if (!blog) return;
+
+		reset({
+			title: blog.title,
+			description: blog.description,
+		});
+		setTags(blog.tags.map(({ name }) => name));
+		setPosterUrl(blog.posterUrl)
+	}, [data, isBlogLoading, reset]);
+
 	return (
 		<div className='flex flex-col gap-y-6 w-full'>
 			<Section className='bg-placeholder transition-colors flex flex-col gap-y-6 md:py-0 py-0 rounded-xl w-full relative min-h-60 md:min-h-87.5 overflow-hidden group'>
-				{poster && (
+				{poster && !posterUrl && (
 					<Image
 						src={URL.createObjectURL(poster)}
 						alt={t('blogPage.blogPoster')}
@@ -138,10 +162,19 @@ export const CreateBlogPage = () => {
 						fill
 					/>
 				)}
+				{!poster && posterUrl && (
+					<Image
+						src={posterUrl}
+						alt={t('blogPage.blogPoster')}
+						sizes='100%'
+						fill
+						className='z-0'
+					/>
+				)}
 				<label
 					className={cn(
 						'w-full h-full group flex items-center justify-center cursor-pointer',
-						poster &&
+						poster || posterUrl &&
 							'absolute inset-0 bg-[rgba(0,0,0,0.4)] group-hover:opacity-100 md:opacity-0 transition-opacity duration-300'
 					)}>
 					<div className='bg-primary rounded-full size-30 flex items-center justify-center p-2.5'>
@@ -207,11 +240,11 @@ export const CreateBlogPage = () => {
 						</Button>
 					</Dropdown>
 					<Button
-						disabled={!isValid || isCreating}
+						disabled={!isValid || isUpdating || isDirty}
 						variant={isValid ? 'primary' : 'disabled'}
 						type='submit'
 						className='py-4 w-full rounded-lg md:font-bold md:text-xl uppercase leading-[110%] md:leading-[120%] tracking-[5%] md:tracking-[10%]'>
-						{t('btns.createBlog')}
+						{t('btns.saveChanges')}
 					</Button>
 				</form>
 			</Section>

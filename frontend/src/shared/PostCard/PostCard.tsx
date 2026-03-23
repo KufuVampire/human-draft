@@ -50,7 +50,7 @@ export const PostCard = ({
 	const isOwner = profile?.username === author.username;
 
 	return (
-		<li className='bg-[var(--background-color-card)] transition-all rounded-xl py-5 px-4 hover:shadow-primary border-t-16 border-primary self-start lg:max-w-115 min-w-85 w-full break-inside-avoid not-last:mb-6 relative'>
+		<li className='bg-[var(--background-color-card)] transition-all rounded-xl py-5 px-4 hover:shadow-primary border-t-16 border-primary self-start min-w-85 w-full break-inside-avoid not-last:mb-6 relative w-full'>
 			<div className='flex flex-col gap-y-5 transition-colors hover:text-[var(--text-color-main)]'>
 				<div className='flex flex-col gap-y-3'>
 					<h2>
@@ -71,7 +71,7 @@ export const PostCard = ({
 				</div>
 				{tags && tags.length > 0 && <TagsList tags={tags} />}
 			</div>
-			{isBlogPage && (
+			{isBlogPage && isOwner && (
 				<Button
 					className='p-1 rounded-sm absolute top-1 right-1'
 					data-post={id}>

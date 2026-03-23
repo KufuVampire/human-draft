@@ -20,7 +20,7 @@ export const useProfilePoster = () => {
 			onError(err) {
 				console.error(err, 'removePoster');
 			},
-		});
+		});	
 	const [changePosterMutation, { loading: changePosterLoading }] =
 		useChangeProfilePosterMutation({
 			onCompleted() {

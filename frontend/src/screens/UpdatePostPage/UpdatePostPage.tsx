@@ -126,18 +126,18 @@ export const UpdatePostPage = () => {
 			<Container className='md:px-22 selection:bg-[#ede0d4] dark:selection:bg-primary'>
 				<form
 					onSubmit={handleSubmit(onSubmit)}
-					className='w-full'>
+					className='w-full flex flex-col gap-y-6'>
 					<FormField
 						text={t('createPostPage.title')}
 						className='w-full outline-0 border-0 [&:not(:placeholder-shown)]:shadow-none px-0'
 						placeholder={t('createPostPage.title')}
 						{...register('title', { required: true })}
 					/>
+					<Milkdown />
 					<TagsPicker
 						tags={tags}
 						setTags={setTags}
 					/>
-					<Milkdown />
 					<Button
 						type='submit'
 						isLoading={loading || isUpdating}

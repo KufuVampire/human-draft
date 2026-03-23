@@ -2,10 +2,10 @@
 
 import { ChevronRight, Globe } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
-import { MouseEvent, useState } from 'react';
+import { MouseEvent, useCallback, useState } from 'react';
 
 import { Locale, locales, setLocale } from '@/libs';
-import { Button, Dropdown, RadioButton } from '@/shared';
+import { Button, Dropdown, FormField } from '@/shared';
 import { cn } from '@/utils';
 
 interface LanguageItem {
@@ -29,14 +29,14 @@ interface Props {
 	isExpanded?: boolean;
 }
 
-export const LanguageSwitcher = ({ className, isExpanded }: Props) => {
+export const LanguageSwitcher = ({ className, isExpanded = true }: Props) => {
 	const currentLocale = useLocale();
 	const [isOpen, setOpen] = useState(false);
 	const t = useTranslations('dashboard');
 
-	const handleClose = () => {
+	const handleClose = useCallback(() => {
 		setOpen(false);
-	};
+	}, []);
 
 	const handleClick = (e: MouseEvent<HTMLUListElement>) => {
 		const target = e.target as HTMLElement;
@@ -55,12 +55,19 @@ export const LanguageSwitcher = ({ className, isExpanded }: Props) => {
 	};
 
 	const mappedLanguageItems = languageItems.map(({ locale, text }) => (
-		<RadioButton
+		<FormField
 			key={locale}
-			text={text}
+			text={isExpanded ? text : locale.toUpperCase()}
 			name='language'
+			type='radio'
 			data-locale={locale}
-			className='text-xl leading-[1.375rem] outline-0 bg-transparent hover:text-primary-hover focus-visible:text-primary-hover gap-x-1 flex justify-normal hover:stroke-primary-hover'
+			className='outline-0 bg-transparent hover:text-primary-hover focus-visible:text-primary-hover gap-x-1 flex justify-normal hover:stroke-primary-hover'
+			wrapperClassNames={cn(
+				'px-2 md:px-3.5 py-2.5 text-[var(--text-color-main)] gap-x-1',
+				currentLocale === locale && !isExpanded && 'text-primary'
+			)}
+			inputWrapperClassName={cn(!isExpanded && 'hidden')}
+			labelTextClassName='text-[1rem] md:text-xl leading-[1.375rem]'
 			checked={currentLocale === locale}
 			readOnly
 		/>
@@ -72,11 +79,18 @@ export const LanguageSwitcher = ({ className, isExpanded }: Props) => {
 			setOpen={setOpen}
 			items={mappedLanguageItems}
 			className={className}
-			listClassName='md:left-0 right-0 px-2.5 py-6 gap-y-3 md:top-[calc(100%+2rem)] bg-[var(--background-color-main)] border border-primary bg-[var(--background-color-card)] origin-top-right md:origin-top-left'
+			listClassName={cn(
+				'static h-0 bg-transparent shadow-none overflow-x',
+				isOpen && 'h-auto'
+			)}
+			displayDirection='top'
 			onClick={handleClick}>
 			<Button
 				variant='clear'
-				className='gap-x-1 w-full text-[1rem] md:text-xl leading-[1.375rem] hover:stroke-primary-hover justify-between'
+				className={cn(
+					'gap-x-1 w-full text-[1rem] md:text-xl leading-[1.375rem] hover:stroke-primary-hover justify-between p-2 md:p-2.5 md:px-3.5',
+					!isExpanded && 'justify-center'
+				)}
 				onClick={() => setOpen((prev) => !prev)}>
 				<div className='flex items-center gap-x-1'>
 					<Globe />
@@ -86,7 +100,7 @@ export const LanguageSwitcher = ({ className, isExpanded }: Props) => {
 				</div>
 				<ChevronRight
 					className={cn(
-						'transition-transform',
+						'transition-transform shrink-0',
 						!isExpanded && 'md:hidden',
 						isOpen && 'rotate-90'
 					)}

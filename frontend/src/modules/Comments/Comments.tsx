@@ -22,7 +22,7 @@ const Comments = () => {
 		if (data && data.getAllPostComments) {
 			setComments(data.getAllPostComments);
 		}
-	}, [data]);
+	}, [data, setComments]);
 
 	return (
 		<>

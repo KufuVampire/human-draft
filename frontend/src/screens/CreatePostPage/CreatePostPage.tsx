@@ -6,7 +6,7 @@ import { Milkdown, useEditor } from '@milkdown/react';
 import { ChevronDown, Search } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { redirect, useParams } from 'next/navigation';
-import { MouseEvent, useEffect, useState } from 'react';
+import { MouseEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
 import { uploadPostImage } from '@/api';
@@ -15,6 +15,7 @@ import {
 	useCreatePostMutation,
 	useGetBlogsForPinQuery,
 } from '@/graphql/generated/output';
+import { useDebounce } from '@/hooks';
 import { TypeCreatePostSchema } from '@/schemas';
 import {
 	Button,
@@ -38,7 +39,12 @@ export const CreatePostPage = () => {
 		handleSubmit,
 		setFocus,
 		watch,
-	} = useForm<TypeCreatePostSchema>();
+	} = useForm<TypeCreatePostSchema>({
+		defaultValues: {
+			search: '',
+			title: '',
+		},
+	});
 	const { loading: isEditorLoading, get } = useEditor(
 		(root) => {
 			const crepe = new Crepe({
@@ -87,13 +93,11 @@ export const CreatePostPage = () => {
 		if (isEditorLoading) return;
 
 		const editor = get();
-
 		if (!editor) return;
 
 		const json = editor.action((ctx) =>
 			ctx.get(editorViewCtx).state.doc.toJSON()
 		);
-
 		const convertedJson = convertImageBlockToImage(json);
 
 		createPost({
@@ -103,52 +107,58 @@ export const CreatePostPage = () => {
 					content: convertedJson,
 					tags,
 				},
-				blogId: blogIdForPin || blogId,
+				blogId: blogIdForPin ? blogIdForPin : blogId,
 			},
 		});
 	};
 
-	const handlePickBlogForPin = (e: MouseEvent<HTMLUListElement>) => {
+	const handlePickBlogForPin = useCallback((e: MouseEvent<HTMLUListElement>) => {
 		const target = e.target as HTMLElement;
 		const radio = target.closest('input');
-
 		if (!radio) return;
 
-		const blogId = radio.dataset.blogId;
-
+		const blogId = radio.dataset.blog;
 		if (!blogId) return;
 
 		setBlogIdForPin(blogId);
-	};
-
-	const drodownSearchField = (
-		<FormField
-			{...register('search')}
-			placeholder={t('blogPage.pinPosts.searchFieldPlaceholder')}
-			className='border-none [&:not(:placeholder-shown)]:shadow-none p-0 rounded-none'
-			wrapperClassNames='w-full border border-primary p-2 rounded-sm'
-			inputWrapperClassName='flex items-center justify-between flex-row-reverse'>
-			<Search />
-		</FormField>
-	);
-
-	const searchStr = watch('search');
-	const blogs = data?.blogsForPin || [];
-
-	const dropdownItems = blogs
-		.filter((b) =>
-			b.title.toLowerCase().includes(searchStr.toLowerCase().trim())
-		)
-		.map(({ id, title }) => (
+	}, []);
+	
+	const searchStr = useDebounce(watch('search'));
+	
+	const drodownSearchField = useMemo(
+		() => (
 			<FormField
-				key={id}
-				type='radio'
-				data-blog={id}
-				text={title}
-				wrapperClassNames='w-full justify-end bg-[var(--background-color-card)]'
-				name='pin-blogs'
-			/>
-		));
+				{...register('search')}
+				placeholder={t('blogPage.pinPosts.searchFieldPlaceholder')}
+				className='border-none [&:not(:placeholder-shown)]:shadow-none p-0 rounded-none'
+				wrapperClassNames='w-full border border-primary p-2 rounded-sm'
+				inputWrapperClassName='flex items-center justify-between flex-row-reverse'>
+				<Search />
+			</FormField>
+		),
+		[register, t]
+	);
+	const dropdownItems = useMemo(() => {
+		const blogs = data?.blogsForPin || [];
+		const normalizedSearchStr = searchStr.toLowerCase().trim();
+		return blogs
+			.filter((b) => b.title.toLowerCase().includes(normalizedSearchStr))
+			.map(({ id, title }) => (
+				<FormField
+					key={id}
+					type='radio'
+					data-blog={id}
+					text={title}
+					wrapperClassNames='w-full justify-end bg-[var(--background-color-card)]'
+					name='pin-blog'
+					defaultChecked={id === blogIdForPin}
+				/>
+			));
+	}, [blogIdForPin, data, searchStr]);
+	const allDropdownItems = useMemo(
+		() => [drodownSearchField, ...dropdownItems],
+		[drodownSearchField, dropdownItems]
+	);
 
 	return (
 		<Section className='flex flex-col w-full bg-[var(--background-color-card)] rounded-xl transition-colors'>
@@ -166,7 +176,7 @@ export const CreatePostPage = () => {
 					{!blogId && (
 						<Dropdown
 							isOpen={isOpen}
-							items={[drodownSearchField, ...dropdownItems]}
+							items={allDropdownItems}
 							setOpen={setOpen}
 							className='w-full'
 							listClassName='w-full top-[calc(100%+0.5rem)] overflow-hidden py-3 px-2.5 shadow-secondary min-w-auto'
@@ -176,7 +186,8 @@ export const CreatePostPage = () => {
 							<Button
 								variant='secondary'
 								className='bg-[var(--background-color-card)] px-5 py-2 flex gap-x-5 rounded-lg w-full'
-								onClick={() => setOpen((prev) => !prev)}>
+								onClick={() => setOpen((prev) => !prev)}
+								type='button'>
 								<span className='w-full inline-block text-left'>
 									{t('postPage.pinBlog.pin')}
 								</span>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { useRef } from 'react';
+import { useCallback, useRef } from 'react';
 
 import { useClickOutside } from '@/hooks';
 import { Button, Modal } from '@/shared';
@@ -19,9 +19,9 @@ export const ConfirmationDeletionModal = ({ className }: Props) => {
 	const t = useTranslations();
 	const modalRef = useRef<HTMLDivElement>(null);
 
-	const handleClose = () => {
+	const handleClose = useCallback(() => {
 		setOpen(false);
-	};
+	}, [setOpen]);
 
 	useClickOutside(modalRef, handleClose);
 

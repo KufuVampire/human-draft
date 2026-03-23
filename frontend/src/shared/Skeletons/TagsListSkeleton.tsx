@@ -1,8 +1,13 @@
+import { cn } from '@/utils';
 import { Skeleton } from './Skeleton';
 
-export const TagsListSkeleton = () => {
+interface Props {
+	className?: string;
+}
+
+export const TagsListSkeleton = ({ className }: Props) => {
 	return (
-		<ul className='flex flex-wrap gap-2'>
+		<ul className={cn('flex flex-wrap gap-2', className)}>
 			<li className='rounded-[0.125rem] cursor-default bg-secondary dark:bg-placeholder transition-colors rounded-xs'>
 				<Skeleton className='w-16 h-5.5 rounded-xs' />
 			</li>

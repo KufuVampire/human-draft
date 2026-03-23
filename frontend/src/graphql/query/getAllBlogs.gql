@@ -1,5 +1,5 @@
-query GetAllBlogs($searchParams: SearchParamsInput!) {
-	getAllBlogsPagination(searchParams: $searchParams) {
+query GetAllBlogs($searchParams: SearchParamsInput!, $filters: FiltersInput) {
+	getAllBlogsPagination(searchParams: $searchParams, filters: $filters) {
 		data {
 			...BlogFragment
 		}

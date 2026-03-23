@@ -2,45 +2,64 @@
 
 import { useEffect, useMemo, useState } from 'react';
 
-import { GetAllBlogsQuery, GetAllPostsQuery } from '@/graphql/generated/output';
-import { useBlogs } from './useBlogs';
-import { usePosts } from './usePosts';
+import {
+	GetAllBlogsQuery,
+	GetAllPostsQuery,
+	useGetAllBlogsQuery,
+	useGetAllPostsQuery,
+} from '@/graphql/generated/output';
 
 interface Params {
 	page: number;
 	perPage: number;
-	filters: {
-		onlySubscriptions: boolean;
-		onlyPosts: boolean;
-		onlyBlogs: boolean;
-	};
+	search: string;
 }
 
 type PostsAndBlogs =
 	| GetAllPostsQuery['getAllPostsPagination']['data'][number]
 	| GetAllBlogsQuery['getAllBlogsPagination']['data'][number];
 
-export const usePostsAndBlogs = (params: Params) => {
-	const { posts, isPostsLoading } = usePosts(params);
-	const { blogs, isBlogsLoading } = useBlogs(params);
+export const usePostsAndBlogsSearch = (params: Params) => {
+	const { page, perPage, search } = params;
+
+	const {
+		data: postsData,
+		loading: isPostsLoading,
+	} = useGetAllPostsQuery({
+		variables: {
+			searchParams: { page, perPage },
+			filters: { search },
+		},
+		skip: search.length < 3,
+	});
+
+	const {
+		data: blogsData,
+		loading: isBlogsLoading,
+	} = useGetAllBlogsQuery({
+		variables: {
+			searchParams: { page, perPage },
+			filters: { search },
+		},
+		skip: search.length < 3,
+	});
+
 	const [allItems, setAllItems] = useState<PostsAndBlogs[]>([]);
 	const [hasMore, setHasMore] = useState(true);
 
 	const currentPageItems = useMemo(() => {
-		return [...posts, ...blogs];
-	}, [posts, blogs]);
+		const paginationPostsData = postsData?.getAllPostsPagination.data || [];
+		const paginationBlogsData = blogsData?.getAllBlogsPagination.data || [];
+
+		return [...paginationPostsData, ...paginationBlogsData];
+	}, [postsData, blogsData]);
 
 	useEffect(() => {
 		if (params.page === 1) {
 			setAllItems([]);
 			setHasMore(true);
 		}
-	}, [
-		params.page,
-		params.filters.onlySubscriptions,
-		params.filters.onlyPosts,
-		params.filters.onlyBlogs,
-	]);
+	}, [params.page, params.search]);
 
 	useEffect(() => {
 		if (!currentPageItems.length) {
@@ -67,8 +86,6 @@ export const usePostsAndBlogs = (params: Params) => {
 	}, [allItems]);
 
 	return {
-		posts,
-		blogs,
 		postsAndBlogs,
 		hasMore,
 		isLoading: isPostsLoading || isBlogsLoading,

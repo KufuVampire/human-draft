@@ -1,5 +1,5 @@
-query getAllPosts($searchParams: SearchParamsInput!) {
-	getAllPostsPagination(searchParams: $searchParams) {
+query getAllPosts($searchParams: SearchParamsInput!, $filters: FiltersInput) {
+	getAllPostsPagination(searchParams: $searchParams, filters: $filters) {
 		data {
 			...PostFragment
 			tags {

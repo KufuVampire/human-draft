@@ -3,25 +3,34 @@
 import { ChevronDown, Search, Trash } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { redirect, useParams } from 'next/navigation';
-import { ChangeEvent, MouseEvent, useEffect, useState } from 'react';
+import {
+	ChangeEvent,
+	MouseEvent,
+	memo,
+	useCallback,
+	useEffect,
+	useMemo,
+	useReducer,
+	useState,
+} from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
+import { blogPostsReducer } from './blog-posts.reducer';
 import { routesConfig } from '@/config';
 import {
-	GetBlogByIdQuery,
 	useChangeBlogPosterMutation,
 	useDeleteBlogMutation,
 	useDeleteBlogPosterMutation,
 	useDeletePostMutation,
 	useGetAllFreePostsForPinQuery,
-	useGetBlogByIdQuery,
 	usePinPostMutation,
 	useUnPinPostMutation,
 } from '@/graphql/generated/output';
-import { useDebounce, useProfile } from '@/hooks';
+import { useBlog, useDebounce, useProfile } from '@/hooks';
 import { TypeSearchSchema } from '@/schemas';
 import {
+	BlogPageSkeleton,
 	Button,
 	CreatePostLink,
 	CustomLink,
@@ -36,17 +45,14 @@ import { cn } from '@/utils';
 
 const btnStyles = 'px-3 py-2 leading-[150%] font-bold rounded-lg';
 
-export const BlogPage = () => {
+export const BlogPage = memo(() => {
 	const { blogId } = useParams<{ blogId: string }>();
+	const [blogPosts, dispatch] = useReducer(blogPostsReducer, []);
 	const [posterFile, setPosterFile] = useState<File | null>(null);
 	const [posterUrl, setPosterUrl] = useState<string | null>(null);
 	const [isOpen, setOpen] = useState(false);
-	const [blogPosts, setBlogPosts] = useState<
-		GetBlogByIdQuery['getBlogById']['posts']
-	>([]);
-	const { isAuth, profile } = useProfile();
+	const { profile } = useProfile();
 	const t = useTranslations();
-
 	const {
 		setType,
 		setCb,
@@ -59,18 +65,19 @@ export const BlogPage = () => {
 		},
 	});
 
-	const { data, loading: isBlogLoading } = useGetBlogByIdQuery({
-		variables: {
-			blogId,
-		},
-	});
-	const { data: freePosts } = useGetAllFreePostsForPinQuery({
+	const { data, loading: isBlogLoading } = useBlog(blogId);
+	const { data: postsData, refetch } = useGetAllFreePostsForPinQuery({
 		skip: !isOpen,
 	});
 
+	const blog = data?.getBlogById;
+
 	useEffect(() => {
 		if (data && data.getBlogById) {
-			setBlogPosts(data.getBlogById.posts);
+			dispatch({
+				type: 'INIT',
+				payload: data.getBlogById.posts,
+			});
 		}
 		if (data && data.getBlogById.posterUrl) {
 			setPosterUrl(data.getBlogById.posterUrl);
@@ -81,33 +88,38 @@ export const BlogPage = () => {
 
 	const [pinPosts] = usePinPostMutation({
 		onCompleted(data) {
-			setBlogPosts((prev) =>
-				[...prev, data.pinPost].sort(
-					(a, b) =>
-						new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-				)
-			);
+			dispatch({
+				type: 'PIN',
+				payload: data.pinPost,
+			});
+			refetch();
 		},
 	});
 	const [unpinPosts] = useUnPinPostMutation({
 		onCompleted(data) {
-			setBlogPosts((prev) =>
-				prev.filter((p) => p.id !== data.unPinPost.postId)
-			);
+			dispatch({
+				type: 'UNPIN',
+				payload: data.unPinPost,
+			});
+			refetch();
 		},
 	});
 	const [deletePost] = useDeletePostMutation({
 		onCompleted(data) {
 			toast.success(t('postPage.postDeletedSuccess'));
-			setBlogPosts((prev) =>
-				prev.filter((p) => p.id !== data.deletePost.postId)
-			);
+			dispatch({
+				type: 'DELETE',
+				payload: data.deletePost,
+			});
 		},
 	});
 	const [deleteBlog] = useDeleteBlogMutation({
 		onCompleted() {
 			toast.success(t('blogPage.blogDeletedSuccess'));
 			redirect(routesConfig.home);
+		},
+		onError(err) {
+			console.error(err);
 		},
 	});
 	const [updatePoster, { loading: isPosterUpdating }] =
@@ -129,77 +141,78 @@ export const BlogPage = () => {
 			},
 		});
 
-	if (!blogId || (!isBlogLoading && !data)) {
+	const posts = useMemo(() => {
+		const freePosts = postsData?.getFreePostsForPin || [];
+		const blogPostIds = new Set(blogPosts.map((p) => p.id));
+		const uniqueFreePosts = freePosts.filter((p) => !blogPostIds.has(p.id));
+		return [...uniqueFreePosts, ...blogPosts];
+	}, [blogPosts, postsData]);
+	const dropdownItems = useMemo(() => {
+		const normalizedSearch = postsSearchStr.toLowerCase().trim();
+
+		return posts
+			.filter((p) => p.title.toLowerCase().includes(normalizedSearch))
+			.map(({ id, title }) => (
+				<FormField
+					key={id}
+					type='checkbox'
+					data-post={id}
+					text={title}
+					wrapperClassNames='w-full justify-end bg-[var(--background-color-card)]'
+					defaultChecked={blogPosts.some((p) => p.id === id)}
+				/>
+			));
+	}, [posts, postsSearchStr, blogPosts]);
+	const dropdownSearchField = useMemo(
+		() => (
+			<FormField
+				{...register('search')}
+				placeholder={t('blogPage.pinPosts.searchFieldPlaceholder')}
+				className='border-none [&:not(:placeholder-shown)]:shadow-none p-0 rounded-none'
+				wrapperClassNames='w-full border border-primary p-2 rounded-sm'
+				inputWrapperClassName='flex items-center justify-between flex-row-reverse'>
+				<Search />
+			</FormField>
+		),
+		[register, t]
+	);
+	const dropdownAllItems = useMemo(() => {
+		return [dropdownSearchField, ...dropdownItems];
+	}, [dropdownSearchField, dropdownItems]);
+
+	const handleTogglePin = useCallback(
+		(e: MouseEvent<HTMLUListElement>) => {
+			const target = e.target as HTMLElement;
+			const checkbox = target.closest('input');
+			if (!checkbox) return;
+
+			const postId = checkbox.dataset.post;
+			if (!postId) return;
+
+			if (checkbox.checked) {
+				pinPosts({ variables: { blogId, postId } });
+			} else {
+				unpinPosts({ variables: { blogId, postId } });
+			}
+		},
+		[blogId, pinPosts, unpinPosts]
+	);
+
+	if (!isBlogLoading && !data) {
 		redirect(routesConfig.notFound);
 	}
 
 	if (isBlogLoading) {
-		return;
+		return (
+			<BlogPageSkeleton isOwner={profile?.username === blog?.author.username} />
+		);
 	}
-
-	const blog = data?.getBlogById;
 
 	if (!blog) {
 		redirect(routesConfig.notFound);
 	}
 
-	const posts = [...(freePosts?.getFreePostsForPin || []), ...blogPosts];
-
-	const dropdownItems = posts
-		.filter((p) =>
-			p.title.toLowerCase().includes(postsSearchStr.toLowerCase().trim())
-		)
-		.map(({ id, title }) => (
-			<FormField
-				key={id}
-				type='checkbox'
-				data-post={id}
-				text={title}
-				wrapperClassNames='w-full justify-end bg-[var(--background-color-card)]'
-				defaultChecked={blog.posts.some((p) => p.id === id)}
-			/>
-		));
-
-	const drodownSearchField = (
-		<FormField
-			{...register('search')}
-			placeholder={t('blogPage.pinPosts.searchFieldPlaceholder')}
-			className='border-none [&:not(:placeholder-shown)]:shadow-none p-0 rounded-none'
-			wrapperClassNames='w-full border border-primary p-2 rounded-sm'
-			inputWrapperClassName='flex items-center justify-between flex-row-reverse'>
-			<Search />
-		</FormField>
-	);
-
-	const handleTogglePin = (e: MouseEvent<HTMLUListElement>) => {
-		const target = e.target as HTMLElement;
-		const checkbox = target.closest('input');
-
-		if (!checkbox) return;
-
-		const postId = checkbox.dataset.post;
-
-		if (!postId) return;
-
-		if (checkbox.checked) {
-			pinPosts({
-				variables: {
-					blogId,
-					postId,
-				},
-			});
-			return;
-		}
-
-		unpinPosts({
-			variables: {
-				blogId,
-				postId,
-			},
-		});
-	};
-
-	const handleRemovePost = (e: MouseEvent<HTMLUListElement>) => {
+	const handleDeletePost = (e: MouseEvent<HTMLUListElement>) => {
 		const target = e.target as HTMLElement;
 		const button = target.closest('button');
 
@@ -221,10 +234,14 @@ export const BlogPage = () => {
 		setModalOpen(true);
 	};
 
-	const handleRemoveBlog = () => {
+	const handleDeleteBlog = () => {
 		setType('blog');
 		setCb(() => {
-			deleteBlog({});
+			deleteBlog({
+				variables: {
+					blogId,
+				},
+			});
 			setModalOpen(false);
 		});
 		setModalOpen(true);
@@ -258,6 +275,8 @@ export const BlogPage = () => {
 		setModalOpen(true);
 	};
 
+	const isOwner = profile?.username === blog.author.username;
+
 	return (
 		<div className='flex flex-col gap-y-6 w-full'>
 			<Section
@@ -284,7 +303,7 @@ export const BlogPage = () => {
 							/>
 						</div>
 					</div>
-					{isAuth && profile?.username === blog.author.username && (
+					{isOwner && (
 						<div className='flex gap-x-2 self-end'>
 							<label className='text-secondary px-3 rounded-lg leading-6 backdrop-blur-disabled hover:text-primary-hover focus-visible:text-primary-hover cursor-pointer transition-colors text-left z-10 relative bg-disabled py-2'>
 								{t('btns.editPoster')}
@@ -307,56 +326,57 @@ export const BlogPage = () => {
 					)}
 				</div>
 			</Section>
-			<div className='flex flex-col-reverse md:flex-row gap-2'>
-				<Dropdown
-					isOpen={isOpen}
-					items={[drodownSearchField, ...dropdownItems]}
-					setOpen={setOpen}
-					className='w-full'
-					listClassName='w-full top-[calc(100%+0.5rem)] overflow-hidden py-3 px-2.5 shadow-secondary min-w-auto'
-					onClick={handleTogglePin}
-					displayDirection='top'>
-					<Button
-						variant='secondary'
-						className='bg-[var(--background-color-card)] px-5 py-2 flex gap-x-5 rounded-lg w-full'
-						onClick={() => setOpen((prev) => !prev)}>
-						<span className='w-full inline-block text-left'>
-							{t('blogPage.pinPosts.pin')}
-						</span>
-						<ChevronDown
-							className={cn(
-								'transition-transform shrink-0',
-								isOpen && 'rotate-180'
-							)}
-						/>
-					</Button>
-				</Dropdown>
-				<div className='flex gap-x-2'>
-					<Button
-						variant='secondary'
-						className={btnStyles}
-						onClick={handleRemoveBlog}>
-						{t('btns.remove')}
-					</Button>
-					<CustomLink
-						href={routesConfig.blogUpdate(blogId)}
-						variant='primary'
-						className={cn(btnStyles, 'text-nowrap w-full md:w-auto')}>
-						{t('blogPage.editBlog')}
-					</CustomLink>
-				</div>
-			</div>
-			<CreatePostLink href={routesConfig.postCreateWithBlog(blogId)} />
+			{isOwner && (
+				<Section className='flex flex-col-reverse md:flex-row gap-2 py-0 md:py-0'>
+					<Dropdown
+						isOpen={isOpen}
+						items={dropdownAllItems}
+						setOpen={setOpen}
+						className='w-full'
+						listClassName='w-full top-[calc(100%+0.5rem)] overflow-hidden py-3 px-2.5 shadow-secondary min-w-auto'
+						onClick={handleTogglePin}
+						displayDirection='top'>
+						<Button
+							variant='secondary'
+							className='bg-[var(--background-color-card)] px-5 py-2 flex gap-x-5 rounded-lg w-full'
+							onClick={() => setOpen((prev) => !prev)}>
+							<span className='w-full inline-block text-left'>
+								{t('blogPage.pinPosts.pin')}
+							</span>
+							<ChevronDown
+								className={cn(
+									'transition-transform shrink-0',
+									isOpen && 'rotate-180'
+								)}
+							/>
+						</Button>
+					</Dropdown>
+					<div className='flex gap-x-2'>
+						<Button
+							variant='secondary'
+							className={btnStyles}
+							onClick={handleDeleteBlog}>
+							{t('btns.remove')}
+						</Button>
+						<CustomLink
+							href={routesConfig.blogUpdate(blogId)}
+							variant='primary'
+							className={cn(btnStyles, 'text-nowrap w-full md:w-auto')}>
+							{t('blogPage.editBlog')}
+						</CustomLink>
+					</div>
+				</Section>
+			)}
+			{isOwner && (
+				<CreatePostLink href={routesConfig.postCreateWithBlog(blogId)} />
+			)}
 			<PostsAndBlogsList
-				onClick={handleRemovePost}
-				data={blogPosts
-					.slice()
-					.sort(
-						(a, b) =>
-							new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-					)}
+				onClick={handleDeletePost}
+				data={blogPosts}
 				isBlogPage
 			/>
 		</div>
 	);
-};
+});
+
+BlogPage.displayName = 'BlogPage';

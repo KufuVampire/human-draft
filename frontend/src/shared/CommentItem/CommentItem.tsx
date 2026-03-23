@@ -94,7 +94,7 @@ export const CommentItem = ({ comment, className }: Props) => {
 			className={cn(
 				'flex flex-col relative after:content-[""] after:absolute after:top-8 after:left-4 after:w-0.25 after:bg-placeholder after:bottom-5',
 				isReply && 'after:bottom-3/4',
-				isReply && replies && replies.length && 'after:h-3/4',
+				isReply && replies && replies.length && 'after:h-[calc(100%-4rem)]',
 				className
 			)}>
 			<div

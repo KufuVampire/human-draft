@@ -20,13 +20,15 @@ import { FormField } from '../FormField/FormField';
 import { useGetTagsBySearchStringQuery } from '@/graphql/generated/output';
 import { useDebounce } from '@/hooks';
 import { TypeSearchTagsSchema } from '@/schemas';
+import { cn } from '@/utils';
 
 interface Props {
 	tags: string[];
 	setTags: Dispatch<SetStateAction<string[]>>;
+	className?: string;
 }
 
-export const TagsPicker = ({ tags, setTags }: Props) => {
+export const TagsPicker = ({ tags, setTags, className }: Props) => {
 	const t = useTranslations();
 	const [isOpen, setOpen] = useState(false);
 	const { register, watch, reset, setFocus } = useForm<TypeSearchTagsSchema>({
@@ -149,7 +151,7 @@ export const TagsPicker = ({ tags, setTags }: Props) => {
 			className='w-full'
 			onClick={handleAddTag}>
 			<div
-				className='flex flex-col gap-y-4'
+				className={cn('flex flex-col gap-y-4', className)}
 				onClick={() => setFocus('search')}>
 				<h2 className='font-bold text-xl leading-[110%] font-title cursor-pointer'>
 					{t('tagsPickerTitle')}

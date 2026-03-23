@@ -15,7 +15,7 @@ export const TagsList = ({ tags, location = 'post' }: Props) => {
 				<li
 					key={id}
 					className={cn(
-						'text-xs leading-[150%] py-0.5 px-1 rounded-[0.125rem] font-light cursor-default bg-secondary dark:bg-placeholder transition-colors',
+						'text-xs leading-[150%] py-0.5 px-1 rounded-[0.125rem] font-light cursor-default bg-secondary dark:bg-placeholder transition-colors group-hover:text-[var(--text-color-main)] text-[var(--text-color-main)]',
 						{
 							['bg-[rgba(229,229,229,0.25)] dark:bg-[rgba(229,229,229,0.25)] backdrop-blur-xs text-secondary']:
 								location === 'blog',

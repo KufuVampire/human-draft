@@ -5,16 +5,21 @@ import { useGetAllBlogsQuery } from '@/graphql/generated/output';
 interface Params {
 	page: number;
 	perPage: number;
+	filters: {
+		onlySubscriptions: boolean;
+		onlyPosts: boolean;
+		onlyBlogs: boolean;
+	};
 }
 
-export const useBlogs = ({ page, perPage }: Params) => {
+export const useBlogs = ({ page, perPage, filters }: Params) => {
+	const { onlySubscriptions, onlyPosts, onlyBlogs } = filters;
 	const { data, loading, error } = useGetAllBlogsQuery({
 		variables: {
-			searchParams: {
-				page,
-				perPage,
-			},
+			searchParams: { page, perPage },
+			filters: { onlySubscriptions },
 		},
+		skip: !onlyBlogs && onlyPosts,
 	});
 
 	const paginationData = data?.getAllBlogsPagination;
@@ -25,7 +30,7 @@ export const useBlogs = ({ page, perPage }: Params) => {
 		perPage: paginationData?.perPage,
 		totalCount: paginationData?.totalCount,
 		totalPages: paginationData?.totalPages,
-		isPostsLoading: loading,
-		postErrors: error,
+		isBlogsLoading: loading,
+		blogsErrors: error,
 	};
 };

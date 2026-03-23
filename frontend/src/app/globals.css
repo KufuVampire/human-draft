@@ -5,7 +5,7 @@
 
 :root {
 	/* light theme */
-	--main-bg-light-theme: #	;
+	--main-bg-light-theme: #e5e5e5;
 	--card-bg-light-theme: #ffffff;
 	--tag-bg-light-theme: #e5e5e5;
 
@@ -82,8 +82,8 @@
 	--backdrop-blur-disabled: var(--bg-blur);
 
 	--z-index-header: 20;
-	--z-index-dropdown: 30;
-	--z-index-modal: 40;
+	--z-index-dropdown: 40;
+	--z-index-modal: 50;
 
 	--shadow-filled-input: var(--input-filled-shadow);
 	--shadow-primary: var(--primary-shadow);
@@ -170,13 +170,17 @@ body {
 	--crepe-color-outline: #242424; /* Border/outline color */
 	--crepe-color-inverse: #362f27; /* Inverse color for contrast */
 	--crepe-color-on-inverse: #fcefe2; /* Text color on inverse */
-	--crepe-color-inline-code: var(--text-color-secondary); /* Inline code color */
+	--crepe-color-inline-code: var(
+		--text-color-secondary
+	); /* Inline code color */
 	--crepe-color-error: #ba1a1a; /* Error state color */
 
 	/* Interactive Colors */
 	--crepe-color-hover: #f9ecdf; /* Hover state color */
 	--crepe-color-selected: var(--primary-color-hover); /* Selected state color */
-	--crepe-color-inline-area: var(--primary-color); /* Inline editing area color */
+	--crepe-color-inline-area: var(
+		--primary-color
+	); /* Inline editing area color */
 
 	--crepe-shadow-1: var(--shadow-primary);
 }
@@ -248,4 +252,5 @@ body {
 	@apply mb-8;
 }
 
-@media (prefers-reduced-motion: reduce) {}
+@media (prefers-reduced-motion: reduce) {
+}

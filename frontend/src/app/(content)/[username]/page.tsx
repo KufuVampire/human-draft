@@ -14,6 +14,17 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 
 	return {
 		title: username,
+		openGraph: {
+			type: 'profile',
+			title: username,
+			siteName: 'HUMAN DRAFT',
+			username,
+			url: `https://human-draft.com/${username}`,
+		},
+		robots: {
+			index: true,
+			follow: true,
+		},
 	};
 }
 

@@ -3,18 +3,21 @@
 import { useEffect } from 'react';
 
 import { UserModel } from '@/graphql/generated/output';
-import { useProfile } from '@/store';
+import { useProfile } from '@/hooks';
 
 interface Props {
 	user: UserModel | null;
 }
 
 export const AuthProvider = ({ user }: Props) => {
-	const setProfile = useProfile((s) => s.setProfile);
+	const { setProfile, setSubscriptions } = useProfile();
 
 	useEffect(() => {
-		setProfile(user);
-	}, [setProfile, user]);
+		if (user) {
+			setProfile(user);
+			setSubscriptions(user?.subscriptions);
+		}
+	}, [setProfile, setSubscriptions, user]);
 
 	return null;
 };

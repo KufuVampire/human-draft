@@ -1,11 +1,5 @@
 mutation createPost($data: CreatePostInput!, $blogId: String) {
 	createPost(data: $data, blogId: $blogId) {
-		...PostFragment
-		blog {
-			id
-		}
-		likesCount
-		viewsCount
-		commentsCount
+		id
 	}
 }

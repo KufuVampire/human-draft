@@ -2,12 +2,11 @@
 
 import { Newspaper, Settings, User, Users } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useEffect, useMemo, useState } from 'react';
-import { useMediaQuery } from 'react-responsive';
+import { useMemo, useState } from 'react';
 
 import { Burger } from './Burger/Burger';
 import { routesConfig } from '@/config';
-import { useActiveLink, useProfile } from '@/hooks';
+import { useActiveLink, useProfile, useResolvedHref } from '@/hooks';
 import {
 	CustomLink,
 	Dropdown,
@@ -60,18 +59,8 @@ export const BurgerMenu = ({ className }: Props) => {
 	const t = useTranslations();
 	const [isOpen, setOpen] = useState(false);
 	const { isAuth, profile } = useProfile();
-	const isMobile = useMediaQuery({ maxWidth: 768 });
 	const isActiveLink = useActiveLink();
-
-	const handleClose = () => {
-		setOpen(false);
-	};
-
-	useEffect(() => {
-		if (!isMobile) {
-			handleClose();
-		}
-	}, [isMobile]);
+	const resolveHref = useResolvedHref();
 
 	const dropdownItems = useMemo(() => {
 		const items = burgerDropdownItems
@@ -84,22 +73,12 @@ export const BurgerMenu = ({ className }: Props) => {
 					return (
 						<Component
 							key={i}
-							className='p-2 text-secondary'
+							className='text-secondary'
 						/>
 					);
 				}
 
-				const settingsHref =
-					href === routesConfig.settings && profile?.username
-						? routesConfig.profileSettings(profile.username)
-						: href;
-
-				const profileHref =
-					href === routesConfig.profile && profile?.username
-						? routesConfig.profileUsername(profile.username)
-						: href;
-				const currentHref =
-					href === routesConfig.profile ? profileHref : settingsHref;
+				const currentHref = resolveHref(href);
 
 				return (
 					<CustomLink
@@ -133,7 +112,7 @@ export const BurgerMenu = ({ className }: Props) => {
 		}
 
 		return items;
-	}, [isActiveLink, isAuth, profile, t]);
+	}, [isActiveLink, isAuth, profile, resolveHref, t]);
 
 	return (
 		<Dropdown

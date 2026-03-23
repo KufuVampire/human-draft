@@ -1,8 +1,9 @@
-import { UserBadgeLocation } from '@/types';
 import { CustomLink } from '../CustomLink/CustomLink';
 import { UserBadge } from '../UserBadge/UserBadge';
 
+import { routesConfig } from '@/config';
 import { useCreateAt } from '@/hooks';
+import { UserBadgeLocation } from '@/types';
 import { cn } from '@/utils';
 
 interface Props {
@@ -14,7 +15,8 @@ interface Props {
 	isOwner?: boolean;
 	isShow?: boolean;
 	className?: string;
-	location?: UserBadgeLocation
+	location?: UserBadgeLocation;
+	type?: 'link' | 'not-link';
 }
 
 export const UserBadgeWithCreatedAt = ({
@@ -23,14 +25,15 @@ export const UserBadgeWithCreatedAt = ({
 	isOwner = false,
 	isShow = false,
 	className,
-	location = 'post-card'
+	location = 'post-card',
+	type = 'link',
 }: Props) => {
 	const datetime = useCreateAt(createdAt);
 
 	return (
 		<div className={cn('flex gap-x-3 items-center', className)}>
-			{!isOwner && !isShow && (
-				<CustomLink href={`/${author.username}`}>
+			{!isOwner && !isShow && type === 'link' && (
+				<CustomLink href={routesConfig.profileUsername(author.username)}>
 					<UserBadge
 						location={location}
 						avatarUrl={author.avatarUrl}
@@ -38,7 +41,23 @@ export const UserBadgeWithCreatedAt = ({
 					/>
 				</CustomLink>
 			)}
-			{isShow && (
+			{!isOwner && !isShow && type === 'not-link' && (
+				<UserBadge
+					location={location}
+					avatarUrl={author.avatarUrl}
+					username={author.username}
+				/>
+			)}
+			{isShow && type === 'link' && (
+				<CustomLink href={routesConfig.profileUsername(author.username)}>
+					<UserBadge
+						location={location}
+						avatarUrl={author.avatarUrl}
+						username={author.username}
+					/>
+				</CustomLink>
+			)}
+			{isShow && type === 'not-link' && (
 				<UserBadge
 					location={location}
 					avatarUrl={author.avatarUrl}

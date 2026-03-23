@@ -66,6 +66,11 @@ export type CreatePostInput = {
   title: Scalars['String']['input'];
 };
 
+export type FiltersInput = {
+  onlySubscriptions?: InputMaybe<Scalars['Boolean']['input']>;
+  search?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   changeBlogPoster: Scalars['Boolean']['output'];
@@ -91,7 +96,7 @@ export type Mutation = {
   unPinPost: UnPinPostResponse;
   unPinPostFromBlog: UnPinPostResponse;
   unsubscribeFromUser: Scalars['Boolean']['output'];
-  updateBlog: BlogModel;
+  updateBlog: Scalars['Boolean']['output'];
   updateComment: Scalars['Boolean']['output'];
   updatePost: Scalars['Boolean']['output'];
   updatePostOrBlogTags: Scalars['Boolean']['output'];
@@ -212,6 +217,7 @@ export type MutationUnsubscribeFromUserArgs = {
 export type MutationUpdateBlogArgs = {
   blogId: Scalars['String']['input'];
   data: UpdateBlogInput;
+  poster?: InputMaybe<Scalars['Upload']['input']>;
 };
 
 
@@ -293,6 +299,7 @@ export type QueryFindTagsBySearchStringArgs = {
 
 
 export type QueryGetAllBlogsPaginationArgs = {
+  filters?: InputMaybe<FiltersInput>;
   searchParams?: InputMaybe<SearchParamsInput>;
 };
 
@@ -303,6 +310,7 @@ export type QueryGetAllPostCommentsArgs = {
 
 
 export type QueryGetAllPostsPaginationArgs = {
+  filters?: InputMaybe<FiltersInput>;
   searchParams?: InputMaybe<SearchParamsInput>;
 };
 
@@ -366,7 +374,8 @@ export type UnPinPostResponse = {
 
 export type UpdateBlogInput = {
   description?: InputMaybe<Scalars['String']['input']>;
-  posterUrl?: InputMaybe<Scalars['String']['input']>;
+  postIds?: InputMaybe<Array<Scalars['String']['input']>>;
+  tags?: InputMaybe<Array<Scalars['String']['input']>>;
   title?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -467,7 +476,7 @@ export type CreateBlogMutationVariables = Exact<{
 }>;
 
 
-export type CreateBlogMutation = { __typename?: 'Mutation', createBlog: { __typename?: 'BlogModel', id: string, title: string, description: string, posterUrl?: string | null, createdAt: any, posts: Array<{ __typename?: 'PostModel', id: string, title: string, content: any, createdAt: any, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null } }>, tags: Array<{ __typename?: 'TagModel', id: string, name: string }>, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null } } };
+export type CreateBlogMutation = { __typename?: 'Mutation', createBlog: { __typename?: 'BlogModel', id: string } };
 
 export type CreateCommentMutationVariables = Exact<{
   text: Scalars['String']['input'];
@@ -484,7 +493,7 @@ export type CreatePostMutationVariables = Exact<{
 }>;
 
 
-export type CreatePostMutation = { __typename?: 'Mutation', createPost: { __typename?: 'PostModel', likesCount: number, viewsCount: number, commentsCount: number, id: string, title: string, content: any, createdAt: any, blog?: { __typename?: 'BlogModel', id: string } | null, author: { __typename?: 'UserModel', username: string, avatarUrl?: string | null } } };
+export type CreatePostMutation = { __typename?: 'Mutation', createPost: { __typename?: 'PostModel', id: string } };
 
 export type DeleteBlogMutationVariables = Exact<{
   blogId: Scalars['String']['input'];
@@ -551,6 +560,14 @@ export type SubscribeMutationVariables = Exact<{
 
 export type SubscribeMutation = { __typename?: 'Mutation', subscribeToUser: boolean };
 
+export type TogglePinBlogMutationVariables = Exact<{
+  blogId: Scalars['String']['input'];
+  postId: Scalars['String']['input'];
+}>;
+
+
+export type TogglePinBlogMutation = { __typename?: 'Mutation', pinPostToBlog: { __typename?: 'PostModel', blog?: { __typename?: 'BlogModel', id: string } | null } };
+
 export type UnPinPostMutationVariables = Exact<{
   blogId: Scalars['String']['input'];
   postId: Scalars['String']['input'];
@@ -565,6 +582,15 @@ export type UnsubscribeMutationVariables = Exact<{
 
 
 export type UnsubscribeMutation = { __typename?: 'Mutation', unsubscribeFromUser: boolean };
+
+export type UpdateBlogMutationVariables = Exact<{
+  data: UpdateBlogInput;
+  blogId: Scalars['String']['input'];
+  poster?: InputMaybe<Scalars['Upload']['input']>;
+}>;
+
+
+export type UpdateBlogMutation = { __typename?: 'Mutation', updateBlog: boolean };
 
 export type UpdateCommentMutationVariables = Exact<{
   text: Scalars['String']['input'];
@@ -598,6 +624,7 @@ export type GetTagsBySearchStringQuery = { __typename?: 'Query', findTagsBySearc
 
 export type GetAllBlogsQueryVariables = Exact<{
   searchParams: SearchParamsInput;
+  filters?: InputMaybe<FiltersInput>;
 }>;
 
 
@@ -619,6 +646,7 @@ export type GetAllPostCommentsQuery = { __typename?: 'Query', getAllPostComments
 
 export type GetAllPostsQueryVariables = Exact<{
   searchParams: SearchParamsInput;
+  filters?: InputMaybe<FiltersInput>;
 }>;
 
 
@@ -870,14 +898,10 @@ export type ChangeProfilePosterMutationOptions = Apollo.BaseMutationOptions<Chan
 export const CreateBlogDocument = gql`
     mutation createBlog($data: CreateBlogInput!, $poster: Upload) {
   createBlog(data: $data, poster: $poster) {
-    ...BlogFragment
-    posts {
-      ...PostFragment
-    }
+    id
   }
 }
-    ${BlogFragmentFragmentDoc}
-${PostFragmentFragmentDoc}`;
+    `;
 export type CreateBlogMutationFn = Apollo.MutationFunction<CreateBlogMutation, CreateBlogMutationVariables>;
 
 /**
@@ -943,16 +967,10 @@ export type CreateCommentMutationOptions = Apollo.BaseMutationOptions<CreateComm
 export const CreatePostDocument = gql`
     mutation createPost($data: CreatePostInput!, $blogId: String) {
   createPost(data: $data, blogId: $blogId) {
-    ...PostFragment
-    blog {
-      id
-    }
-    likesCount
-    viewsCount
-    commentsCount
+    id
   }
 }
-    ${PostFragmentFragmentDoc}`;
+    `;
 export type CreatePostMutationFn = Apollo.MutationFunction<CreatePostMutation, CreatePostMutationVariables>;
 
 /**
@@ -1304,6 +1322,42 @@ export function useSubscribeMutation(baseOptions?: Apollo.MutationHookOptions<Su
 export type SubscribeMutationHookResult = ReturnType<typeof useSubscribeMutation>;
 export type SubscribeMutationResult = Apollo.MutationResult<SubscribeMutation>;
 export type SubscribeMutationOptions = Apollo.BaseMutationOptions<SubscribeMutation, SubscribeMutationVariables>;
+export const TogglePinBlogDocument = gql`
+    mutation TogglePinBlog($blogId: String!, $postId: String!) {
+  pinPostToBlog(blogId: $blogId, postId: $postId) {
+    blog {
+      id
+    }
+  }
+}
+    `;
+export type TogglePinBlogMutationFn = Apollo.MutationFunction<TogglePinBlogMutation, TogglePinBlogMutationVariables>;
+
+/**
+ * __useTogglePinBlogMutation__
+ *
+ * To run a mutation, you first call `useTogglePinBlogMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useTogglePinBlogMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [togglePinBlogMutation, { data, loading, error }] = useTogglePinBlogMutation({
+ *   variables: {
+ *      blogId: // value for 'blogId'
+ *      postId: // value for 'postId'
+ *   },
+ * });
+ */
+export function useTogglePinBlogMutation(baseOptions?: Apollo.MutationHookOptions<TogglePinBlogMutation, TogglePinBlogMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<TogglePinBlogMutation, TogglePinBlogMutationVariables>(TogglePinBlogDocument, options);
+      }
+export type TogglePinBlogMutationHookResult = ReturnType<typeof useTogglePinBlogMutation>;
+export type TogglePinBlogMutationResult = Apollo.MutationResult<TogglePinBlogMutation>;
+export type TogglePinBlogMutationOptions = Apollo.BaseMutationOptions<TogglePinBlogMutation, TogglePinBlogMutationVariables>;
 export const UnPinPostDocument = gql`
     mutation UnPinPost($blogId: String!, $postId: String!) {
   unPinPost(blogId: $blogId, postId: $postId) {
@@ -1369,6 +1423,39 @@ export function useUnsubscribeMutation(baseOptions?: Apollo.MutationHookOptions<
 export type UnsubscribeMutationHookResult = ReturnType<typeof useUnsubscribeMutation>;
 export type UnsubscribeMutationResult = Apollo.MutationResult<UnsubscribeMutation>;
 export type UnsubscribeMutationOptions = Apollo.BaseMutationOptions<UnsubscribeMutation, UnsubscribeMutationVariables>;
+export const UpdateBlogDocument = gql`
+    mutation UpdateBlog($data: UpdateBlogInput!, $blogId: String!, $poster: Upload) {
+  updateBlog(data: $data, blogId: $blogId, poster: $poster)
+}
+    `;
+export type UpdateBlogMutationFn = Apollo.MutationFunction<UpdateBlogMutation, UpdateBlogMutationVariables>;
+
+/**
+ * __useUpdateBlogMutation__
+ *
+ * To run a mutation, you first call `useUpdateBlogMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateBlogMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateBlogMutation, { data, loading, error }] = useUpdateBlogMutation({
+ *   variables: {
+ *      data: // value for 'data'
+ *      blogId: // value for 'blogId'
+ *      poster: // value for 'poster'
+ *   },
+ * });
+ */
+export function useUpdateBlogMutation(baseOptions?: Apollo.MutationHookOptions<UpdateBlogMutation, UpdateBlogMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateBlogMutation, UpdateBlogMutationVariables>(UpdateBlogDocument, options);
+      }
+export type UpdateBlogMutationHookResult = ReturnType<typeof useUpdateBlogMutation>;
+export type UpdateBlogMutationResult = Apollo.MutationResult<UpdateBlogMutation>;
+export type UpdateBlogMutationOptions = Apollo.BaseMutationOptions<UpdateBlogMutation, UpdateBlogMutationVariables>;
 export const UpdateCommentDocument = gql`
     mutation UpdateComment($text: String!, $commentId: String!) {
   updateComment(text: $text, commentId: $commentId)
@@ -1513,8 +1600,8 @@ export type GetTagsBySearchStringLazyQueryHookResult = ReturnType<typeof useGetT
 export type GetTagsBySearchStringSuspenseQueryHookResult = ReturnType<typeof useGetTagsBySearchStringSuspenseQuery>;
 export type GetTagsBySearchStringQueryResult = Apollo.QueryResult<GetTagsBySearchStringQuery, GetTagsBySearchStringQueryVariables>;
 export const GetAllBlogsDocument = gql`
-    query GetAllBlogs($searchParams: SearchParamsInput!) {
-  getAllBlogsPagination(searchParams: $searchParams) {
+    query GetAllBlogs($searchParams: SearchParamsInput!, $filters: FiltersInput) {
+  getAllBlogsPagination(searchParams: $searchParams, filters: $filters) {
     data {
       ...BlogFragment
     }
@@ -1539,6 +1626,7 @@ export const GetAllBlogsDocument = gql`
  * const { data, loading, error } = useGetAllBlogsQuery({
  *   variables: {
  *      searchParams: // value for 'searchParams'
+ *      filters: // value for 'filters'
  *   },
  * });
  */
@@ -1649,8 +1737,8 @@ export type GetAllPostCommentsLazyQueryHookResult = ReturnType<typeof useGetAllP
 export type GetAllPostCommentsSuspenseQueryHookResult = ReturnType<typeof useGetAllPostCommentsSuspenseQuery>;
 export type GetAllPostCommentsQueryResult = Apollo.QueryResult<GetAllPostCommentsQuery, GetAllPostCommentsQueryVariables>;
 export const GetAllPostsDocument = gql`
-    query getAllPosts($searchParams: SearchParamsInput!) {
-  getAllPostsPagination(searchParams: $searchParams) {
+    query getAllPosts($searchParams: SearchParamsInput!, $filters: FiltersInput) {
+  getAllPostsPagination(searchParams: $searchParams, filters: $filters) {
     data {
       ...PostFragment
       tags {
@@ -1679,6 +1767,7 @@ export const GetAllPostsDocument = gql`
  * const { data, loading, error } = useGetAllPostsQuery({
  *   variables: {
  *      searchParams: // value for 'searchParams'
+ *      filters: // value for 'filters'
  *   },
  * });
  */

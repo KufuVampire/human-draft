@@ -2,10 +2,10 @@
 
 import { ChevronRight, Settings, User } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { routesConfig } from '@/config';
-import { useActiveLink, useProfile } from '@/hooks';
+import { useActiveLink, useProfile, useResolvedHref } from '@/hooks';
 import {
 	Button,
 	CustomLink,
@@ -34,50 +34,38 @@ const items = [
 export const UserProfile = () => {
 	const t = useTranslations();
 	const [isOpen, setOpen] = useState(false);
-	const { profile, isAuth, setSubscriptions, isLoading } = useProfile();
+	const { profile, isAuth, isLoading } = useProfile();
 	const isActiveLink = useActiveLink();
+	const resolveHref = useResolvedHref();
 
-	useEffect(() => {
-		if (profile) {
-			setSubscriptions(profile.subscriptions);
-		}
-	}, [profile, setSubscriptions]);
+	const navigationItems = useMemo(
+		() =>
+			items.map(({ Component, Icon, href, translationKey }) => {
+				if (Component) {
+					return (
+						<Component
+							key={href}
+							className='text-secondary'
+						/>
+					);
+				}
 
-	const navigationItems = items.map(
-		({ Component, Icon, href, translationKey }) => {
-			if (Component) {
+				const currentHref = resolveHref(href);
+
 				return (
-					<Component
+					<CustomLink
 						key={href}
-						className='text-secondary'
-					/>
+						href={currentHref}
+						className={cn(
+							'p-2 hover:bg-main-hover text-secondary transition-colors w-full flex items-center justify-normal gap-x-1',
+							isActiveLink(currentHref) && 'text-primary'
+						)}>
+						<Icon />
+						{t(translationKey)}
+					</CustomLink>
 				);
-			}
-
-			const settingsHref =
-				href === routesConfig.settings && profile?.username
-					? `/${profile?.username}/${routesConfig.settings}`
-					: href;
-			const profileHref =
-				href === routesConfig.profile && profile?.username
-					? routesConfig.profileUsername(profile.username)
-					: href;
-			const currentHref =
-				href === routesConfig.profile ? profileHref : settingsHref;
-
-			return (
-				<CustomLink
-					key={href}
-					href={currentHref}
-					className={cn(
-						'p-2 hover:bg-main-hover text-secondary transition-colors w-full flex items-center justify-normal gap-x-1',
-						isActiveLink(currentHref) && 'text-primary'
-					)}>
-					<Icon />
-					{t(translationKey)}
-				</CustomLink>
-			);
-		}
+			}),
+		[isActiveLink, resolveHref, t]
 	);
 
 	return (
