@@ -8,6 +8,9 @@ export class UpdateBlogInput {
 	@Field(() => String, { nullable: true })
 	description?: string;
 
-	@Field(() => String, { nullable: true })
-	posterUrl?: string;
+	@Field(() => [String], { nullable: true })
+	postIds?: string[];
+
+	@Field(() => [String], { nullable: true })
+	tags?: string[];
 }

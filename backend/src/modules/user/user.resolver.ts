@@ -1,9 +1,10 @@
 import { Args, Context, Query, Resolver } from '@nestjs/graphql';
 
+import { UserService } from './user.service';
+import { PAGINATION_PAGE, PAGINATION_PER_PAGE } from '@/src/consts';
 import { SearchParamsInput } from '@/src/inputs';
 import { UserModel, UserPagination } from '@/src/models';
 import { IGQLContext } from '@/src/types';
-import { UserService } from './user.service';
 
 @Resolver('User')
 export class UserResolver {
@@ -18,11 +19,19 @@ export class UserResolver {
 	async getAllUsers(
 		@Args('searchParams', {
 			nullable: true,
-			defaultValue: { page: 1, perPage: 10 },
+			defaultValue: { page: PAGINATION_PAGE, perPage: PAGINATION_PER_PAGE },
 		})
 		searchParams: SearchParamsInput,
-		@Context() { req }: IGQLContext
+		@Args('onlySubscriptions', { type: () => Boolean })
+		onlySubscriptions: boolean,
+		@Args('searchStr', { nullable: true, defaultValue: '' }) searchStr?: string,
+		@Context() context?: IGQLContext
 	) {
-		return this.userService.getAllUsers(searchParams, req.session.userId);
+		return this.userService.getAllUsers({
+			onlySubscriptions,
+			searchParams,
+			searchStr,
+			userId: context?.req.session.userId,
+		});
 	}
 }

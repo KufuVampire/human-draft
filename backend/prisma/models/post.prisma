@@ -2,6 +2,7 @@ model Post {
   id            String   @id @default(uuid())
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
+  title         String
   content       Json     @db.JsonB
   likesCount    Int      @default(0)
   viewsCount    Int      @default(0)

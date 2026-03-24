@@ -26,22 +26,23 @@ type CommentModel {
   author: UserModel!
   createdAt: DateTime!
   id: ID!
-  parent: CommentModel
+  parentId: String
   post: PostModel
   replies: [CommentModel!]!
   text: String!
-  updatedAt: DateTime!
 }
 
 input CreateBlogInput {
-  description: String!
-  postIds: [ID!]!
-  posterUrl: String
+  description: String
+  postIds: [String!]!
+  tags: [String!]!
   title: String!
 }
 
 input CreatePostInput {
   content: JSON!
+  tags: [String!]!
+  title: String!
 }
 
 """
@@ -49,48 +50,62 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+input FiltersInput {
+  onlySubscriptions: Boolean
+  search: String
+}
+
 """
 The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
 """
 scalar JSON
 
 type Mutation {
+  changeBlogPoster(blogId: String!, posterFile: Upload!): Boolean!
   changeProfileAvatar(file: Upload!): UserModel!
   changeProfilePoster(file: Upload!): UserModel!
-  createBlog(data: CreateBlogInput!): BlogModel!
+  createBlog(data: CreateBlogInput!, poster: Upload): BlogModel!
   createComment(parentId: String, postId: String!, text: String!): CommentModel!
   createPost(blogId: String, data: CreatePostInput!): PostModel!
   createTag(name: String!): TagModel!
-  deleteBlog(blogId: String!): BlogModel!
-  deleteComment(commentId: String!): CommentModel!
-  deletePost(postId: String!): Boolean!
+  deleteBlog(blogId: String!): Boolean!
+  deleteBlogPoster(blogId: String!): Boolean!
+  deleteComment(commentId: String!): Boolean!
+  deletePost(postId: String!): PostDeleteResponse!
   deleteTag(name: String!): Boolean!
+  pinPost(blogId: String!, postId: String!): PostModel!
   pinPostToBlog(blogId: String!, postId: String!): PostModel!
   removeProfileAvatar: UserModel!
   removeProfilePoster: UserModel!
-  signIn(data: SignInInput!): Boolean!
+  signIn(data: SignInInput!): UserModel!
   signOutAccount: Boolean!
-  signUp(data: SignUpInput!): Boolean!
+  signUp(data: SignUpInput!): UserModel!
   subscribeToUser(toId: String!): Boolean!
-  unPinPostFromBlog(blogId: String!, postId: String!): PostModel!
+  unPinPost(blogId: String!, postId: String!): UnPinPostResponse!
+  unPinPostFromBlog(blogId: String!, postId: String!): UnPinPostResponse!
   unsubscribeFromUser(toId: String!): Boolean!
-  updateBlog(blogId: String!, data: UpdateBlogInput!): BlogModel!
-  updateComment(commentId: String!, text: String!): CommentModel!
-  updatePost(data: UpdatePostInput!, postId: String!): PostModel!
+  updateBlog(blogId: String!, data: UpdateBlogInput!, poster: Upload): Boolean!
+  updateComment(commentId: String!, text: String!): Boolean!
+  updatePost(data: UpdatePostInput!, postId: String!): Boolean!
   updatePostOrBlogTags(tags: [String!]!, to: UpdatePostOrBlogTagsInput!): Boolean!
   updateUser(data: UpdateUserInput!): UserModel!
+  uploadImage(image: Upload!): UploadImageModel!
+}
+
+type PostDeleteResponse {
+  postId: String!
 }
 
 type PostModel {
   author: UserModel!
   blog: BlogModel
-  comments: [CommentModel!]!
   commentsCount: Int!
   content: JSON!
   createdAt: DateTime!
   id: ID!
   likesCount: Int!
   tags: [TagModel!]!
+  title: String!
   updatedAt: DateTime!
   viewsCount: Int!
 }
@@ -104,9 +119,15 @@ type PostPagination {
 }
 
 type Query {
-  getAllBlogsPagination(searchParams: SearchParamsInput = {page: 1, perPage: 10}): BlogPagination!
-  getAllPostsPagination(searchParams: SearchParamsInput = {page: 1, perPage: 10}): PostPagination!
-  getAllUsersPagination(searchParams: SearchParamsInput = {page: 1, perPage: 10}): UserPagination!
+  blogsForPin: [BlogModel!]!
+  findTagsBySearchString(search: String!): [TagModel!]!
+  getAllBlogsPagination(filters: FiltersInput, searchParams: SearchParamsInput = {page: 1, perPage: 10}): BlogPagination!
+  getAllPostComments(postId: String!): [CommentModel!]!
+  getAllPostsPagination(filters: FiltersInput, searchParams: SearchParamsInput = {page: 1, perPage: 10}): PostPagination!
+  getAllUsersPagination(onlySubscriptions: Boolean!, searchParams: SearchParamsInput = {page: 1, perPage: 10}, searchStr: String = ""): UserPagination!
+  getBlogById(blogId: String!): BlogModel!
+  getFreePostsForPin(searchStr: String): [PostModel!]!
+  getPostById(postId: String!): PostModel!
   getUserByUsername(username: String!): UserModel!
   userProfile: UserModel!
 }
@@ -136,14 +157,23 @@ type TagModel {
   updatedAt: DateTime!
 }
 
+type UnPinPostResponse {
+  postId: String!
+}
+
 input UpdateBlogInput {
   description: String
-  posterUrl: String
+  postIds: [String!]
+  tags: [String!]
   title: String
 }
 
 input UpdatePostInput {
-  content: JSON!
+  content: JSON
+  likesCount: Int
+  tags: [String!]
+  title: String
+  viewsCount: Int
 }
 
 input UpdatePostOrBlogTagsInput {
@@ -162,16 +192,20 @@ input UpdateUserInput {
 """The `Upload` scalar type represents a file upload."""
 scalar Upload
 
+type UploadImageModel {
+  url: String!
+}
+
 type UserModel {
   avatarUrl: String
-  blogs: [BlogModel!]
+  blogs: [BlogModel!]!
   comments: [CommentModel!]
   createdAt: DateTime!
   description: String
   email: String!
   id: ID!
   posterUrl: String
-  posts: [PostModel!]
+  posts: [PostModel!]!
   subscribers: [String!]!
   subscriptions: [String!]!
   updatedAt: DateTime!

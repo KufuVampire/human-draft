@@ -1,0 +1,3 @@
+mutation UpdateBlog($data: UpdateBlogInput!, $blogId: String!, $poster: Upload) {
+	updateBlog(data: $data, blogId: $blogId, poster: $poster)
+}

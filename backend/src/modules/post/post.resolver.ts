@@ -4,10 +4,17 @@ import { PostService } from './post.service';
 import { Auth, Authorized } from '@/src/decorators';
 import {
 	CreatePostInput,
+	FiltersInput,
 	SearchParamsInput,
 	UpdatePostInput,
 } from '@/src/inputs';
-import { PostModel, PostPagination } from '@/src/models';
+import {
+	PostDeleteResponse,
+	PostModel,
+	PostPagination,
+	UnPinPostResponse,
+	UserModel,
+} from '@/src/models';
 
 @Resolver('Post')
 export class PostResolver {
@@ -24,7 +31,7 @@ export class PostResolver {
 	}
 
 	@Auth()
-	@Mutation(() => PostModel, { name: 'updatePost' })
+	@Mutation(() => Boolean, { name: 'updatePost' })
 	async update(
 		@Authorized('id') authorId: string,
 		@Args('postId') postId: string,
@@ -34,12 +41,13 @@ export class PostResolver {
 	}
 
 	@Auth()
-	@Mutation(() => Boolean, { name: 'deletePost' })
+	@Mutation(() => PostDeleteResponse, { name: 'deletePost' })
 	async delete(
 		@Authorized('id') authorId: string,
 		@Args('postId') postId: string
 	) {
-		return this.postService.delete(authorId, postId);
+		await this.postService.delete(authorId, postId);
+		return { postId };
 	}
 
 	@Auth()
@@ -53,13 +61,22 @@ export class PostResolver {
 	}
 
 	@Auth()
-	@Mutation(() => PostModel, { name: 'unPinPostFromBlog' })
+	@Mutation(() => UnPinPostResponse, { name: 'unPinPostFromBlog' })
 	async unPinPostFromBlog(
 		@Authorized('id') authorId: string,
 		@Args('postId') postId: string,
 		@Args('blogId') blogId: string
 	) {
-		return this.postService.unPinPostFromBlog(authorId, postId, blogId);
+		await this.postService.unPinPostFromBlog(authorId, postId, blogId);
+
+		return {
+			postId,
+		};
+	}
+
+	@Query(() => PostModel, { name: 'getPostById' })
+	async getPostById(@Args('postId') postId: string) {
+		return this.postService.getPostById(postId);
 	}
 
 	@Query(() => PostPagination, { name: 'getAllPostsPagination' })
@@ -68,8 +85,19 @@ export class PostResolver {
 			nullable: true,
 			defaultValue: { page: 1, perPage: 10 },
 		})
-		searchParams: SearchParamsInput
+		searchParams: SearchParamsInput,
+		@Args('filters', { nullable: true }) filters: FiltersInput,
+		@Authorized() user?: UserModel
 	) {
-		return this.postService.getAllPosts(searchParams);
+		return this.postService.getAllPosts(searchParams, filters, user);
+	}
+
+	@Auth()
+	@Query(() => [PostModel], { name: 'getFreePostsForPin' })
+	async getFreePostsForPin(
+		@Authorized('id') userId: string,
+		@Args('searchStr', { nullable: true }) searchStr?: string
+	) {
+		return this.postService.getAllFreeUserPostsForPin(userId, searchStr);
 	}
 }

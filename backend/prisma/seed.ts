@@ -1,4 +1,5 @@
 import { PrismaPg } from '@prisma/adapter-pg';
+import { hash } from 'argon2';
 import 'dotenv/config';
 import { env } from 'prisma/config';
 
@@ -17,13 +18,15 @@ const prisma = new PrismaClient({
 	adapter,
 });
 
+const tags = ['React', 'HTML', 'HTML5', 'CSS', 'CSS3'];
+
 async function main() {
 	for (let i = 1; i <= 10; i++) {
 		const isExists = await prisma.user.findUnique({
 			where: {
-				username: `user${i}`
-			}
-		})
+				username: `user${i}`,
+			},
+		});
 
 		if (isExists) {
 			continue;
@@ -33,7 +36,15 @@ async function main() {
 			data: {
 				email: `user${i}@test.ru`,
 				username: `user${i}`,
-				password: '12345678',
+				password: await hash('12345678'),
+			},
+		});
+	}
+
+	for (let i = 0; i < tags.length; i++) {
+		await prisma.tag.create({
+			data: {
+				name: tags[i],
 			},
 		});
 	}

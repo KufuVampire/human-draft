@@ -1,0 +1,9 @@
+mutation PinPost($blogId: String!, $postId: String!) {
+	pinPost(blogId: $blogId, postId: $postId) {
+		...PostFragment
+		tags {
+			id
+			name
+		}
+	}
+}

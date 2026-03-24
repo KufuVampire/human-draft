@@ -1,0 +1,12 @@
+query GetBlogById($blogId: String!) {
+	getBlogById(blogId: $blogId) {
+		...BlogFragment
+		posts {
+			...PostFragment
+			tags {
+				id
+				name
+			}
+		}
+	}
+}

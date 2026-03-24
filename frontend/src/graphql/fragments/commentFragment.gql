@@ -1,0 +1,33 @@
+fragment CommentFields on CommentModel {
+	id
+	text
+	parentId
+	createdAt
+	author {
+		username
+		avatarUrl
+	}
+	replies {
+		...RepliesFields
+		replies {
+			...RepliesFields
+			replies {
+				...RepliesFields
+				replies {
+					...RepliesFields
+				}
+			}
+		}
+	}
+}
+
+fragment RepliesFields on CommentModel {
+	id
+	text
+	parentId
+	createdAt
+	author {
+		username
+		avatarUrl
+	}
+}

@@ -1,3 +1,5 @@
 mutation SignUp($data: SignUpInput!) {
-	signUp(data: $data) 
+	signUp(data: $data) {
+		...AuthUserFragment
+	}
 }

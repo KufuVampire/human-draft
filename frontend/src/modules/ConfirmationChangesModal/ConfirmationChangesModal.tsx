@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 
 import { useClickOutside } from '@/hooks';
 import { Button, Modal } from '@/shared';
@@ -25,23 +25,15 @@ export const ConfirmationChangesModal = ({ className }: Props) => {
 
 	useClickOutside(modalRef, handleClose);
 
-	useEffect(() => {
-		if (isOpen) {
-			document.body.classList.add('overflow-hidden');
-		} else {
-			document.body.classList.remove('overflow-hidden');
-		}
-	}, [isOpen]);
-
 	return (
 		<Modal isOpen={isOpen}>
 			<div
 				ref={modalRef}
 				className={cn(
-					'bg-[var(--background-color-card)] px-5 py-6 rounded-lg flex flex-col gap-y-12',
+					'bg-[var(--background-color-card)] px-3 md:px-5 py-6 rounded-lg flex flex-col gap-y-[1.875rem] md:gap-y-12',
 					className
 				)}>
-				<h2 className='font-title text-4xl font-bold leading-[110%]'>
+				<h2 className='font-title text-[1.75rem] md:text-4xl font-bold leading-[110%]'>
 					{t('modals.saveChanges')}
 				</h2>
 				<div className='flex justify-between gap-x-12'>

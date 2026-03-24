@@ -4,6 +4,8 @@
 		"createBlog": "Создать блог",
 		"editPoster": "Изменить обложку",
 		"removePoster": "Удалить обложку",
+		"editAvatar": "Изменить аватарку",
+		"removeAvatar": "Удалить аватарку",
 		"subscribe": "Подписаться",
 		"unsubscribe": "Отписаться",
 		"signIn": "Войти",
@@ -14,7 +16,13 @@
 		"remove": "Удалить",
 		"ok": "Ок",
 		"showPassword": "Показать пароль",
-		"hidePassword": "Скрыть пароль"
+		"hidePassword": "Скрыть пароль",
+		"reply": "Ответить",
+		"aria": {
+			"profilePage": {
+				"dropdown": "Нажмите чтобы посмотреть больше действий с вашим профилем"
+			}
+		}
 	},
 	"dashboard": {
 		"expand": "Развернуть",
@@ -36,11 +44,12 @@
 	},
 	"fields": {
 		"searchInput": "Поиск по названию, автору или тэгу",
+		"searchByName": "Поиск по имени пользователя",
 		"username": "Имя пользователя",
 		"email": "Почта",
 		"password": "Пароль",
 		"repeatPassword": "Повторите пароль",
-		"leaveComment": "Комментарий",
+		"comment": "Комментарий",
 		"shortDescription": "Краткое описание"
 	},
 	"authTabLinks": {
@@ -94,9 +103,10 @@
 		}
 	},
 	"comments": {
-		"leaveComment": "Сохранить комментарий",
-		"reply": "Ответа",
-		"replies": "Ответов"
+		"leaveComment": "Оставить комментарий",
+		"updateComment": "Обновить комментарий",
+		"hideReplies": "Скрыть ответы",
+		"replies": "{count, plural, one {# ответ} few {# ответа} many {# ответов} other {# ответов}}"
 	},
 	"homePage": {
 		"metadata": {
@@ -109,6 +119,9 @@
 		"needAuth": "Необходимо войти в аккаунт",
 		"removeBlog": "Удалить блог?",
 		"removePost": "Удалить пост?",
+		"removePoster": "Удалить постер?",
+		"removeAvatar": "Удалить аватар?",
+		"removeComment": "Удалить комментарий?",
 		"saveChanges": "Сохранить изменения"
 	},
 	"profilePage": {
@@ -119,7 +132,9 @@
 		"editProfile": "Редактировать профиль",
 		"notifications": {
 			"changePosterSuccess": "Обложка успешна изменена",
-			"removePosterSuccess": "Обложка успешно удалена"
+			"removePosterSuccess": "Обложка успешно удалена",
+			"changeAvatarSuccess": "Аватар успешно изменен",
+			"removeAvatarSuccess": "Аватар успешно удален"
 		}
 	},
 	"settingsPage": {
@@ -127,13 +142,14 @@
 			"title": "Настройки профиля",
 			"description": "Здесь вы можете изменить данные вашего профиля, такие как аватар, имя пользователя, почту и описание"
 		},
-		"editAvatar": "Изменить аватар"
+		"editAvatar": "Изменить аватар",
+		"notMyAcc": "Это не ваш аккаунт, зайдите в настройки вашего аккаунта",
+		"notifications": {
+			"updateSuccess": "Данные успешно изменены",
+			"updateError": "Ошибка изменения данных, попробуйте ещё раз"
+		}
 	},
 	"postPage": {
-		"metadata": {
-			"title": "",
-			"description": ""
-		},
 		"like": "Поставить лайк",
 		"commentsCount": "Количество комментариев",
 		"viewsCount": "Количество просмотров",
@@ -141,18 +157,28 @@
 		"pinBlog": {
 			"pin": "Закрепить блог",
 			"searchFieldPlaceholder": "Поиск блогов"
+		},
+		"postDeletedSuccess": "Пост успешно удалён",
+		"postUpdatedSuccess": "Пост успешно обновлён",
+		"comments": {
+			"exitEditMode": "Выйти из режима редактирования комментария",
+			"enterEditMode": "Войти в режим редактирования комментария",
+			"deleteComment": "Удалить комментарий"
 		}
 	},
 	"blogPage": {
-		"metadata": {
-			"title": "",
-			"description": ""
-		},
-		"editFields": {
-			"title": "Заголовок",
+		"fields": {
+			"title": "Название блога",
 			"description": "Описание блога"
 		},
+		"blogPoster": "Обложка блога",
 		"editBlog": "Редактировать блог",
+		"blogDeletedSuccess": "Блог успешно удалён",
+		"blogUpdatedSuccess": "Блог успешно обновлён",
+		"poster": {
+			"deleted": "Постер успешно удален",
+			"updated": "Постер успешно обновлён"
+		},
 		"pinPosts": {
 			"pin": "Закрепить посты",
 			"searchFieldPlaceholder": "Поиск постов"
@@ -169,5 +195,18 @@
 		"goToMain": "Спасибо, Уточка, я на главную"
 	},
 	"logoutSuccess": "Вы успешно вышли из аккаунта",
-	"userAvatar": "Аватар пользователя"
+	"userAvatar": "Аватар пользователя",
+	"createPostPage": {
+		"title": "Заголовок вашего поста",
+		"defaultValue": "Начните писать ваш пост",
+		"copyCode": "Скопировать код",
+		"tagPickerPlaceholder": "Выберите теги"
+	},
+	"in": "в",
+	"tagsPickerTitle": "Выбор тэгов",
+	"usersPage": {
+		"metadata": {
+			"title": "Участники"
+		}
+	}
 }

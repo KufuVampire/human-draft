@@ -1,3 +1,4 @@
+'use server';
 import { cookies } from 'next/headers';
 
 import { API_URL } from '@/consts';
@@ -6,9 +7,9 @@ import { UserModel } from '@/graphql/generated/output';
 const profileQuery = `
 	query me {
 		userProfile {
-			username
 			id
 			email
+			username
 			description
 			posterUrl
 			avatarUrl
@@ -18,10 +19,7 @@ const profileQuery = `
 			subscriptions
 			posts {
 				id
-				author {
-					id
-					username
-				}
+				title
 				content
 				tags {
 					id
@@ -31,27 +29,11 @@ const profileQuery = `
 				updatedAt
 				likesCount
 				viewsCount
-				comments {
-					id
-					text
-					replies {
-						id
-						text
-						updatedAt
-						createdAt
-					}
-					createdAt
-					updatedAt
-				}
 				commentsCount
 			}
 			blogs {
 				id
 				title
-				author {
-					id
-					username
-				}
 				description
 				tags {
 					id
@@ -78,7 +60,8 @@ export async function fetchMe(): Promise<UserModel | null> {
 			body: JSON.stringify({
 				query: profileQuery,
 			}),
-			cache: 'no-cache',
+			credentials: 'include',
+			cache: 'no-store',
 		});
 
 		if (!res.ok) {

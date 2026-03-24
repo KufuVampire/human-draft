@@ -54,11 +54,14 @@ export class CommentService {
 					},
 				}),
 			},
+			include: {
+				author: true,
+			},
 		});
 	}
 
 	async update(authorId: string, commentId: string, text: string) {
-		const result = await this.prismaService.comment.updateMany({
+		const updatedComment = await this.prismaService.comment.update({
 			where: {
 				id: commentId,
 				authorId,
@@ -68,16 +71,13 @@ export class CommentService {
 			},
 		});
 
-		if (result.count === 0) {
-			// либо не существует, либо не автор
+		if (!updatedComment) {
 			throw new ForbiddenException(
 				'Comment not found or you have no permission to update it'
 			);
 		}
 
-		return this.prismaService.comment.findUnique({
-			where: { id: commentId },
-		});
+		return true;
 	}
 
 	async delete(authorId: string, commentId: string) {
@@ -103,5 +103,18 @@ export class CommentService {
 		});
 
 		return true;
+	}
+
+	async allPostComments(postId: string) {
+		const comments = await this.prismaService.comment.findMany({
+			where: {
+				postId,
+			},
+			include: {
+				author: true,
+			},
+		});
+
+		return comments;
 	}
 }

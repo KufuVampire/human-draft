@@ -13,14 +13,11 @@ export class CommentModel {
   @Field(() => GraphQLISODateTime)
   createdAt: Date;
 
-  @Field(() => GraphQLISODateTime)
-  updatedAt: Date;
-
   @Field(() => UserModel)
   author: UserModel;
 
-  @Field(() => CommentModel, { nullable: true })
-  parent?: CommentModel | null;
+  @Field({ nullable: true })
+  parentId?: string;
 
   @Field(() => [CommentModel])
   replies: CommentModel[];

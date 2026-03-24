@@ -1,0 +1,11 @@
+query GetAllBlogs($searchParams: SearchParamsInput!, $filters: FiltersInput) {
+	getAllBlogsPagination(searchParams: $searchParams, filters: $filters) {
+		data {
+			...BlogFragment
+		}
+		page
+		perPage
+		totalPages
+		totalCount
+	}
+}

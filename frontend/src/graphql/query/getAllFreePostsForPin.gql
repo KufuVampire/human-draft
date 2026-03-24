@@ -1,0 +1,6 @@
+query GetAllFreePostsForPin($searchStr: String) {
+	getFreePostsForPin(searchStr: $searchStr) {
+		id
+		title
+	}
+}

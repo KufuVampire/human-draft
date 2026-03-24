@@ -15,13 +15,45 @@ export class UserService {
 			where: {
 				username,
 			},
+			include: {
+				blogs: {
+					include: {
+						author: true,
+						tags: true
+					}
+				},
+				posts: {
+					include: {
+						author: true,
+						tags: true
+					},
+				},
+				subscribers: {
+					select: {
+						fromUserId: true,
+						id: true,
+					},
+				},
+				subscriptions: {
+					select: {
+						toUserId: true,
+						id: true,
+					},
+				},
+			},
 		});
 
 		if (!user) {
 			throw new NotFoundException(`User not found by ${username}`);
 		}
 
-		return user;
+		return {
+			...user,
+			posts: user.posts ?? [],
+			blogs: user.blogs ?? [],
+			subscribers: user.subscribers.map((s) => s.fromUserId),
+			subscriptions: user.subscriptions.map((s) => s.toUserId),
+		};
 	}
 
 	public async findById(id: string) {
@@ -38,6 +70,26 @@ export class UserService {
 		const user = await this.prismaService.user.findFirst({
 			where: {
 				OR: fields,
+			},
+			include: {
+				blogs: {
+					include: {
+						posts: true,
+					},
+				},
+				posts: true,
+				subscribers: {
+					select: {
+						fromUserId: true,
+						id: true,
+					},
+				},
+				subscriptions: {
+					select: {
+						toUserId: true,
+						id: true,
+					},
+				},
 			},
 		});
 
@@ -67,33 +119,45 @@ export class UserService {
 		return updatedUser;
 	}
 
-	public async getAllUsers(searchParams: SearchParamsInput, userId?: string) {
+	public async getAllUsers(params: {
+		searchParams: SearchParamsInput;
+		searchStr?: string;
+		onlySubscriptions?: boolean;
+		userId?: string;
+	}) {
+		const { searchParams, onlySubscriptions, searchStr, userId } = params;
+
 		const { page = PAGINATION_PAGE, perPage = PAGINATION_PER_PAGE } =
 			searchParams;
 
 		const skip = (page - 1) * perPage;
 
-		const where = userId
-			? {
-					id: {
-						not: userId,
-					},
-				}
-			: undefined;
-
 		const [users, totalCount] = await this.prismaService.$transaction([
 			this.prismaService.user.findMany({
 				take: perPage,
 				skip,
-				where,
-				orderBy: { id: 'asc' },
+				where: {
+					id: { not: userId },
+					username: {
+						contains: searchStr,
+						mode: 'insensitive',
+					},
+					...(onlySubscriptions && {
+						subscribers: {
+							some: {
+								fromUserId: userId,
+							},
+						},
+					}),
+				},
+				orderBy: { username: 'asc' },
 			}),
 			this.prismaService.user.count(),
 		]);
 
 		return {
 			data: users,
-			totalCount,
+			totalCount: userId ? totalCount - 1 : totalCount,
 			page,
 			perPage,
 			totalPages: Math.ceil(totalCount / perPage),

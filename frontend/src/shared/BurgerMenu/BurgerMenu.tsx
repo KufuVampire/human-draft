@@ -2,12 +2,11 @@
 
 import { Newspaper, Settings, User, Users } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { useMediaQuery } from 'react-responsive';
+import { useMemo, useState } from 'react';
 
 import { Burger } from './Burger/Burger';
 import { routesConfig } from '@/config';
-import { useActiveLink, useClickOutside, useProfile } from '@/hooks';
+import { useActiveLink, useProfile, useResolvedHref } from '@/hooks';
 import {
 	CustomLink,
 	Dropdown,
@@ -60,22 +59,9 @@ export const BurgerMenu = ({ className }: Props) => {
 	const t = useTranslations();
 	const [isOpen, setOpen] = useState(false);
 	const { isAuth, profile } = useProfile();
-	const isMobile = useMediaQuery({ maxWidth: 768 });
 	const isActiveLink = useActiveLink();
+	const resolveHref = useResolvedHref();
 
-	const dropdownRef = useRef<HTMLDivElement>(null);
-
-	const handleClose = () => {
-		setOpen(false);
-	};
-
-	useClickOutside(dropdownRef, handleClose);
-
-	useEffect(() => {
-		if (!isMobile) {
-			handleClose();
-		}
-	}, [isMobile]);
 	const dropdownItems = useMemo(() => {
 		const items = burgerDropdownItems
 			.map(({ Icon, href, translationKey, Component, needAuth }, i) => {
@@ -87,22 +73,12 @@ export const BurgerMenu = ({ className }: Props) => {
 					return (
 						<Component
 							key={i}
-							className='p-2 text-secondary'
+							className='text-secondary'
 						/>
 					);
 				}
 
-				const settingsHref =
-					href === routesConfig.settings && profile?.username
-						? `/${profile?.username}/${routesConfig.settings}`
-						: href;
-
-				const profileHref =
-					href === routesConfig.profile && profile?.username
-						? `/${profile.username}`
-						: href;
-				const currentHref =
-					href === routesConfig.profile ? profileHref : settingsHref;
+				const currentHref = resolveHref(href);
 
 				return (
 					<CustomLink
@@ -119,26 +95,32 @@ export const BurgerMenu = ({ className }: Props) => {
 			})
 			.filter(Boolean);
 
-		return [
-			<div key='user-profile' className='flex gap-x-1 p-2 w-full items-center'>
-				<UserBadge
-					username={profile?.username}
-					avatarUrl={profile?.avatarUrl}
-					location='burger-menu'
-					className='size-6'
-				/>
-			</div>,
-			...items,
-		];
-	}, [isActiveLink, isAuth, profile, t]);
+		if (profile) {
+			return [
+				<div
+					key='user-profile'
+					className='flex gap-x-1 p-2 w-full items-center'>
+					<UserBadge
+						username={profile?.username}
+						avatarUrl={profile.avatarUrl}
+						location='burger-menu'
+						className='size-6'
+					/>
+				</div>,
+				...items,
+			];
+		}
+
+		return items;
+	}, [isActiveLink, isAuth, profile, resolveHref, t]);
 
 	return (
 		<Dropdown
 			displayDirection='top-right'
 			className={className}
 			listClassName='top-[calc(100%+1.875rem)] bg-layout'
-			ref={dropdownRef}
 			isOpen={isOpen}
+			setOpen={setOpen}
 			items={dropdownItems}>
 			<Burger
 				isOpen={isOpen}

@@ -1,4 +1,4 @@
-import { HTMLAttributes, ReactNode } from 'react';
+import { HTMLAttributes, ReactNode, memo } from 'react';
 
 import { DropdownItem } from './DropdownItem/DropdownItem';
 import { DisplayDropdownDirection } from '@/types';
@@ -24,32 +24,36 @@ const originMap: Record<DisplayDropdownDirection, string> = {
 	center: 'origin-center',
 };
 
-export const DropdownList = ({
-	listClassName,
-	itemClassName,
-	isOpen,
-	items,
-	displayDirection,
-	...props
-}: Props) => {
-	return (
-		<ul
-			{...props}
-			className={cn(
-				'absolute top-[calc(100%+0.75rem)] right-0 z-[var(--z-dropdown)] flex flex-col min-w-max rounded-xl bg-[var(--background-color-card)] scale-0 transition-all opacity-0',
-				originMap[displayDirection],
-				{
-					['scale-100 opacity-100']: isOpen,
-				},
-				listClassName
-			)}>
-			{items.map((Component, i) => (
-				<DropdownItem
-					key={i}
-					className={itemClassName}>
-					{Component}
-				</DropdownItem>
-			))}
-		</ul>
-	);
-};
+export const DropdownList = memo(
+	({
+		listClassName,
+		itemClassName,
+		isOpen,
+		items,
+		displayDirection,
+		...props
+	}: Props) => {
+		return (
+			<ul
+				{...props}
+				className={cn(
+					'absolute top-[calc(100%+0.75rem)] right-0 z-dropdown flex flex-col min-w-max rounded-xl bg-[var(--background-color-card)] scale-0 transition-all opacity-0 duration-200 shadow-primary',
+					originMap[displayDirection],
+					{
+						['scale-100 opacity-100']: isOpen,
+					},
+					listClassName
+				)}>
+				{items.map((Component, i) => (
+					<DropdownItem
+						key={i}
+						className={itemClassName}>
+						{Component}
+					</DropdownItem>
+				))}
+			</ul>
+		);
+	}
+);
+
+DropdownList.displayName = 'DropdownList';

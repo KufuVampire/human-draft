@@ -1,0 +1,15 @@
+query getAllPosts($searchParams: SearchParamsInput!, $filters: FiltersInput) {
+	getAllPostsPagination(searchParams: $searchParams, filters: $filters) {
+		data {
+			...PostFragment
+			tags {
+				id
+				name
+			}
+		}
+		page
+		perPage
+		totalCount
+		totalPages
+	}
+}

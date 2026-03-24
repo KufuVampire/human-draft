@@ -18,20 +18,20 @@ export const Dashboard = () => {
 	return (
 		<aside
 			className={cn(
-				'sticky py-6 top-0 bg-[var(--background-color-card)] shadow-primary rounded-xl md:flex flex-col hidden gap-y-8 h-min max-w-[10.625rem] transition-colors',
-				!isExpanded ? 'px-6' : 'w-full'
+				'sticky py-3.5 pb-0 md:top-26 bg-[var(--background-color-card)] shadow-primary rounded-xl md:flex flex-col hidden gap-y-5.5 h-min w-full max-w-42.5 shrink-0 transition-all z-10',
+				!isExpanded && 'max-w-13.5'
 			)}>
 			<Button
 				variant='clear'
 				className={cn(
-					'justify-normal gap-x-1 w-full text-xl leading-[1.375rem] hover:stroke-primary-hover px-2.5',
+					'justify-normal gap-x-1 w-full text-xl leading-5.5 hover:stroke-primary-hover p-2.5 px-3.5',
 					!isExpanded && 'justify-center'
 				)}
 				onClick={handleClick}
 				title={t(isExpanded ? 'collapse' : 'expand')}>
 				<ArrowLeft
 					className={cn(
-						'transition-transform duration-300 size-6',
+						'transition-transform duration-300 size-6 shrink-0',
 						!isExpanded && 'rotate-180'
 					)}
 				/>
@@ -39,7 +39,6 @@ export const Dashboard = () => {
 			</Button>
 			<Navigation isExpanded={isExpanded} />
 			<LanguageSwitcher
-				className='px-2.5'
 				isExpanded={isExpanded}
 			/>
 		</aside>

@@ -1,5 +1,5 @@
-query getAllUsers {
-	getAllUsersPagination {
+query getAllUsers($searchParams: SearchParamsInput!, $searchStr: String!, $onlySubscriptions: Boolean!) {
+	getAllUsersPagination(searchParams: $searchParams, searchStr: $searchStr, onlySubscriptions: $onlySubscriptions) {
 		data {
 			id
 			avatarUrl

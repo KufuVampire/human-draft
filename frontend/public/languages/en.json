@@ -4,6 +4,8 @@
 		"createBlog": "Create blog",
 		"editPoster": "Edit poster",
 		"removePoster": "Remove poster",
+		"editAvatar": "Edit avatar",
+		"removeAvatar": "Remove avatar",
 		"subscribe": "Subscribe",
 		"unsubscribe": "Unsubscribe",
 		"signIn": "Sign in",
@@ -14,7 +16,13 @@
 		"remove": "Delete",
 		"ok": "OK",
 		"showPassword": "Show password",
-		"hidePassword": "Hide password"
+		"hidePassword": "Hide password",
+		"reply": "Reply",
+		"aria": {
+			"profilePage": {
+				"dropdown": "Click to see more actions with your profile"
+			}
+		}
 	},
 	"dashboard": {
 		"expand": "Expand",
@@ -36,11 +44,12 @@
 	},
 	"fields": {
 		"searchInput": "Search by title, author, or tag",
+		"searchByName": "Search by username",
 		"username": "Username",
 		"email": "Email",
 		"password": "Password",
 		"repeatPassword": "Repeat password",
-		"leaveComment": "Comment",
+		"comment": "Comment",
 		"shortDescription": "Short description"
 	},
 	"authTabLinks": {
@@ -95,8 +104,9 @@
 	},
 	"comments": {
 		"leaveComment": "Save comment",
-		"reply": "Reply",
-		"replies": "Replies"
+		"updateComment": "Update comment",
+		"hideReplies": "Hide replies",
+		"replies": "{count, plural, one {# reply} other {# replies}}"
 	},
 	"homePage": {
 		"metadata": {
@@ -109,6 +119,9 @@
 		"needAuth": "You need to sign in",
 		"removeBlog": "Delete blog?",
 		"removePost": "Delete post?",
+		"removePoster": "Delete poster?",
+		"removeAvatar": "Delete avatar?",
+		"removeComment": "Delete comment?",
 		"saveChanges": "Save changes"
 	},
 	"profilePage": {
@@ -119,7 +132,9 @@
 		"editProfile": "Edit profile",
 		"notifications": {
 			"changePosterSuccess": "Poster successfully changed",
-			"removePosterSuccess": "Poster successfully deleted"
+			"removePosterSuccess": "Poster successfully deleted",
+			"changeAvatarSuccess": "Avatar successfully changed",
+			"removeAvatarSuccess": "Avatar successfully deleted"
 		}
 	},
 	"settingsPage": {
@@ -127,13 +142,14 @@
 			"title": "Profile settings",
 			"description": "Here you can change your profile data such as avatar, username, email, and description"
 		},
-		"editAvatar": "Edit avatar"
+		"editAvatar": "Edit avatar",
+		"notMyAcc": "This is not your account. Please go to your account settings.",
+		"notifications": {
+			"updateSuccess": "Data successfully updated",
+			"updateError": "Data modification error, please try again"
+		}
 	},
 	"postPage": {
-		"metadata": {
-			"title": "",
-			"description": ""
-		},
 		"like": "Like",
 		"commentsCount": "Number of comments",
 		"viewsCount": "Number of views",
@@ -141,18 +157,28 @@
 		"pinBlog": {
 			"pin": "Pin blog",
 			"searchFieldPlaceholder": "Search blogs"
+		},
+		"postDeletedSuccess": "Post successfully deleted",
+		"postUpdatedSuccess": "Post successfully updated",
+		"comments": {
+			"exitEditMode": "Exit comment edit mode",
+			"enterEditMode": "Enter in comment edit mode",
+			"deleteComment": "Delete comment"
 		}
 	},
 	"blogPage": {
-		"metadata": {
-			"title": "",
-			"description": ""
-		},
-		"editFields": {
-			"title": "Title",
+		"fields": {
+			"title": "Blog title",
 			"description": "Blog description"
 		},
 		"editBlog": "Edit blog",
+		"blogPoster": "Poster blog",
+		"blogDeletedSuccess": "Blog successfully deleted",
+		"blogUpdatedSuccess": "Blog successfully updated",
+		"poster": {
+			"deleted": "Poster successfully deleted",
+			"updated": "Poster successfully updated"
+		},
 		"pinPosts": {
 			"pin": "Pin posts",
 			"searchFieldPlaceholder": "Search posts"
@@ -169,5 +195,18 @@
 		"goToMain": "Thank you, Duck, take me to the home page"
 	},
 	"logoutSuccess": "You have successfully logged out of your account.",
-	"userAvatar": "User avatar"
+	"userAvatar": "User avatar",
+	"createPostPage": {
+		"title": "Title of your post",
+		"defaultValue": "Start writing your post",
+		"copyCode": "Copy code",
+		"tagPickerPlaceholder": "Select tags"
+	},
+	"in": "in",
+	"tagsPickerTitle": "Select tags",
+	"usersPage": {
+		"metadata": {
+			"title": "Users"
+		}
+	}
 }

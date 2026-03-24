@@ -5,5 +5,26 @@ query GetUserByUsername($username: String!) {
 		description
 		avatarUrl
 		posterUrl
+		posts {
+			id
+			title
+			content
+			createdAt
+			updatedAt
+			tags {
+				id
+				name
+			}
+			likesCount
+			viewsCount
+			commentsCount
+			author {
+				username
+				avatarUrl
+			}
+		}
+		blogs {
+			...BlogFragment
+		}
 	}
 }

@@ -7,8 +7,8 @@ import { toast } from 'sonner';
 import { Button } from '../Button/Button';
 
 import { useSignOutMutation } from '@/graphql/generated/output';
-import { cn } from '@/utils';
 import { useProfile } from '@/hooks';
+import { cn } from '@/utils';
 
 interface Props {
 	className?: string;
@@ -19,16 +19,14 @@ export const LogoutButton = ({ className }: Props) => {
 	const { logout } = useProfile();
 
 	const [signOutMutation] = useSignOutMutation({
-		onCompleted(data) {
-			if (data.signOutAccount) {
-				toast.success('Вы успешно вышли из аккаунта');
-			}
+		onCompleted() {
+			toast.success('Вы успешно вышли из аккаунта');
 		},
 	});
 
 	const handleClick = () => {
-		signOutMutation();
 		logout();
+		signOutMutation();
 	};
 
 	return (

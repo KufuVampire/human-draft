@@ -5,4 +5,4 @@ export {
 	locales,
 	type Locale,
 } from './i18n/config';
-export { getCurrentLocale, setLocale } from './i18n/locales';
+export { setLocale } from './i18n/locales';

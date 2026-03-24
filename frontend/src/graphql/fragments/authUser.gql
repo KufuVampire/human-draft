@@ -1,0 +1,12 @@
+fragment AuthUserFragment on UserModel {
+	id
+	username
+	email
+	description
+	avatarUrl
+	posterUrl
+	subscriptions
+	subscribers
+	createdAt
+	updatedAt
+}

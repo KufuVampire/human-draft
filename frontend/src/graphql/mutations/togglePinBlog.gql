@@ -1,0 +1,7 @@
+mutation TogglePinBlog($blogId: String!, $postId: String!) {
+	pinPostToBlog(blogId: $blogId, postId: $postId) {
+		blog {
+			id
+		}
+	}
+}

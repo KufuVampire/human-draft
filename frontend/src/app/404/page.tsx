@@ -2,7 +2,6 @@ import { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import Image from 'next/image';
 
-import { fetchMe } from '@/api';
 import { NO_INDEX_PAGE } from '@/consts';
 import { Container, CustomLink, Footer, Header, Main } from '@/shared';
 
@@ -18,11 +17,9 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function NotFound() {
 	const t = await getTranslations('404');
 
-	const profile = await fetchMe();
-
 	return (
 		<>
-			<Header userProfile={profile} />
+			<Header />
 			<Main>
 				<Container className='flex flex-col gap-x-4 items-center justify-center'>
 					<h1 className='flex justify-center items-center font-title mb-2.5'>

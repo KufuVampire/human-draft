@@ -12,13 +12,13 @@ import { validateFileFormat, validateFileSize } from '../utils';
 @Injectable()
 export class FileValidationPipe implements PipeTransform {
 	public async transform(value: any, metadata: ArgumentMetadata) {
+		if (!value) return null;
+		
 		if (!value.filename) {
 			throw new BadRequestException('File not uploaded');
 		}
 
 		const { filename, createReadStream } = value;
-
-		const fileStream = createReadStream() as ReadStream;
 
 		const allowedFormats = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
 		const isFileFormatValid = validateFileFormat(filename, allowedFormats);
@@ -27,7 +27,10 @@ export class FileValidationPipe implements PipeTransform {
 			throw new BadRequestException('Unsupported file type');
 		}
 
+		const fileStream = createReadStream() as ReadStream;
 		const isFileSizeValid = await validateFileSize(fileStream, MAX_FILE_SIZE);
+
+		fileStream.destroy();
 
 		if (!isFileSizeValid) {
 			throw new BadRequestException('File size more than 10 mb');

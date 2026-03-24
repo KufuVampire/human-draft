@@ -4,13 +4,13 @@ import { NestFactory } from '@nestjs/core';
 import { RedisStore } from 'connect-redis';
 import * as cookieParser from 'cookie-parser';
 import * as session from 'express-session';
-import { graphqlUploadExpress } from 'graphql-upload-ts';
 
+import { parseBoolean } from '@/src/utils';
+import { graphqlUploadExpress } from 'graphql-upload-ts';
 import { AppModule } from './app.module';
 import { MAX_FILE_SIZE } from './consts';
 import { RedisService } from './modules';
 import { ms, StringValue } from './utils';
-import { parseBoolean } from '@/src/utils';
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
@@ -19,16 +19,13 @@ async function bootstrap() {
 	const redis = app.get(RedisService);
 
 	app.use(cookieParser(config.getOrThrow<string>('COOKIE_SECRET')));
-	app.use(
-		graphqlUploadExpress({
-			maxFileSize: MAX_FILE_SIZE,
-		})
-	);
+	app.use(graphqlUploadExpress({
+		maxFileSize: MAX_FILE_SIZE
+}))
 
 	app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
 	const maxAge = ms(config.getOrThrow<StringValue>('SESSION_MAX_AGE'));
-
 	app.use(
 		session({
 			secret: config.getOrThrow<string>('SESSION_SECRET'),
@@ -40,7 +37,7 @@ async function bootstrap() {
 				maxAge,
 				httpOnly: parseBoolean(config.getOrThrow<string>('SESSION_HTTP_ONLY')),
 				secure: parseBoolean(config.getOrThrow<string>('SESSION_SECURE')),
-				sameSite: 'none',
+				sameSite: 'lax',
 			},
 			store: new RedisStore({
 				client: redis.client,
@@ -50,20 +47,7 @@ async function bootstrap() {
 	);
 
 	app.enableCors({
-		origin: (origin, callback) => {
-			if (
-				origin.endsWith('.vercel.app') &&
-				origin.startsWith('https://human-draft')
-			) {
-				return callback(null, true);
-			}
-
-			if (origin === config.getOrThrow<string>('ALLOWED_ORIGIN')) {
-				return callback(null, true);
-			}
-
-			return callback(new Error('Not allowed by CORS'), false);
-		},
+		origin: config.getOrThrow<string>('ALLOWED_ORIGINS').split(','),
 		credentials: true,
 		exposedHeaders: ['set-cookie'],
 	});

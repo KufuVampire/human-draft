@@ -31,7 +31,7 @@ export class AccountService {
 
 	public async signUp(req: Request, input: SignUpInput) {
 		const { email, password, username } = input;
-		console.log(input)
+
 		const isUserExists = await this.userService.findByFields([
 			{ username },
 			{ email },
@@ -53,8 +53,7 @@ export class AccountService {
 			throw new UnprocessableEntityException('Unable to create account');
 		}
 
-		await this.sessionService.signUp(req, newUser);
-		return true;
+		return this.sessionService.signUp(req, newUser);
 	}
 
 	public async signIn(req: Request, input: SignInInput) {
@@ -72,8 +71,7 @@ export class AccountService {
 			throw new UnauthorizedException('Unable to sign in to your account');
 		}
 
-		await this.sessionService.saveSession(req, user);
-		return true;
+		return this.sessionService.saveSession(req, user);
 	}
 
 	public async signOut(req: Request) {
@@ -88,10 +86,14 @@ export class AccountService {
 			include: {
 				blogs: {
 					include: {
-						posts: true,
-					},
+						tags: true
+					}
 				},
-				posts: true,
+				posts: {
+					include: {
+						tags: true
+					}
+				},
 				subscribers: {
 					select: {
 						fromUserId: true,
@@ -110,7 +112,7 @@ export class AccountService {
 		if (!user) {
 			throw new NotFoundException('User not found');
 		}
-
+		
 		return {
 			...user,
 			posts: user.posts ?? [],
@@ -147,10 +149,10 @@ export class AccountService {
 			.webp()
 			.toBuffer();
 
-		await this.storageService.upload(processesBuffer, fileName, 'image/webp');
+		await this.storageService.uploadForProfile(processesBuffer, fileName, 'image/webp');
 
 		const fileUrl = this.storageService.getFileUrl(fileName);
-		return await this.userService.updateUser(user.id, { posterUrl: fileUrl });
+		return this.userService.updateUser(user.id, { posterUrl: fileUrl });
 	}
 
 	public async removePoster(user: UserModel) {
@@ -185,14 +187,14 @@ export class AccountService {
 		}
 
 		const processesBuffer = await sharp(buffer)
-			.resize(950, 250)
+			.resize(170, 170)
 			.webp()
 			.toBuffer();
 
-		await this.storageService.upload(processesBuffer, fileName, 'image/webp');
+		await this.storageService.uploadForProfile(processesBuffer, fileName, 'image/webp');
 
 		const fileUrl = this.storageService.getFileUrl(fileName);
-		return await this.userService.updateUser(user.id, { avatarUrl: fileUrl });
+		return this.userService.updateUser(user.id, { avatarUrl: fileUrl });
 	}
 
 	public async removeAvatar(user: UserModel) {

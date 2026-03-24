@@ -1,43 +1,48 @@
-import { Field, GraphQLISODateTime, ID, ObjectType, Int } from '@nestjs/graphql';
+import {
+	Field,
+	GraphQLISODateTime,
+	ID,
+	Int,
+	ObjectType,
+} from '@nestjs/graphql';
 import GraphQLJSON from 'graphql-type-json';
 
-import { UserModel } from './user.model';
-import { CommentModel } from './comment.model';
 import { BlogModel } from './blog.model';
 import { TagModel } from './tag.model';
+import { UserModel } from './user.model';
 
 @ObjectType()
 export class PostModel {
-  @Field(() => ID)
-  id: string;
+	@Field(() => ID)
+	id: string;
 
-  @Field(() => GraphQLISODateTime)
-  createdAt: Date;
+	@Field(() => GraphQLISODateTime)
+	createdAt: Date;
 
-  @Field(() => GraphQLISODateTime)
-  updatedAt: Date;
+	@Field(() => GraphQLISODateTime)
+	updatedAt: Date;
 
-  @Field(() => GraphQLJSON)
-  content: any;
+	@Field()
+	title: string;
 
-  @Field(() => Int)
-  likesCount: number;
+	@Field(() => GraphQLJSON)
+	content: any;
 
-  @Field(() => Int)
-  viewsCount: number;
+	@Field(() => Int)
+	likesCount: number;
 
-  @Field(() => Int)
-  commentsCount: number;
+	@Field(() => Int)
+	viewsCount: number;
 
-  @Field(() => UserModel)
-  author: UserModel;
+	@Field(() => Int)
+	commentsCount: number;
 
-  @Field(() => BlogModel, { nullable: true })
-  blog?: BlogModel | null;
+	@Field(() => UserModel)
+	author: UserModel;
 
-  @Field(() => [CommentModel])
-  comments: CommentModel[];
+	@Field(() => BlogModel, { nullable: true })
+	blog?: BlogModel | null;
 
-  @Field(() => [TagModel])
-  tags: TagModel[];
+	@Field(() => [TagModel])
+	tags: TagModel[];
 }

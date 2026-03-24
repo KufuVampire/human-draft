@@ -1,20 +1,24 @@
 import { ReactNode } from 'react';
 
-import { fetchMe } from '@/api';
-import { ConfirmationChangesModal, Dashboard } from '@/modules';
+import {
+	ConfirmationChangesModal,
+	ConfirmationDeletionModal,
+	CropperModal,
+	Dashboard,
+	NeedAuthModal,
+} from '@/modules';
 import { Container, Footer, Header, Main } from '@/shared';
 
 import '@/app/globals.css';
 
-export default async function ContentLayout({
+export default function ContentLayout({
 	children,
 }: Readonly<{
 	children: ReactNode;
 }>) {
-	const profile = await fetchMe();
 	return (
 		<>
-			<Header userProfile={profile} />
+			<Header />
 			<Main>
 				<Container className='flex gap-x-4'>
 					<Dashboard />
@@ -22,6 +26,9 @@ export default async function ContentLayout({
 				</Container>
 			</Main>
 			<ConfirmationChangesModal />
+			<ConfirmationDeletionModal />
+			<CropperModal />
+			<NeedAuthModal />
 			<Footer />
 		</>
 	);

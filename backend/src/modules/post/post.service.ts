@@ -5,28 +5,46 @@ import {
 	NotFoundException,
 } from '@nestjs/common';
 
+import { AwsStorageService } from '../aws-storage/aws-storage.service';
 import { PrismaService } from '../prisma/prisma.service';
 
+import { PostWhereInput } from '@/prisma/generated/models';
 import { PAGINATION_PAGE, PAGINATION_PER_PAGE } from '@/src/consts';
 import {
 	CreatePostInput,
+	FiltersInput,
 	SearchParamsInput,
 	UpdatePostInput,
 } from '@/src/inputs';
+import { UserModel } from '@/src/models';
 
 @Injectable()
 export class PostService {
-	constructor(private readonly prismaService: PrismaService) {}
+	constructor(
+		private readonly prismaService: PrismaService,
+		private readonly storage: AwsStorageService
+	) {}
 
 	async create(authorId: string, input: CreatePostInput, blogId?: string) {
+		const { content, title, tags } = input;
+
 		return this.prismaService.post.create({
 			data: {
-				...input,
+				title,
+				content,
 				author: {
 					connect: {
 						id: authorId,
 					},
 				},
+				...(tags && {
+					tags: {
+						connectOrCreate: tags.map((tag) => ({
+							where: { name: tag },
+							create: { name: tag },
+						})),
+					},
+				}),
 				...(blogId && {
 					blog: {
 						connect: { id: blogId },
@@ -43,18 +61,34 @@ export class PostService {
 			},
 		});
 
-		if (!post || post.authorId !== authorId) {
+		if (!post) {
 			throw new NotFoundException('Post not found or you are not the author');
 		}
 
-		return this.prismaService.post.update({
+		const { content, title, tags, likesCount, viewsCount } = input;
+
+		await this.prismaService.post.update({
 			where: {
 				id: postId,
 			},
 			data: {
-				...input,
+				title,
+				content,
+				likesCount,
+				viewsCount,
+				...(tags && {
+					tags: {
+						set: [],
+						connectOrCreate: tags.map((tag) => ({
+							where: { name: tag },
+							create: { name: tag },
+						})),
+					},
+				}),
 			},
 		});
+
+		return true;
 	}
 
 	async delete(authorId: string, postId: string) {
@@ -68,13 +102,30 @@ export class PostService {
 			throw new NotFoundException('Post not found or you are not the author');
 		}
 
+		const removeImages = async (nodes: any[]) => {
+			for (const node of nodes) {
+				if (node.type === 'image' && node.attrs?.src) {
+					await this.storage.remove(node.attrs.src);
+				}
+				if (Array.isArray(node.content)) {
+					await removeImages(node.content);
+				}
+			}
+		};
+
+		if (post.content && typeof post.content === 'object') {
+			if (Array.isArray((post.content as any).content)) {
+				await removeImages((post.content as any).content);
+			} else if (Array.isArray(post.content)) {
+				await removeImages(post.content);
+			}
+		}
+
 		await this.prismaService.post.delete({
 			where: {
 				id: postId,
 			},
 		});
-
-		return true;
 	}
 
 	async pinPostToBlog(authorId: string, postId: string, blogId: string) {
@@ -121,6 +172,10 @@ export class PostService {
 					},
 				},
 			},
+			include: {
+				author: true,
+				tags: true,
+			},
 		});
 	}
 
@@ -149,7 +204,7 @@ export class PostService {
 			throw new NotFoundException('Blog not found');
 		}
 
-		return this.prismaService.post.update({
+		await this.prismaService.post.update({
 			where: {
 				id: postId,
 			},
@@ -161,17 +216,72 @@ export class PostService {
 		});
 	}
 
-	async getAllPosts(searchParams: SearchParamsInput) {
+	async getPostById(id: string) {
+		const post = await this.prismaService.post.findUnique({
+			where: {
+				id,
+			},
+			include: {
+				author: true,
+				blog: true,
+				tags: true,
+				_count: {
+					select: {
+						comments: true,
+					},
+				},
+			},
+		});
+
+		if (!post) {
+			throw new NotFoundException('Post was not found');
+		}
+
+		return {
+			...post,
+			commentsCount: post._count.comments,
+		};
+	}
+
+	async getAllPosts(
+		searchParams: SearchParamsInput,
+		filters?: FiltersInput,
+		user?: UserModel
+	) {
 		const { page = PAGINATION_PAGE, perPage = PAGINATION_PER_PAGE } =
 			searchParams;
 
 		const skip = (page - 1) * perPage;
 
+		const where: PostWhereInput = {
+			...(filters?.search && {
+					title: {
+						contains: filters?.search,
+						mode: 'insensitive',
+					},
+				}),
+			...(filters?.onlySubscriptions &&
+				user && {
+					author: {
+						subscribers: {
+							some: {
+								fromUserId: user.id,
+							},
+						},
+					},
+				}),
+		};
+
 		const [posts, totalCount] = await this.prismaService.$transaction([
 			this.prismaService.post.findMany({
+				where,
 				take: perPage,
 				skip,
 				orderBy: { id: 'asc' },
+				include: {
+					author: true,
+					tags: true,
+				},
 			}),
 			this.prismaService.post.count(),
 		]);
@@ -183,5 +293,22 @@ export class PostService {
 			perPage,
 			totalPages: Math.ceil(totalCount / perPage),
 		};
+	}
+
+	async getAllFreeUserPostsForPin(userId: string, searchStr?: string) {
+		const posts = await this.prismaService.post.findMany({
+			where: {
+				author: {
+					id: userId,
+				},
+				blogId: null,
+				title: {
+					contains: searchStr,
+					mode: 'insensitive',
+				},
+			},
+		});
+
+		return posts;
 	}
 }

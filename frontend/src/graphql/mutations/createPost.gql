@@ -1,0 +1,5 @@
+mutation createPost($data: CreatePostInput!, $blogId: String) {
+	createPost(data: $data, blogId: $blogId) {
+		id
+	}
+}
