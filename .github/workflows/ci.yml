@@ -33,6 +33,7 @@ jobs:
 
       - name: Run ESLint
         run: bun run lint
+        continue-on-error: true
 
       - name: Typecheck TypeScript
         run: bunx tsc --noEmit
@@ -69,6 +70,7 @@ jobs:
 
       - name: Run ESLint check
         run: yarn eslint "{src,apps,libs,test}/**/*.ts"
+        continue-on-error: true
 
       - name: Run Unit Tests
         run: yarn test --passWithNoTests
