@@ -194,7 +194,7 @@ export const CommentItem = ({ comment, className }: Props) => {
 					/>
 				)}
 				{isShowReplies && replies && replies.length > 0 && (
-					<CommentsList data={replies} />
+					<CommentsList data={replies as any} />
 				)}
 				{replies && replies.length > 0 && (
 					<Button

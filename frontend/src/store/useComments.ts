@@ -19,9 +19,7 @@ export const useComments = create<InitialProps>((set, get) => ({
 	getCommentsCount: () => {
 		const { comments } = get();
 
-		const getAllCommentsFlatArr = (
-			comments: GetAllPostCommentsQuery['getAllPostComments']
-		): GetAllPostCommentsQuery['getAllPostComments'] => {
+		const getAllCommentsFlatArr = (comments: any[]): any[] => {
 			return comments.flatMap((comment) => [
 				comment,
 				...(comment.replies ? getAllCommentsFlatArr(comment.replies) : []),
@@ -34,9 +32,7 @@ export const useComments = create<InitialProps>((set, get) => ({
 	deleteComment: (id: string) => {
 		const { comments } = get();
 
-		const removeComment = (
-			commentsList: GetAllPostCommentsQuery['getAllPostComments']
-		): GetAllPostCommentsQuery['getAllPostComments'] => {
+		const removeComment = (commentsList: any[]): any[] => {
 			return commentsList
 				.filter((comment) => comment.id !== id)
 				.map((comment) => ({
@@ -47,14 +43,12 @@ export const useComments = create<InitialProps>((set, get) => ({
 
 		const filteredComments = removeComment(comments);
 
-		set({ comments: filteredComments });
+		set({ comments: filteredComments as GetAllPostCommentsQuery['getAllPostComments'] });
 	},
 	addComment: (comment) => {
 		const { comments } = get();
 
-		const addReply = (
-			commentsList: GetAllPostCommentsQuery['getAllPostComments']
-		): GetAllPostCommentsQuery['getAllPostComments'] => {
+		const addReply = (commentsList: any[]): any[] => {
 			return commentsList.map((c) => {
 				if (c.id === comment.parentId) {
 					return {
@@ -75,7 +69,7 @@ export const useComments = create<InitialProps>((set, get) => ({
 		};
 
 		if (comment.parentId) {
-			set({ comments: addReply(comments) });
+			set({ comments: addReply(comments) as GetAllPostCommentsQuery['getAllPostComments'] });
 			return;
 		}
 
