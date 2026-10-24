@@ -122,12 +122,12 @@ export const PostPage = () => {
 		}
 	}, [blog]);
 
-	const hasViewedRef = useRef(false);
+	const viewedPostIdRef = useRef<string | null>(null);
 
 	useEffect(() => {
-		if (isLoading || hasViewedRef.current) return;
-		hasViewedRef.current = true;
+		if (isLoading || viewedPostIdRef.current === postId) return;
 		const timer = setTimeout(() => {
+			viewedPostIdRef.current = postId;
 			updatePost({
 				variables: {
 					postId,

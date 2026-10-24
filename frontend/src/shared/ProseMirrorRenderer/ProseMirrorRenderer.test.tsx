@@ -6,7 +6,6 @@ import {
 	ProseMirrorRenderer,
 	sanitizeImageUrl,
 	sanitizeLinkUrl,
-	sanitizeUrl,
 } from './ProseMirrorRenderer';
 
 describe('ProseMirrorRenderer (colocated unit tests)', () => {
@@ -164,8 +163,10 @@ describe('ProseMirrorRenderer (colocated unit tests)', () => {
 			);
 		});
 
-		it('Блокирует data:image/svg+xml и javascript: для картинок', () => {
+		it('Блокирует data:image/svg variants и javascript: для картинок', () => {
 			expect(sanitizeImageUrl('data:image/svg+xml;utf8,<svg>')).toBe('#');
+			expect(sanitizeImageUrl('data:image/svg;utf8,<svg>')).toBe('#');
+			expect(sanitizeImageUrl('data:image/svg-xml;utf8,<svg>')).toBe('#');
 			expect(sanitizeImageUrl('javascript:alert(1)')).toBe('#');
 		});
 	});

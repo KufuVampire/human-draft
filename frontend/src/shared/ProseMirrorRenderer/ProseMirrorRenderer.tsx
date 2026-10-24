@@ -41,8 +41,8 @@ export function sanitizeImageUrl(url?: unknown): string {
 	const trimmed = url.trim();
 	const lower = trimmed.toLowerCase();
 
-	// Disallow data:image/svg+xml to prevent SVG XSS inside img tags
-	if (lower.startsWith('data:image/svg+xml')) {
+	// Disallow all data:image/svg variants to prevent SVG XSS inside img tags
+	if (lower.startsWith('data:image/svg')) {
 		return '#';
 	}
 
@@ -59,8 +59,6 @@ export function sanitizeImageUrl(url?: unknown): string {
 
 	return '#';
 }
-
-export const sanitizeUrl = sanitizeLinkUrl;
 
 function applyMarks(
 	element: ReactNode,
@@ -123,7 +121,11 @@ function renderNode(
 
 	if (node.type === 'text') {
 		const textContent = node.text ?? '';
-		return applyMarks(textContent, node.marks, key);
+		return (
+			<Fragment key={key}>
+				{applyMarks(textContent, node.marks, key)}
+			</Fragment>
+		);
 	}
 
 	switch (node.type) {
