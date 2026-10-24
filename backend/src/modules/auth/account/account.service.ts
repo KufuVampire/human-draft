@@ -71,7 +71,7 @@ export class AccountService {
 			throw new UnauthorizedException('Unable to sign in to your account');
 		}
 
-		return this.sessionService.saveSession(req, user as any);
+		return this.sessionService.saveSession(req, user);
 	}
 
 	public async signOut(req: Request) {

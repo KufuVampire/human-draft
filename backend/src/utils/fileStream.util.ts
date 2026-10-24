@@ -29,8 +29,8 @@ export async function readStreamWithLimit(
 		totalBytes += bufferChunk.length;
 
 		if (totalBytes > maxSize) {
-			if (typeof (stream as any).destroy === 'function') {
-				(stream as any).destroy();
+			if (!stream.destroyed) {
+				stream.destroy();
 			}
 			throw new PayloadTooLargeException(
 				`File size exceeds the limit of ${maxSize} bytes`

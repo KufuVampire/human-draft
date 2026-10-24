@@ -6,13 +6,15 @@ import { AuthGuard } from './auth.guard';
 import { UserService } from '../modules/user/user.service';
 
 describe('AuthGuard', () => {
-	const createMockContext = (session: Record<string, any> = {}) => {
-		const req: Record<string, any> = { session };
+	const createMockContext = (session: Record<string, string> = {}) => {
+		const req: { session: Record<string, string>; user?: unknown } = { session };
 		const ctx = {
 			getContext: () => ({ req }),
 		};
 
-		vi.spyOn(GqlExecutionContext, 'create').mockReturnValue(ctx as any);
+		vi.spyOn(GqlExecutionContext, 'create').mockReturnValue(
+			ctx as unknown as GqlExecutionContext
+		);
 
 		return {
 			req,
