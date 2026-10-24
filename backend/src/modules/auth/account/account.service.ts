@@ -10,7 +10,7 @@ import {
 import { hash, verify } from 'argon2';
 import { Request } from 'express';
 import { FileUpload } from 'graphql-upload-ts';
-import * as sharp from 'sharp';
+import sharp from 'sharp';
 
 import { AwsStorageService } from '../../aws-storage/aws-storage.service';
 import { UserService } from '../../user/user.service';
