@@ -1,6 +1,6 @@
 'use client';
 
-import React, { FC, ReactNode, memo } from 'react';
+import { FC, ReactNode, memo, useEffect, useState } from 'react';
 
 import { cn } from '@/utils';
 
@@ -291,6 +291,27 @@ function renderNode(
 	}
 }
 
+function parseDocInput(doc: unknown): {
+	parsed: ProseMirrorNodeJSON | null;
+	raw: string | null;
+} {
+	if (!doc) return { parsed: null, raw: null };
+
+	if (typeof doc === 'string') {
+		try {
+			return { parsed: JSON.parse(doc), raw: null };
+		} catch {
+			return { parsed: null, raw: doc };
+		}
+	}
+
+	if (typeof doc === 'object') {
+		return { parsed: doc as ProseMirrorNodeJSON, raw: null };
+	}
+
+	return { parsed: null, raw: null };
+}
+
 export interface ProseMirrorRendererProps {
 	doc: unknown;
 	className?: string;
@@ -298,25 +319,29 @@ export interface ProseMirrorRendererProps {
 
 export const ProseMirrorRenderer: FC<ProseMirrorRendererProps> = memo(
 	({ doc, className }) => {
+		const [parsedDoc, setParsedDoc] = useState<ProseMirrorNodeJSON | null>(
+			() => parseDocInput(doc).parsed
+		);
+		const [rawText, setRawText] = useState<string | null>(
+			() => parseDocInput(doc).raw
+		);
+
+		useEffect(() => {
+			const { parsed, raw } = parseDocInput(doc);
+			setParsedDoc(parsed);
+			setRawText(raw);
+		}, [doc]);
+
 		if (!doc) return null;
 
-		let parsedDoc: ProseMirrorNodeJSON | null = null;
-
-		if (typeof doc === 'string') {
-			try {
-				parsedDoc = JSON.parse(doc);
-			} catch {
-				// Safe fallback: plain text, no innerHTML
-				return (
-					<div className={cn('prose-mirror-doc', className)}>
-						<p className='leading-relaxed text-[var(--text-color-main)]'>
-							{doc}
-						</p>
-					</div>
-				);
-			}
-		} else if (typeof doc === 'object') {
-			parsedDoc = doc as ProseMirrorNodeJSON;
+		if (rawText) {
+			return (
+				<div className={cn('prose-mirror-doc', className)}>
+					<p className='leading-relaxed text-[var(--text-color-main)]'>
+						{rawText}
+					</p>
+				</div>
+			);
 		}
 
 		if (!parsedDoc) return null;
