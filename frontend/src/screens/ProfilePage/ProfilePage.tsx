@@ -2,8 +2,8 @@
 
 import { EllipsisVertical } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { redirect } from 'next/navigation';
-import { MouseEvent, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { MouseEvent, useEffect, useMemo, useState } from 'react';
 
 import { ProfilePoster } from './ProfilePoster/ProfilePoster';
 import { routesConfig } from '@/config';
@@ -26,6 +26,7 @@ interface Props {
 }
 
 export const ProfilePage = ({ username }: Props) => {
+	const router = useRouter();
 	const [isOpen, setOpen] = useState(false);
 	const {
 		profile,
@@ -173,18 +174,16 @@ export const ProfilePage = ({ username }: Props) => {
 		}
 	};
 
-	if (loading) {
-		return <ProfilePageSkeleton isOwner={isOwner} />;
-	}
-
-	if (!loading && !data) {
-		redirect(routesConfig.notFound);
-	}
-
 	const user = data?.getUserByUsername;
 
-	if (!user) {
-		redirect(routesConfig.notFound);
+	useEffect(() => {
+		if (!loading && (!data || !user)) {
+			router.replace(routesConfig.notFound);
+		}
+	}, [loading, data, user, router]);
+
+	if (loading || !user) {
+		return <ProfilePageSkeleton isOwner={isOwner} />;
 	}
 
 	const userBlogsAndPosts = [...user.posts, ...user.blogs];

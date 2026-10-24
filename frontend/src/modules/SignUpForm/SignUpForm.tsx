@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslations } from 'next-intl';
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -66,6 +66,7 @@ export const SignUpForm = () => {
 		},
 	});
 	const t = useTranslations();
+	const router = useRouter();
 	const setProfile = useProfile((s) => s.setProfile);
 
 	const [signUpMutation, { loading }] = useSignUpMutation({
@@ -73,7 +74,7 @@ export const SignUpForm = () => {
 			if (data) {
 				setProfile(data.signUp);
 				toast.success(t('authPages.signUp.signUpSuccess'));
-				redirect(routesConfig.home);
+				router.push(routesConfig.home);
 			}
 		},
 		onError() {

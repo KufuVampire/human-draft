@@ -4,10 +4,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { ChevronDown, Plus, Search } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
-import { redirect, useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { ChangeEvent, MouseEvent, useEffect, useMemo, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 
+import { routesConfig } from '@/config';
 import {
 	useGetAllFreePostsForPinQuery,
 	useUpdateBlogMutation,
@@ -16,10 +18,9 @@ import { useBlog, useDebounce } from '@/hooks';
 import { TypeUpdateBlogSchema, createBlogSchema } from '@/schemas';
 import { Button, Dropdown, FormField, Section, TagsPicker } from '@/shared';
 import { cn } from '@/utils';
-import { toast } from 'sonner';
-import { routesConfig } from '@/config';
 
 export const UpdateBlogPage = () => {
+	const router = useRouter();
 	const { blogId } = useParams<{ blogId: string }>();
 	const { data, loading: isBlogLoading } = useBlog(blogId);
 	const [tags, setTags] = useState<string[]>([]);
@@ -48,7 +49,7 @@ export const UpdateBlogPage = () => {
 		onCompleted(data) {
 			if (data.updateBlog) {
 				toast.success(t('blogPage.blogUpdatedSuccess'));
-				redirect(routesConfig.blogById(blogId));
+				router.push(routesConfig.blogById(blogId));
 			}
 		},
 	});
@@ -148,7 +149,7 @@ export const UpdateBlogPage = () => {
 			description: blog.description,
 		});
 		setTags(blog.tags.map(({ name }) => name));
-		setPosterUrl(blog.posterUrl)
+		setPosterUrl(blog.posterUrl);
 	}, [data, isBlogLoading, reset]);
 
 	return (
@@ -174,7 +175,7 @@ export const UpdateBlogPage = () => {
 				<label
 					className={cn(
 						'w-full h-full group flex items-center justify-center cursor-pointer',
-						poster || posterUrl &&
+						(poster || posterUrl) &&
 							'absolute inset-0 bg-[rgba(0,0,0,0.4)] group-hover:opacity-100 md:opacity-0 transition-opacity duration-300'
 					)}>
 					<div className='bg-primary rounded-full size-30 flex items-center justify-center p-2.5'>
@@ -240,7 +241,7 @@ export const UpdateBlogPage = () => {
 						</Button>
 					</Dropdown>
 					<Button
-						disabled={!isValid || isUpdating || isDirty}
+						disabled={!isValid || isUpdating || !isDirty}
 						variant={isValid ? 'primary' : 'disabled'}
 						type='submit'
 						className='py-4 w-full rounded-lg md:font-bold md:text-xl uppercase leading-[110%] md:leading-[120%] tracking-[5%] md:tracking-[10%]'>

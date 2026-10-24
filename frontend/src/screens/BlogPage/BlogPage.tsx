@@ -2,7 +2,7 @@
 
 import { ChevronDown, Search, Trash } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { redirect, useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import {
 	ChangeEvent,
 	MouseEvent,
@@ -46,6 +46,7 @@ import { cn } from '@/utils';
 const btnStyles = 'px-3 py-2 leading-[150%] font-bold rounded-lg';
 
 export const BlogPage = memo(() => {
+	const router = useRouter();
 	const { blogId } = useParams<{ blogId: string }>();
 	const [blogPosts, dispatch] = useReducer(blogPostsReducer, []);
 	const [posterFile, setPosterFile] = useState<File | null>(null);
@@ -116,7 +117,7 @@ export const BlogPage = memo(() => {
 	const [deleteBlog] = useDeleteBlogMutation({
 		onCompleted() {
 			toast.success(t('blogPage.blogDeletedSuccess'));
-			redirect(routesConfig.home);
+			router.push(routesConfig.home);
 		},
 		onError(err) {
 			console.error(err);
@@ -198,18 +199,16 @@ export const BlogPage = memo(() => {
 		[blogId, pinPosts, unpinPosts]
 	);
 
-	if (!isBlogLoading && !data) {
-		redirect(routesConfig.notFound);
-	}
+	useEffect(() => {
+		if (!isBlogLoading && (!data || !blog)) {
+			router.replace(routesConfig.notFound);
+		}
+	}, [isBlogLoading, data, blog, router]);
 
-	if (isBlogLoading) {
+	if (isBlogLoading || !blog) {
 		return (
 			<BlogPageSkeleton isOwner={profile?.username === blog?.author.username} />
 		);
-	}
-
-	if (!blog) {
-		redirect(routesConfig.notFound);
 	}
 
 	const handleDeletePost = (e: MouseEvent<HTMLUListElement>) => {
@@ -249,7 +248,6 @@ export const BlogPage = memo(() => {
 
 	const handleChangePoster = (e: ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
-		console.log(e.target.files);
 		if (!file) return;
 		setPosterFile(file);
 		updatePoster({

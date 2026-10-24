@@ -13,10 +13,8 @@ export const AuthProvider = ({ user }: Props) => {
 	const { setProfile, setSubscriptions } = useProfile();
 
 	useEffect(() => {
-		if (user) {
-			setProfile(user);
-			setSubscriptions(user?.subscriptions);
-		}
+		setProfile(user);
+		setSubscriptions(user?.subscriptions ?? []);
 	}, [setProfile, setSubscriptions, user]);
 
 	return null;

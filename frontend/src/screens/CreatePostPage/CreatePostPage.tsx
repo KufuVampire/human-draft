@@ -5,7 +5,7 @@ import { Crepe } from '@milkdown/crepe';
 import { Milkdown, useEditor } from '@milkdown/react';
 import { ChevronDown, Search } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { redirect, useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { MouseEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
@@ -28,6 +28,7 @@ import {
 import { cn, convertImageBlockToImage } from '@/utils';
 
 export const CreatePostPage = () => {
+	const router = useRouter();
 	const { blogId } = useParams<{ blogId?: string }>();
 	const [tags, setTags] = useState<string[]>([]);
 	const [isOpen, setOpen] = useState(false);
@@ -84,7 +85,7 @@ export const CreatePostPage = () => {
 
 	const [createPost, { loading: isPostCreating }] = useCreatePostMutation({
 		onCompleted(data) {
-			redirect(routesConfig.postById(data.createPost.id));
+			router.push(routesConfig.postById(data.createPost.id));
 		},
 	});
 

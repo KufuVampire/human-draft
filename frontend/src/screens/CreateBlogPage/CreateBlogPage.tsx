@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { ChevronDown, Plus, Search } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { ChangeEvent, MouseEvent, useMemo, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
@@ -19,6 +19,7 @@ import { Button, Dropdown, FormField, Section, TagsPicker } from '@/shared';
 import { cn } from '@/utils';
 
 export const CreateBlogPage = () => {
+	const router = useRouter();
 	const [tags, setTags] = useState<string[]>([]);
 	const [poster, setPoster] = useState<File | null>(null);
 	const [postIds, setPostIds] = useState<string[]>([]);
@@ -41,7 +42,7 @@ export const CreateBlogPage = () => {
 
 	const [createBlog, { loading: isCreating }] = useCreateBlogMutation({
 		onCompleted(data) {
-			redirect(routesConfig.blogById(data.createBlog.id));
+			router.push(routesConfig.blogById(data.createBlog.id));
 		},
 		onError(err) {
 			console.error(err);

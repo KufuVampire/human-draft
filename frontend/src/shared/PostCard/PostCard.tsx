@@ -11,7 +11,6 @@ import { UserBadgeWithCreatedAt } from '../UserBadgeWithCreatedAt/UserBadgeWithC
 
 import { routesConfig } from '@/config';
 import { useProfile } from '@/store';
-import { milkdownJsonToHtml } from '@/utils';
 
 interface Props {
 	id: string;
@@ -39,12 +38,23 @@ export const PostCard = ({
 	isBlogPage = false,
 }: Props) => {
 	const { profile } = useProfile();
-	const html = useMemo(() => {
-		const cuttedContent = {
-			...content,
-			content: content.content.slice(0, 2),
+	const previewContent = useMemo(() => {
+		if (!content) return null;
+		let parsed: unknown = content;
+		if (typeof content === 'string') {
+			try {
+				parsed = JSON.parse(content);
+			} catch {
+				return content;
+			}
+		}
+		if (typeof parsed !== 'object' || !parsed) return content;
+		const rawContent = (parsed as { content?: unknown[] }).content;
+		if (!Array.isArray(rawContent)) return parsed;
+		return {
+			...parsed,
+			content: rawContent.slice(0, 2),
 		};
-		return milkdownJsonToHtml(cuttedContent);
 	}, [content]);
 
 	const isOwner = profile?.username === author.username;
@@ -67,7 +77,7 @@ export const PostCard = ({
 							createdAt={createdAt}
 						/>
 					</div>
-					<MilkdownContent content={html} />
+					<MilkdownContent content={previewContent} />
 				</div>
 				{tags && tags.length > 0 && <TagsList tags={tags} />}
 			</div>
