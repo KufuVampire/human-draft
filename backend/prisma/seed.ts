@@ -5,14 +5,18 @@ import { env } from 'prisma/config';
 
 import { PrismaClient } from '@/prisma/generated/client';
 
-const adapter = new PrismaPg({
-	host: env('DATABASE_HOST'),
-	port: env('DATABASE_PORT'),
-	database: env('DATABASE_NAME'),
-	user: env('DATABASE_USERNAME'),
-	password: env('DATABASE_PASSWORD'),
-	schema: 'public',
-});
+const adapter = new PrismaPg(
+	{
+		host: env('DATABASE_HOST'),
+		port: Number(env('DATABASE_PORT')),
+		database: env('DATABASE_NAME'),
+		user: env('DATABASE_USERNAME'),
+		password: env('DATABASE_PASSWORD'),
+	},
+	{
+		schema: 'public',
+	}
+);
 
 const prisma = new PrismaClient({
 	adapter,

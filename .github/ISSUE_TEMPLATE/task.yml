@@ -1,0 +1,85 @@
+name: '📋 Task / Sub-issue'
+description: 'Шаблон рабочей подзадачи или атомарного изменения'
+title: '[STACK-MODULE-ID] Краткое описание результата'
+labels: ['task']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ### Регламент задачи
+        * **Формат заголовка:** `[STACK-MODULE-ID] Краткое описание результата`
+        * **Для подзадачи:** `[STACK-MODULE-ID-1] Описание подзадачи`
+        * **Стеки:** `FRONTEND`, `BACKEND`, `FULLSTACK`.
+        * **Нумерация:** с `01` по нарастающей.
+
+        ### Обязательные плашки (выставить в правой панели Issue):
+        1. `stack:*` (ровно 1): `stack:frontend`, `stack:backend`, `stack:fullstack`
+        2. `type:*` (ровно 1): `type:feature`, `type:bug`, `type:refactor`, `type:test`, `type:docs`, `type:chore`
+        3. `feature:*` (от 1): `feature:auth`, `feature:user`, `feature:post`, `feature:blog`, `feature:comment`, `feature:tag`, `feature:subscription`, `feature:feed`, `feature:search`, `feature:settings`, `feature:call`
+        4. `module:*` (от 1, могут повторяться): `module:ui`, `module:editor`, `module:api`, `module:db`, `module:redis`, `module:storage`, `module:i18n`, `module:theme`, `module:state`, `module:auth`, `module:repo`, `module:infra`, `module:chore`
+
+  - type: input
+    id: parent_feature
+    attributes:
+      label: 'Родительская Feature / Epic'
+      description: 'Ссылка на родительскую Feature Issue (если это Sub-issue)'
+      placeholder: '#123 или https://github.com/.../issues/123'
+    validations:
+      required: false
+
+  - type: textarea
+    id: context
+    attributes:
+      label: '1. Контекст'
+      description: 'Почему требуется изменение и какую проблему оно решает.'
+      placeholder: 'Опишите предысторию, текущее поведение и почему требуется изменение...'
+    validations:
+      required: true
+
+  - type: textarea
+    id: requirements
+    attributes:
+      label: '2. Требуется'
+      description: 'Что конкретно необходимо реализовать.'
+      placeholder: |
+        - Добавить мутацию...
+        - Создать компонент...
+        - Настроить валидацию...
+    validations:
+      required: true
+
+  - type: textarea
+    id: contracts
+    attributes:
+      label: '3. API / Контракт'
+      description: 'Изменения в GraphQL / REST API, типах, схеме БД или интерфейсах.'
+      placeholder: |
+        - Query / Mutation:
+        - Arguments:
+        - Response:
+        - Error codes:
+    validations:
+      required: false
+
+  - type: textarea
+    id: constraints
+    attributes:
+      label: '4. Проверки и ограничения'
+      description: 'Бизнес-правила, ограничения доступа, валидация полей, исключения.'
+      placeholder: |
+        - Доступ разрешен только автору ресурса.
+        - Максимальный размер файла 5 МБ.
+    validations:
+      required: false
+
+  - type: textarea
+    id: acceptance_criteria
+    attributes:
+      label: '5. Критерии приёмки (Acceptance Criteria)'
+      description: 'Наблюдаемые условия, при выполнении которых задача считается сделанной.'
+      placeholder: |
+        - [ ] При успешном выполнении возвращается статус 200 / объект модели.
+        - [ ] Ошибочные данные возвращают валидный код ошибки.
+        - [ ] Изменения отображаются в UI без ручной перезагрузки.
+    validations:
+      required: true

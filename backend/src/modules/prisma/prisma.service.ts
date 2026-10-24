@@ -8,14 +8,18 @@ import { PrismaClient } from '@/prisma/generated/client';
 export class PrismaService extends PrismaClient {
 	constructor(configService: ConfigService) {
 		super({
-			adapter: new PrismaPg({
-				host: configService.getOrThrow<string>('DATABASE_HOST'),
-				port: configService.getOrThrow<number>('DATABASE_PORT'),
-				database: configService.getOrThrow<string>('DATABASE_NAME'),
-				user: configService.getOrThrow<string>('DATABASE_USERNAME'),
-				password: configService.getOrThrow<string>('DATABASE_PASSWORD'),
-				schema: 'public',
-			}),
+			adapter: new PrismaPg(
+				{
+					host: configService.getOrThrow<string>('DATABASE_HOST'),
+					port: configService.getOrThrow<number>('DATABASE_PORT'),
+					database: configService.getOrThrow<string>('DATABASE_NAME'),
+					user: configService.getOrThrow<string>('DATABASE_USERNAME'),
+					password: configService.getOrThrow<string>('DATABASE_PASSWORD'),
+				},
+				{
+					schema: 'public',
+				}
+			),
 		});
 	}
 }

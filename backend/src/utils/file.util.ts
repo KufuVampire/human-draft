@@ -18,8 +18,10 @@ export async function validateFileSize(
 		let fileSizeInBytes = 0;
 
 		fileStream
-			.on('data', (data: Buffer) => {
-				fileSizeInBytes = data.byteLength;
+			.on('data', (data: Buffer | string) => {
+				fileSizeInBytes = Buffer.isBuffer(data)
+					? data.byteLength
+					: Buffer.byteLength(data);
 			})
 			.on('end', () => {
 				resolve(fileSizeInBytes <= allowFileSizeInBytes);

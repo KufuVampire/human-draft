@@ -2,11 +2,11 @@ import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { RedisStore } from 'connect-redis';
-import * as cookieParser from 'cookie-parser';
-import * as session from 'express-session';
+import cookieParser from 'cookie-parser';
+import session from 'express-session';
+import { graphqlUploadExpress } from 'graphql-upload-ts';
 
 import { parseBoolean } from '@/src/utils';
-import { graphqlUploadExpress } from 'graphql-upload-ts';
 import { AppModule } from './app.module';
 import { MAX_FILE_SIZE } from './consts';
 import { RedisService } from './modules';
@@ -19,9 +19,11 @@ async function bootstrap() {
 	const redis = app.get(RedisService);
 
 	app.use(cookieParser(config.getOrThrow<string>('COOKIE_SECRET')));
-	app.use(graphqlUploadExpress({
-		maxFileSize: MAX_FILE_SIZE
-}))
+	app.use(
+		graphqlUploadExpress({
+			maxFileSize: MAX_FILE_SIZE,
+		})
+	);
 
 	app.useGlobalPipes(new ValidationPipe({ transform: true }));
 

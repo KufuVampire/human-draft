@@ -1,0 +1,7 @@
+# Global code ownership - single repository owner and developer
+* @KufuVampire
+
+/docs/ @KufuVampire
+/.github/ @KufuVampire
+/frontend/ @KufuVampire
+/backend/ @KufuVampire
