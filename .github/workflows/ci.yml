@@ -33,15 +33,12 @@ jobs:
 
       - name: Run ESLint
         run: bun run lint
-        continue-on-error: true
 
       - name: Typecheck TypeScript
         run: bunx tsc --noEmit
-        continue-on-error: true
 
       - name: Build Next.js application
         run: bun run build
-        continue-on-error: true
         env:
           NEXT_PUBLIC_SERVER_URL: ${{ secrets.NEXT_PUBLIC_SERVER_URL || 'http://localhost:4001/graphql' }}
 
@@ -72,7 +69,6 @@ jobs:
 
       - name: Run ESLint check
         run: yarn eslint "{src,apps,libs,test}/**/*.ts"
-        continue-on-error: true
 
       - name: Run Unit Tests
         run: yarn test --passWithNoTests

@@ -7,7 +7,6 @@ import {
 } from '@aws-sdk/client-s3';
 import {
 	BadRequestException,
-	ConflictException,
 	Injectable,
 	UnsupportedMediaTypeException,
 } from '@nestjs/common';

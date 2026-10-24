@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 type ObserverRect = Omit<DOMRectReadOnly, 'toJSON'>;
 
@@ -23,57 +23,52 @@ export function useResizeObserver<T extends HTMLElement = HTMLDivElement>(
 
 	const [rect, setRect] = useState<ObserverRect>(defaultState);
 
-	const observer = useMemo(
-		() =>
-			typeof window !== 'undefined'
-				? new ResizeObserver((entries) => {
-						const entry = entries[0];
-
-						if (entry) {
-							cancelAnimationFrame(frameID.current);
-
-							frameID.current = requestAnimationFrame(() => {
-								if (ref.current) {
-									const boxSize =
-										entry.borderBoxSize?.[0] || entry.contentBoxSize?.[0];
-									if (boxSize) {
-										const width = boxSize.inlineSize;
-										const height = boxSize.blockSize;
-
-										setRect({
-											width,
-											height,
-											x: entry.contentRect.x,
-											y: entry.contentRect.y,
-											top: entry.contentRect.top,
-											left: entry.contentRect.left,
-											bottom: entry.contentRect.bottom,
-											right: entry.contentRect.right,
-										});
-									} else {
-										setRect(entry.contentRect);
-									}
-								}
-							});
-						}
-					})
-				: null,
-		[]
-	);
-
 	useEffect(() => {
-		if (ref.current) {
-			observer?.observe(ref.current, options);
-		}
+		const target = ref.current;
+		if (typeof window === 'undefined' || !target) return;
+
+		const observer = new ResizeObserver((entries) => {
+			const entry = entries[0];
+
+			if (entry) {
+				cancelAnimationFrame(frameID.current);
+
+				frameID.current = requestAnimationFrame(() => {
+					if (ref.current) {
+						const boxSize =
+							entry.borderBoxSize?.[0] || entry.contentBoxSize?.[0];
+						if (boxSize) {
+							const width = boxSize.inlineSize;
+							const height = boxSize.blockSize;
+
+							setRect({
+								width,
+								height,
+								x: entry.contentRect.x,
+								y: entry.contentRect.y,
+								top: entry.contentRect.top,
+								left: entry.contentRect.left,
+								bottom: entry.contentRect.bottom,
+								right: entry.contentRect.right,
+							});
+						} else {
+							setRect(entry.contentRect);
+						}
+					}
+				});
+			}
+		});
+
+		observer.observe(target, options);
 
 		return () => {
-			observer?.disconnect();
+			observer.disconnect();
 
 			if (frameID.current) {
 				cancelAnimationFrame(frameID.current);
 			}
 		};
-	}, [observer, options]);
+	}, [options]);
 
 	return [ref, rect] as const;
 }
