@@ -1,5 +1,4 @@
 import {
-	type ArgumentMetadata,
 	BadRequestException,
 	Injectable,
 	PipeTransform,
@@ -11,7 +10,7 @@ import { validateFileFormat, validateFileSize } from '../utils';
 
 @Injectable()
 export class FileValidationPipe implements PipeTransform {
-	public async transform(value: any, metadata: ArgumentMetadata) {
+	public async transform(value: any) {
 		if (!value) return null;
 		
 		if (!value.filename) {
