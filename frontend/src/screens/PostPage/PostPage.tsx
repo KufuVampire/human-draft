@@ -2,7 +2,7 @@
 
 import { ChevronDown, Eye, Heart, MessageSquare, Search } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { redirect, useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import {
 	MouseEvent,
 	lazy,
@@ -61,6 +61,7 @@ const CommentsLazy = lazy(() => import('@/modules/Comments/Comments'));
 
 export const PostPage = () => {
 	const t = useTranslations();
+	const router = useRouter();
 	const { postId } = useParams<{ postId: string }>();
 	const { profile, isAuth } = useProfile();
 	const [likedAt, setLikedAt] = useLocalStorage<ILikedAt[]>(`likedAt`, []);
@@ -77,6 +78,7 @@ export const PostPage = () => {
 	const {
 		isLoading,
 		content,
+		title,
 		author,
 		createdAt,
 		tags,
@@ -93,7 +95,7 @@ export const PostPage = () => {
 	const [deletePost] = useDeletePostMutation({
 		onCompleted() {
 			toast.success(t('postPage.postDeletedSuccess'));
-			redirect(routesConfig.home);
+			router.push(routesConfig.home);
 		},
 	});
 	const [updatePost, { loading: isUpdating }] = useUpdatePostMutation({
@@ -132,7 +134,7 @@ export const PostPage = () => {
 			});
 		}, 10000);
 		return () => clearTimeout(timer);
-	}, [isLoading]);
+	}, [isLoading, postId, updatePost, viewsCount]);
 
 	const searchStr = useDebounce(watch('search'));
 
@@ -257,7 +259,7 @@ export const PostPage = () => {
 	);
 
 	if (isLoading) {
-		return;
+		return null;
 	}
 
 	return (
@@ -316,6 +318,11 @@ export const PostPage = () => {
 						</div>
 					)}
 				</div>
+				{title && (
+					<h1 className='font-title font-bold leading-[110%] text-4xl md:text-5xl mb-6'>
+						{title}
+					</h1>
+				)}
 				<MilkdownContent
 					content={content}
 					className='border-b border-primary pb-6'
@@ -343,7 +350,6 @@ export const PostPage = () => {
 										likedAtObj?.isLiked &&
 											!isLikeExpired(likedAtObj.date) &&
 											likedAtObj.userId === profile?.id &&
-											likedAtObj.postId === postId &&
 											'stroke-red-500 fill-red-500'
 									)}
 								/>

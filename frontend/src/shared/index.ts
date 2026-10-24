@@ -24,6 +24,7 @@ export { Modal } from './Modal/Modal';
 export { Navigation } from './Navigation/Navigation';
 export { PostCard } from './PostCard/PostCard';
 export { PostsAndBlogsList } from './PostsAndBlogsList/PostsAndBlogsList';
+export { ProseMirrorRenderer } from './ProseMirrorRenderer';
 export { Section } from './Section/Section';
 export { BlogPageSkeleton } from './Skeletons/pages/BlogPageSkeleton';
 export { ProfilePageSkeleton } from './Skeletons/pages/ProfilePageSkeleton';
@@ -37,4 +38,3 @@ export { UnsubscribeButton } from './UnsubscribeButton/UnsubscribeButton';
 export { UserAvatar } from './UserAvatar/UserAvatar';
 export { UserBadge } from './UserBadge/UserBadge';
 export { UserBadgeWithCreatedAt } from './UserBadgeWithCreatedAt/UserBadgeWithCreatedAt';
-

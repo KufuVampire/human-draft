@@ -12,8 +12,9 @@ const schema = new Schema({
 	marks: basicSchema.spec.marks,
 });
 
-export function milkdownJsonToHtml(json: unknown, title?: string) {
+export function milkdownJsonToHtml(json: unknown) {
 	if (!json || typeof json !== 'object') return '';
+	if (typeof document === 'undefined') return '';
 
 	let doc: Node;
 	try {
@@ -26,10 +27,6 @@ export function milkdownJsonToHtml(json: unknown, title?: string) {
 	const fragment = serializer.serializeFragment(doc.content);
 	const div = document.createElement('div');
 	div.appendChild(fragment);
-
-	if (title) {
-		return `<h1 class='font-title font-bold leading-[110%] text-4xl md:text-5xl'>${title}</h1>${div.innerHTML}`;
-	}
 
 	return div.innerHTML;
 }

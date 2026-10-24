@@ -2,26 +2,24 @@
 
 import { memo } from 'react';
 
+import { ProseMirrorRenderer } from '../ProseMirrorRenderer';
 import { cn } from '@/utils';
 
 interface Props {
-	content: string;
+	content: unknown;
 	className?: string;
 }
 
 export const MilkdownContent = memo(
 	({ content, className }: Props) => {
 		return (
-			<div
-				className={cn(
-					'milkdown-content',
-					className
-				)}
-				dangerouslySetInnerHTML={{ __html: content }}
+			<ProseMirrorRenderer
+				doc={content}
+				className={cn('milkdown-content', className)}
 			/>
 		);
 	},
-	(prev, next) => prev.content === next.content
+	(prev, next) => prev.content === next.content && prev.className === next.className
 );
 
 MilkdownContent.displayName = 'MilkdownContent';

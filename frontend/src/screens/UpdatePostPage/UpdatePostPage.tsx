@@ -4,7 +4,7 @@ import { editorViewCtx } from '@milkdown/core';
 import { Crepe } from '@milkdown/crepe';
 import { Milkdown, useEditor } from '@milkdown/react';
 import { useTranslations } from 'next-intl';
-import { redirect, useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -19,6 +19,7 @@ import { convertImageBlockToImage, convertImageToImageBlock } from '@/utils';
 
 export const UpdatePostPage = () => {
 	const t = useTranslations();
+	const router = useRouter();
 	const [isContentLoaded, setIsContentLoaded] = useState(false);
 	const { postId } = useParams<{ postId: string }>();
 	const { title, rawContent, tags: postTags } = usePost(postId);
@@ -59,7 +60,7 @@ export const UpdatePostPage = () => {
 		onCompleted(data) {
 			if (data.updatePost) {
 				toast.success(t('postPage.postUpdatedSuccess'));
-				redirect(routesConfig.postById(postId));
+				router.push(routesConfig.postById(postId));
 			}
 		},
 	});
@@ -73,7 +74,7 @@ export const UpdatePostPage = () => {
 		if (title) {
 			reset({ title });
 		}
-	}, [title]);
+	}, [title, postTags, reset]);
 
 	useEffect(() => {
 		if (!rawContent || loading || isContentLoaded) return;
@@ -93,7 +94,7 @@ export const UpdatePostPage = () => {
 		});
 
 		setIsContentLoaded(true);
-	}, [rawContent, loading]);
+	}, [rawContent, loading, isContentLoaded, get]);
 
 	const onSubmit: SubmitHandler<TypeUpdatePostSchema> = async (data, e) => {
 		e?.preventDefault();

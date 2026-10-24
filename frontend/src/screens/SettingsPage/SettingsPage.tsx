@@ -3,7 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Camera } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { RedirectType, redirect, useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useId } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -54,6 +54,7 @@ const fieldItems: IField<TypeUpdateProfileSchema>[] = [
 
 export const SettingsPage = () => {
 	const t = useTranslations();
+	const router = useRouter();
 	const { username } = useParams();
 	const {
 		profile,
@@ -120,10 +121,7 @@ export const SettingsPage = () => {
 			});
 			setOpen(false);
 			updateProfile(data);
-			redirect(
-				`/${data.username}/${routesConfig.settings}`,
-				RedirectType.replace
-			);
+			router.replace(`/${data.username}/${routesConfig.settings}`);
 		});
 		setOpen(true);
 	};

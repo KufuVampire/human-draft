@@ -2,7 +2,6 @@ import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 import { routesConfig } from '@/config';
-import { AuthGuard } from '@/guards';
 import { ProfilePage } from '@/screens';
 
 interface Params {
@@ -35,9 +34,5 @@ export default async function Profile({ params }: Params) {
 		redirect(routesConfig.notFound);
 	}
 
-	return (
-		<AuthGuard>
-			<ProfilePage username={username} />
-		</AuthGuard>
-	);
+	return <ProfilePage username={username} />;
 }
