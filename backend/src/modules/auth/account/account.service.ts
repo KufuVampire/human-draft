@@ -5,7 +5,6 @@ import {
 	NotFoundException,
 	UnauthorizedException,
 	UnprocessableEntityException,
-	UnsupportedMediaTypeException,
 } from '@nestjs/common';
 import { hash, verify } from 'argon2';
 import { Request } from 'express';
@@ -19,6 +18,7 @@ import { SessionService } from '../session/session.service';
 import { SignInInput, SignUpInput } from '@/src/inputs';
 import { UserModel } from '@/src/models';
 import { PrismaService } from '@/src/modules/prisma/prisma.service';
+import { readStreamWithLimit, validateNoGif } from '@/src/utils';
 
 @Injectable()
 export class AccountService {
@@ -59,7 +59,7 @@ export class AccountService {
 	public async signIn(req: Request, input: SignInInput) {
 		const { password, username } = input;
 
-		const user = await this.userService.findByUsername(username);
+		const user = await this.userService.findForAuth(username);
 
 		if (!user) {
 			throw new NotFoundException('This username does not exist.');
@@ -86,13 +86,13 @@ export class AccountService {
 			include: {
 				blogs: {
 					include: {
-						tags: true
-					}
+						tags: true,
+					},
 				},
 				posts: {
 					include: {
-						tags: true
-					}
+						tags: true,
+					},
 				},
 				subscribers: {
 					select: {
@@ -112,7 +112,7 @@ export class AccountService {
 		if (!user) {
 			throw new NotFoundException('User not found');
 		}
-		
+
 		return {
 			...user,
 			posts: user.posts ?? [],
@@ -123,85 +123,89 @@ export class AccountService {
 	}
 
 	public async changePoster(user: UserModel, file: FileUpload) {
-		if (user.posterUrl) {
-			await this.storageService.remove(`users/${user.id}-poster.webp`);
-		}
-
 		if (!file) {
 			throw new BadRequestException('The file was not transferred');
 		}
 
-		const chunks: Buffer[] = [];
+		validateNoGif(file.filename, file.mimetype);
 
-		for await (const chunk of file.createReadStream()) {
-			chunks.push(chunk);
-		}
-
-		const buffer = Buffer.concat(chunks);
+		const buffer = await readStreamWithLimit(file.createReadStream());
 
 		const fileName = `users/${user.id}-poster.webp`;
-		if (file.filename && file.filename.startsWith('.gif')) {
-			throw new UnsupportedMediaTypeException('Unsupported file type');
-		}
 
 		const processesBuffer = await sharp(buffer)
 			.resize(950, 250)
 			.webp()
 			.toBuffer();
 
-		await this.storageService.uploadForProfile(processesBuffer, fileName, 'image/webp');
+		await this.storageService.uploadForProfile(
+			processesBuffer,
+			fileName,
+			'image/webp'
+		);
 
+		const oldPosterUrl = user.posterUrl;
 		const fileUrl = this.storageService.getFileUrl(fileName);
-		return this.userService.updateUser(user.id, { posterUrl: fileUrl });
+		const updatedUser = await this.userService.updateUser(user.id, {
+			posterUrl: fileUrl,
+		});
+
+		if (oldPosterUrl && oldPosterUrl !== fileUrl) {
+			await this.storageService.remove(oldPosterUrl);
+		}
+
+		return updatedUser;
 	}
 
 	public async removePoster(user: UserModel) {
 		if (!user.posterUrl) {
 			return;
 		}
-		await this.storageService.remove(`users/${user.id}-poster.webp`);
+		await this.storageService.remove(user.posterUrl);
 
 		return await this.userService.updateUser(user.id, { posterUrl: null });
 	}
 
 	public async changeAvatar(user: UserModel, file: FileUpload) {
-		if (user.avatarUrl) {
-			await this.storageService.remove(`users/${user.id}-avatar.webp`);
-		}
-
 		if (!file) {
 			throw new BadRequestException('The file was not transferred');
 		}
 
-		const chunks: Buffer[] = [];
+		validateNoGif(file.filename, file.mimetype);
 
-		for await (const chunk of file.createReadStream()) {
-			chunks.push(chunk);
-		}
-
-		const buffer = Buffer.concat(chunks);
+		const buffer = await readStreamWithLimit(file.createReadStream());
 
 		const fileName = `users/${user.id}-avatar.webp`;
-		if (file.filename && file.filename.startsWith('.gif')) {
-			throw new UnsupportedMediaTypeException('Unsupported file type');
-		}
 
 		const processesBuffer = await sharp(buffer)
 			.resize(170, 170)
 			.webp()
 			.toBuffer();
 
-		await this.storageService.uploadForProfile(processesBuffer, fileName, 'image/webp');
+		await this.storageService.uploadForProfile(
+			processesBuffer,
+			fileName,
+			'image/webp'
+		);
 
+		const oldAvatarUrl = user.avatarUrl;
 		const fileUrl = this.storageService.getFileUrl(fileName);
-		return this.userService.updateUser(user.id, { avatarUrl: fileUrl });
+		const updatedUser = await this.userService.updateUser(user.id, {
+			avatarUrl: fileUrl,
+		});
+
+		if (oldAvatarUrl && oldAvatarUrl !== fileUrl) {
+			await this.storageService.remove(oldAvatarUrl);
+		}
+
+		return updatedUser;
 	}
 
 	public async removeAvatar(user: UserModel) {
 		if (!user.avatarUrl) {
 			return;
 		}
-		await this.storageService.remove(`users/${user.id}-avatar.webp`);
+		await this.storageService.remove(user.avatarUrl);
 
 		return await this.userService.updateUser(user.id, { avatarUrl: null });
 	}

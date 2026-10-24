@@ -1,7 +1,12 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+	ConflictException,
+	Injectable,
+	NotFoundException,
+} from '@nestjs/common';
 
 import { PrismaService } from '../prisma/prisma.service';
 
+import { Prisma } from '@/prisma/generated/client';
 import { PAGINATION_PAGE, PAGINATION_PER_PAGE } from '@/src/consts';
 import { SearchParamsInput } from '@/src/inputs';
 import { UpdateUserModel } from '@/src/types';
@@ -19,13 +24,13 @@ export class UserService {
 				blogs: {
 					include: {
 						author: true,
-						tags: true
-					}
+						tags: true,
+					},
 				},
 				posts: {
 					include: {
 						author: true,
-						tags: true
+						tags: true,
 					},
 				},
 				subscribers: {
@@ -53,6 +58,47 @@ export class UserService {
 			blogs: user.blogs ?? [],
 			subscribers: user.subscribers.map((s) => s.fromUserId),
 			subscriptions: user.subscriptions.map((s) => s.toUserId),
+		};
+	}
+
+	public async findForAuth(username: string) {
+		const user = await this.prismaService.user.findUnique({
+			where: {
+				username,
+			},
+			select: {
+				id: true,
+				username: true,
+				email: true,
+				password: true,
+				description: true,
+				avatarUrl: true,
+				posterUrl: true,
+				createdAt: true,
+				updatedAt: true,
+				subscribers: {
+					select: {
+						fromUserId: true,
+					},
+				},
+				subscriptions: {
+					select: {
+						toUserId: true,
+					},
+				},
+			},
+		});
+
+		if (!user) {
+			return null;
+		}
+
+		return {
+			...user,
+			subscribers: user.subscribers.map((s) => s.fromUserId),
+			subscriptions: user.subscriptions.map((s) => s.toUserId),
+			blogs: [],
+			posts: [],
 		};
 	}
 
@@ -107,16 +153,26 @@ export class UserService {
 	}
 
 	public async updateUser(id: string, data: UpdateUserModel) {
-		const updatedUser = await this.prismaService.user.update({
-			where: {
-				id,
-			},
-			data: {
-				...data,
-			},
-		});
+		try {
+			const updatedUser = await this.prismaService.user.update({
+				where: {
+					id,
+				},
+				data: {
+					...data,
+				},
+			});
 
-		return updatedUser;
+			return updatedUser;
+		} catch (error) {
+			if (
+				error instanceof Prisma.PrismaClientKnownRequestError &&
+				error.code === 'P2002'
+			) {
+				throw new ConflictException('Username or email is already taken');
+			}
+			throw error;
+		}
 	}
 
 	public async getAllUsers(params: {

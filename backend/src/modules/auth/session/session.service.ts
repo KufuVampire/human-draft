@@ -2,16 +2,13 @@ import {
 	Injectable,
 	InternalServerErrorException,
 	NotFoundException,
-	UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { verify } from 'argon2';
 import type { Request } from 'express';
 
 import { UserService } from '../../user/user.service';
 
-import { UserModel } from '@/prisma/generated/models';
-import { SignInInput, SignUpInput } from '@/src/inputs';
+import { SignUpInput } from '@/src/inputs';
 
 @Injectable()
 export class SessionService {
@@ -19,24 +16,6 @@ export class SessionService {
 		private readonly configService: ConfigService,
 		private readonly userService: UserService
 	) {}
-
-	public async signIn(req: Request, input: SignInInput) {
-		const { password, username } = input;
-
-		const user = await this.userService.findByUsername(username);
-
-		if (!user) {
-			throw new NotFoundException('User not found');
-		}
-
-		const isValisPassword = await verify(user.password, password);
-
-		if (!isValisPassword) {
-			throw new UnauthorizedException('Password not valid');
-		}
-
-		return this.saveSession(req, user);
-	}
 
 	public async signUp(req: Request, input: SignUpInput) {
 		const { email, username } = input;
@@ -61,8 +40,11 @@ export class SessionService {
 		return this.destroySession(req);
 	}
 
-	public async saveSession(req: Request, user: UserModel) {
-		return new Promise((resolve, reject) => {
+	public async saveSession<T extends { id: string }>(
+		req: Request,
+		user: T
+	): Promise<T> {
+		return new Promise<T>((resolve, reject) => {
 			req.session.createdAt = new Date().toISOString();
 			req.session.userId = user.id;
 

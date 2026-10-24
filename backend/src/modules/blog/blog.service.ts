@@ -3,7 +3,6 @@ import {
 	ConflictException,
 	Injectable,
 	NotFoundException,
-	UnsupportedMediaTypeException,
 } from '@nestjs/common';
 import { FileUpload } from 'graphql-upload-ts';
 import sharp from 'sharp';
@@ -21,6 +20,7 @@ import {
 	UpdateBlogInput,
 } from '@/src/inputs';
 import { UserModel } from '@/src/models';
+import { readStreamWithLimit, validateNoGif } from '@/src/utils';
 
 @Injectable()
 export class BlogService {
@@ -71,17 +71,11 @@ export class BlogService {
 		if (!posterFile) {
 			return blog;
 		}
-		const chunks: Buffer[] = [];
 
-		for await (const chunk of posterFile.createReadStream()) {
-			chunks.push(chunk);
-		}
+		validateNoGif(posterFile.filename, posterFile.mimetype);
 
-		const buffer = Buffer.concat(chunks);
+		const buffer = await readStreamWithLimit(posterFile.createReadStream());
 		const fileName = `blogs/${blog.id}-poster.webp`;
-		if (posterFile.filename && posterFile.filename.startsWith('.gif')) {
-			throw new UnsupportedMediaTypeException('Unsupported file type');
-		}
 
 		const processesBuffer = await sharp(buffer)
 			.resize(950, 330)
@@ -140,17 +134,10 @@ export class BlogService {
 			return true;
 		}
 
-		const chunks: Buffer[] = [];
+		validateNoGif(posterFile.filename, posterFile.mimetype);
 
-		for await (const chunk of posterFile.createReadStream()) {
-			chunks.push(chunk);
-		}
-
-		const buffer = Buffer.concat(chunks);
+		const buffer = await readStreamWithLimit(posterFile.createReadStream());
 		const fileName = `blogs/${blog.id}-poster.webp`;
-		if (posterFile.filename && posterFile.filename.startsWith('.gif')) {
-			throw new UnsupportedMediaTypeException('Unsupported file type');
-		}
 
 		const processesBuffer = await sharp(buffer)
 			.resize(950, 330)
@@ -310,26 +297,15 @@ export class BlogService {
 			throw new NotFoundException('Blog was not found');
 		}
 
-		if (blog.posterUrl) {
-			await this.storageService.remove(`blogs/${blog.id}-poster.webp`);
-		}
-
 		if (!newPoster) {
 			throw new BadRequestException('The file was not transferred');
 		}
 
-		const chunks: Buffer[] = [];
+		validateNoGif(newPoster.filename, newPoster.mimetype);
 
-		for await (const chunk of newPoster.createReadStream()) {
-			chunks.push(chunk);
-		}
-
-		const buffer = Buffer.concat(chunks);
+		const buffer = await readStreamWithLimit(newPoster.createReadStream());
 
 		const newPosterKey = `blogs/${blog.id}-poster.webp`;
-		if (newPoster.filename && newPoster.filename.startsWith('.gif')) {
-			throw new UnsupportedMediaTypeException('Unsupported file type');
-		}
 
 		const processesBuffer = await sharp(buffer)
 			.resize(950, 330)
@@ -342,6 +318,7 @@ export class BlogService {
 			'image/webp'
 		);
 
+		const oldPosterUrl = blog.posterUrl;
 		const newPosterUrl = this.storageService.getFileUrl(newPosterKey);
 		await this.prismaService.blog.update({
 			where: {
@@ -351,6 +328,10 @@ export class BlogService {
 				posterUrl: newPosterUrl,
 			},
 		});
+
+		if (oldPosterUrl && oldPosterUrl !== newPosterUrl) {
+			await this.storageService.remove(oldPosterUrl);
+		}
 
 		return true;
 	}
@@ -369,7 +350,10 @@ export class BlogService {
 			throw new NotFoundException('Blog was not found');
 		}
 
-		await this.storageService.remove(`blogs/${blog.id}-poster.webp`);
+		if (blog.posterUrl) {
+			await this.storageService.remove(blog.posterUrl);
+		}
+
 		await this.prismaService.blog.update({
 			where: {
 				id: blogId,
