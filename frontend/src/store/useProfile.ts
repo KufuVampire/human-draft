@@ -4,15 +4,20 @@ import { create } from 'zustand';
 
 import { UserModel } from '@/graphql/generated/output';
 
+export type ProfileUser = Omit<UserModel, 'blogs' | 'posts'> & {
+	blogs?: UserModel['blogs'];
+	posts?: UserModel['posts'];
+};
+
 interface ProfileState {
 	isAuth: boolean;
 	isLoading: boolean;
-	profile: UserModel | null;
-	setProfile: (profile: UserModel | null) => void;
+	profile: ProfileUser | null;
+	setProfile: (profile: ProfileUser | null) => void;
 	setLoading: (isLoading: boolean) => void;
 	setAuth: (isAuth: boolean) => void;
 	logout: () => void;
-	updateProfile: (profile: Partial<UserModel> | null) => void;
+	updateProfile: (profile: Partial<ProfileUser> | null) => void;
 }
 
 export const useProfile = create<ProfileState>((set, get) => ({
@@ -35,4 +40,4 @@ export const useProfile = create<ProfileState>((set, get) => ({
 			isAuth: false,
 			isLoading: false,
 		}),
-}));
+	}));

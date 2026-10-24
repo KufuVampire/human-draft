@@ -1,0 +1,15 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: human-draft-app
+    restart: always
+    env_file:
+      - ./backend/.env
+      - ./frontend/.env
+    ports:
+      - "${APPLICATION_PORT}:4000"
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
