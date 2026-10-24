@@ -32,6 +32,11 @@ describe('AwsStorageService', () => {
 			expect(service.extractKey(url)).toBe('users/456-avatar.webp');
 		});
 
+		it('Отсекает имя бакета в path-style URL', () => {
+			const url = 'https://s3.amazonaws.com/test-bucket/posts/image-789.webp';
+			expect(service.extractKey(url)).toBe('posts/image-789.webp');
+		});
+
 		it('Удаляет ведущие слэши из относительного пути', () => {
 			expect(service.extractKey('/blogs/blog-1-poster.webp')).toBe(
 				'blogs/blog-1-poster.webp'

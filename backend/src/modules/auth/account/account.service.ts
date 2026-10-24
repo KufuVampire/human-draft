@@ -123,10 +123,6 @@ export class AccountService {
 	}
 
 	public async changePoster(user: UserModel, file: FileUpload) {
-		if (user.posterUrl) {
-			await this.storageService.remove(user.posterUrl);
-		}
-
 		if (!file) {
 			throw new BadRequestException('The file was not transferred');
 		}
@@ -148,8 +144,17 @@ export class AccountService {
 			'image/webp'
 		);
 
+		const oldPosterUrl = user.posterUrl;
 		const fileUrl = this.storageService.getFileUrl(fileName);
-		return this.userService.updateUser(user.id, { posterUrl: fileUrl });
+		const updatedUser = await this.userService.updateUser(user.id, {
+			posterUrl: fileUrl,
+		});
+
+		if (oldPosterUrl && oldPosterUrl !== fileUrl) {
+			await this.storageService.remove(oldPosterUrl);
+		}
+
+		return updatedUser;
 	}
 
 	public async removePoster(user: UserModel) {
@@ -162,10 +167,6 @@ export class AccountService {
 	}
 
 	public async changeAvatar(user: UserModel, file: FileUpload) {
-		if (user.avatarUrl) {
-			await this.storageService.remove(user.avatarUrl);
-		}
-
 		if (!file) {
 			throw new BadRequestException('The file was not transferred');
 		}
@@ -187,8 +188,17 @@ export class AccountService {
 			'image/webp'
 		);
 
+		const oldAvatarUrl = user.avatarUrl;
 		const fileUrl = this.storageService.getFileUrl(fileName);
-		return this.userService.updateUser(user.id, { avatarUrl: fileUrl });
+		const updatedUser = await this.userService.updateUser(user.id, {
+			avatarUrl: fileUrl,
+		});
+
+		if (oldAvatarUrl && oldAvatarUrl !== fileUrl) {
+			await this.storageService.remove(oldAvatarUrl);
+		}
+
+		return updatedUser;
 	}
 
 	public async removeAvatar(user: UserModel) {

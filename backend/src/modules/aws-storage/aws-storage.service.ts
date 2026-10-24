@@ -99,15 +99,20 @@ export class AwsStorageService {
 
 	public extractKey(keyOrUrl: string): string {
 		if (!keyOrUrl) return '';
+		let key = keyOrUrl;
 		try {
 			if (keyOrUrl.startsWith('http://') || keyOrUrl.startsWith('https://')) {
 				const parsed = new URL(keyOrUrl);
-				return decodeURIComponent(parsed.pathname.replace(/^\/+/, ''));
+				key = decodeURIComponent(parsed.pathname.replace(/^\/+/, ''));
 			}
 		} catch {
 			// ignore URL parse errors and fall through
 		}
-		return keyOrUrl.replace(/^\/+/, '');
+		key = key.replace(/^\/+/, '');
+		if (this.bucket && key.startsWith(`${this.bucket}/`)) {
+			key = key.slice(this.bucket.length + 1);
+		}
+		return key;
 	}
 
 	public getFileUrl(key: string) {

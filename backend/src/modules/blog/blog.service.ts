@@ -297,10 +297,6 @@ export class BlogService {
 			throw new NotFoundException('Blog was not found');
 		}
 
-		if (blog.posterUrl) {
-			await this.storageService.remove(blog.posterUrl);
-		}
-
 		if (!newPoster) {
 			throw new BadRequestException('The file was not transferred');
 		}
@@ -322,6 +318,7 @@ export class BlogService {
 			'image/webp'
 		);
 
+		const oldPosterUrl = blog.posterUrl;
 		const newPosterUrl = this.storageService.getFileUrl(newPosterKey);
 		await this.prismaService.blog.update({
 			where: {
@@ -331,6 +328,10 @@ export class BlogService {
 				posterUrl: newPosterUrl,
 			},
 		});
+
+		if (oldPosterUrl && oldPosterUrl !== newPosterUrl) {
+			await this.storageService.remove(oldPosterUrl);
+		}
 
 		return true;
 	}

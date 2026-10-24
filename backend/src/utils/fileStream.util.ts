@@ -8,9 +8,11 @@ import { MAX_FILE_SIZE } from '../consts';
 
 export function validateNoGif(filename?: string, mimetype?: string): void {
 	const isGifExtension = filename
-		? filename.toLowerCase().endsWith('.gif')
+		? filename.trim().toLowerCase().endsWith('.gif')
 		: false;
-	const isGifMime = mimetype ? mimetype.toLowerCase() === 'image/gif' : false;
+	const isGifMime = mimetype
+		? mimetype.trim().toLowerCase() === 'image/gif'
+		: false;
 
 	if (isGifExtension || isGifMime) {
 		throw new UnsupportedMediaTypeException('Unsupported file type');

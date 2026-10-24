@@ -9,17 +9,23 @@ import { readStreamWithLimit, validateNoGif } from './fileStream.util';
 
 describe('fileStream.util', () => {
 	describe('validateNoGif', () => {
-		it('Выбрасывает UnsupportedMediaTypeException для файлов с расширением .gif (в любом регистре)', () => {
+		it('Выбрасывает UnsupportedMediaTypeException для файлов с расширением .gif (в любом регистре и с пробелами)', () => {
 			expect(() => validateNoGif('image.gif')).toThrow(
 				UnsupportedMediaTypeException
 			);
 			expect(() => validateNoGif('animation.GIF')).toThrow(
 				UnsupportedMediaTypeException
 			);
+			expect(() => validateNoGif('image.gif ')).toThrow(
+				UnsupportedMediaTypeException
+			);
 		});
 
-		it('Выбрасывает UnsupportedMediaTypeException для mimetype image/gif', () => {
+		it('Выбрасывает UnsupportedMediaTypeException для mimetype image/gif (с триммингом)', () => {
 			expect(() => validateNoGif('file.png', 'image/gif')).toThrow(
+				UnsupportedMediaTypeException
+			);
+			expect(() => validateNoGif('file.png', ' image/gif ')).toThrow(
 				UnsupportedMediaTypeException
 			);
 		});
