@@ -53,7 +53,10 @@ export class AwsStorageService {
 		await this.client.send(new PutObjectCommand(command));
 	}
 
-	public async uploadForPost(file: FileUpload, mimetype?: 'image/webp') {
+	public async uploadForPost(
+		file: FileUpload,
+		mimetype: 'image/webp' = 'image/webp'
+	) {
 		if (!file) {
 			throw new BadRequestException('The file was not transferred');
 		}

@@ -1,4 +1,6 @@
+import { Readable } from 'stream';
 import { ConfigService } from '@nestjs/config';
+import { FileUpload } from 'graphql-upload-ts';
 import { describe, expect, it, vi } from 'vitest';
 
 import { AwsStorageService } from './aws-storage.service';
@@ -51,6 +53,41 @@ describe('AwsStorageService', () => {
 			);
 			expect(service.getFileUrl('/posts/image-123.webp')).toBe(
 				'https://test-bucket.s3.amazonaws.com/posts/image-123.webp'
+			);
+		});
+	});
+
+	describe('uploadForPost', () => {
+		it('Отправляет в S3 ContentType: image/webp и ACL: public-read по умолчанию', async () => {
+			const sendMock = vi.fn().mockResolvedValue({});
+			vi.spyOn(service['client'], 'send').mockImplementation(sendMock);
+
+			const mockFile = {
+				filename: 'test-image.png',
+				mimetype: 'image/png',
+				encoding: '7bit',
+				createReadStream: () =>
+					Readable.from([
+						Buffer.from(
+							'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
+							'base64'
+						),
+					]),
+			} as unknown as FileUpload;
+
+			const result = await service.uploadForPost(mockFile);
+
+			expect(result.url).toContain(
+				'https://test-bucket.s3.amazonaws.com/posts/'
+			);
+			expect(sendMock).toHaveBeenCalledWith(
+				expect.objectContaining({
+					input: expect.objectContaining({
+						Bucket: 'test-bucket',
+						ContentType: 'image/webp',
+						ACL: 'public-read',
+					}),
+				})
 			);
 		});
 	});
