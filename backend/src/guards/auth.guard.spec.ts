@@ -21,8 +21,9 @@ describe('AuthGuard', () => {
 	};
 
 	it('Выбрасывает UnauthorizedException при отсутствии userId в сессии', async () => {
+		const findById = vi.fn();
 		const mockUserService = {
-			findById: vi.fn(),
+			findById,
 		} as unknown as UserService;
 
 		const guard = new AuthGuard(mockUserService);
@@ -34,8 +35,9 @@ describe('AuthGuard', () => {
 	});
 
 	it('Выбрасывает UnauthorizedException("User no longer exists"), если пользователь удалён из БД', async () => {
+		const findById = vi.fn().mockResolvedValue(null);
 		const mockUserService = {
-			findById: vi.fn().mockResolvedValue(null),
+			findById,
 		} as unknown as UserService;
 
 		const guard = new AuthGuard(mockUserService);
@@ -44,13 +46,14 @@ describe('AuthGuard', () => {
 		await expect(guard.canActivate(context)).rejects.toThrow(
 			new UnauthorizedException('User no longer exists')
 		);
-		expect(mockUserService.findById).toHaveBeenCalledWith('deleted-user-id');
+		expect(findById).toHaveBeenCalledWith('deleted-user-id');
 	});
 
 	it('Успешно авторизует пользователя и записывает req.user, если пользователь существует', async () => {
 		const mockUser = { id: 'valid-user-id', username: 'testuser' };
+		const findById = vi.fn().mockResolvedValue(mockUser);
 		const mockUserService = {
-			findById: vi.fn().mockResolvedValue(mockUser),
+			findById,
 		} as unknown as UserService;
 
 		const guard = new AuthGuard(mockUserService);

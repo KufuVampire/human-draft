@@ -7,21 +7,23 @@ import { PrismaService } from '../prisma/prisma.service';
 
 describe('UserService', () => {
 	it('findForAuth возвращает легковесную модель пользователя без JOIN блогов и постов', async () => {
+		const findUnique = vi.fn().mockResolvedValue({
+			id: 'user-1',
+			username: 'john_doe',
+			email: 'john@example.com',
+			password: 'hashed-password',
+			description: 'Test description',
+			avatarUrl: null,
+			posterUrl: null,
+			createdAt: new Date(),
+			updatedAt: new Date(),
+			subscribers: [{ fromUserId: 'sub-1' }],
+			subscriptions: [{ toUserId: 'target-1' }],
+		});
+
 		const mockPrisma = {
 			user: {
-				findUnique: vi.fn().mockResolvedValue({
-					id: 'user-1',
-					username: 'john_doe',
-					email: 'john@example.com',
-					password: 'hashed-password',
-					description: 'Test description',
-					avatarUrl: null,
-					posterUrl: null,
-					createdAt: new Date(),
-					updatedAt: new Date(),
-					subscribers: [{ fromUserId: 'sub-1' }],
-					subscriptions: [{ toUserId: 'target-1' }],
-				}),
+				findUnique,
 			},
 		} as unknown as PrismaService;
 
@@ -34,7 +36,7 @@ describe('UserService', () => {
 		expect(result?.subscriptions).toEqual(['target-1']);
 		expect(result?.blogs).toEqual([]);
 		expect(result?.posts).toEqual([]);
-		expect(mockPrisma.user.findUnique).toHaveBeenCalledWith({
+		expect(findUnique).toHaveBeenCalledWith({
 			where: { username: 'john_doe' },
 			select: expect.objectContaining({
 				id: true,
@@ -46,9 +48,10 @@ describe('UserService', () => {
 	});
 
 	it('findForAuth возвращает null, если пользователь не найден', async () => {
+		const findUnique = vi.fn().mockResolvedValue(null);
 		const mockPrisma = {
 			user: {
-				findUnique: vi.fn().mockResolvedValue(null),
+				findUnique,
 			},
 		} as unknown as PrismaService;
 
@@ -67,9 +70,10 @@ describe('UserService', () => {
 			}
 		);
 
+		const update = vi.fn().mockRejectedValue(p2002Error);
 		const mockPrisma = {
 			user: {
-				update: vi.fn().mockRejectedValue(p2002Error),
+				update,
 			},
 		} as unknown as PrismaService;
 
