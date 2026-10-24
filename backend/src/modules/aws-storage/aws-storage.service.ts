@@ -5,17 +5,15 @@ import {
 	PutObjectCommandInput,
 	S3Client,
 } from '@aws-sdk/client-s3';
-import {
-	BadRequestException,
-	Injectable,
-	UnsupportedMediaTypeException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { FileUpload } from 'graphql-upload-ts';
 import sharp from 'sharp';
 import { v4 as uuidv4 } from 'uuid';
 
 import { PrismaService } from '../prisma/prisma.service';
+
+import { readStreamWithLimit, validateNoGif } from '@/src/utils';
 
 @Injectable()
 export class AwsStorageService {
@@ -46,36 +44,26 @@ export class AwsStorageService {
 	) {
 		const command: PutObjectCommandInput = {
 			Bucket: this.bucket,
-			Key: String(key),
+			Key: this.extractKey(key),
 			Body: buffer,
 			ContentType: mimetype,
-			ACL: 'public-read-write',
+			ACL: 'public-read',
 		};
 
 		await this.client.send(new PutObjectCommand(command));
 	}
 
-	public async uploadForPost(
-		file: FileUpload,
-		mimetype?: 'image/webp'
-	) {
+	public async uploadForPost(file: FileUpload, mimetype?: 'image/webp') {
 		if (!file) {
 			throw new BadRequestException('The file was not transferred');
 		}
 
-		const chunks: Buffer[] = [];
+		validateNoGif(file.filename, file.mimetype);
 
-		for await (const chunk of file.createReadStream()) {
-			chunks.push(chunk);
-		}
-
-		const buffer = Buffer.concat(chunks);
+		const buffer = await readStreamWithLimit(file.createReadStream());
 
 		const imageId = uuidv4();
 		const key = `posts/${imageId}-${Date.now()}.webp`;
-		if (file.filename && file.filename.startsWith('.gif')) {
-			throw new UnsupportedMediaTypeException('Unsuppoarted file type');
-		}
 
 		const processesBuffer = await sharp(buffer).webp().toBuffer();
 
@@ -84,7 +72,7 @@ export class AwsStorageService {
 			Key: String(key),
 			Body: processesBuffer,
 			ContentType: mimetype,
-			ACL: 'public-read-write',
+			ACL: 'public-read',
 		};
 
 		await this.client.send(new PutObjectCommand(command));
@@ -92,16 +80,35 @@ export class AwsStorageService {
 		return { url: this.getFileUrl(key) };
 	}
 
-	public async remove(key: string) {
+	public async remove(keyOrUrl: string) {
+		const key = this.extractKey(keyOrUrl);
+		if (!key) {
+			return;
+		}
+
 		const command: DeleteObjectCommandInput = {
 			Bucket: this.bucket,
-			Key: String(key),
+			Key: key,
 		};
 
 		await this.client.send(new DeleteObjectCommand(command));
 	}
 
+	public extractKey(keyOrUrl: string): string {
+		if (!keyOrUrl) return '';
+		try {
+			if (keyOrUrl.startsWith('http://') || keyOrUrl.startsWith('https://')) {
+				const parsed = new URL(keyOrUrl);
+				return decodeURIComponent(parsed.pathname.replace(/^\/+/, ''));
+			}
+		} catch {
+			// ignore URL parse errors and fall through
+		}
+		return keyOrUrl.replace(/^\/+/, '');
+	}
+
 	public getFileUrl(key: string) {
-		return `https://${this.bucket}.s3.amazonaws.com/${key}`;
+		const cleanKey = this.extractKey(key);
+		return `https://${this.bucket}.s3.amazonaws.com/${cleanKey}`;
 	}
 }
