@@ -4,4 +4,6 @@ export {
 	type ProseMirrorNodeJSON,
 	type ProseMirrorMark,
 	sanitizeUrl,
+	sanitizeLinkUrl,
+	sanitizeImageUrl,
 } from './ProseMirrorRenderer';

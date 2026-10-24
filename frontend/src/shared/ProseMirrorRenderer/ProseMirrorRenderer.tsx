@@ -1,6 +1,6 @@
 'use client';
 
-import { FC, ReactNode, memo, useEffect, useState } from 'react';
+import { FC, Fragment, ReactNode, memo, useMemo } from 'react';
 
 import { cn } from '@/utils';
 
@@ -17,7 +17,7 @@ export interface ProseMirrorNodeJSON {
 	text?: string;
 }
 
-export function sanitizeUrl(url?: unknown): string {
+export function sanitizeLinkUrl(url?: unknown): string {
 	if (!url || typeof url !== 'string') return '';
 	const trimmed = url.trim();
 	const lower = trimmed.toLowerCase();
@@ -28,6 +28,28 @@ export function sanitizeUrl(url?: unknown): string {
 		lower.startsWith('mailto:') ||
 		lower.startsWith('tel:') ||
 		lower.startsWith('/') ||
+		lower.startsWith('#')
+	) {
+		return trimmed;
+	}
+
+	return '#';
+}
+
+export function sanitizeImageUrl(url?: unknown): string {
+	if (!url || typeof url !== 'string') return '';
+	const trimmed = url.trim();
+	const lower = trimmed.toLowerCase();
+
+	// Disallow data:image/svg+xml to prevent SVG XSS inside img tags
+	if (lower.startsWith('data:image/svg+xml')) {
+		return '#';
+	}
+
+	if (
+		lower.startsWith('http://') ||
+		lower.startsWith('https://') ||
+		lower.startsWith('/') ||
 		lower.startsWith('#') ||
 		lower.startsWith('data:image/') ||
 		lower.startsWith('blob:')
@@ -37,6 +59,8 @@ export function sanitizeUrl(url?: unknown): string {
 
 	return '#';
 }
+
+export const sanitizeUrl = sanitizeLinkUrl;
 
 function applyMarks(
 	element: ReactNode,
@@ -65,7 +89,7 @@ function applyMarks(
 					</code>
 				);
 			case 'link': {
-				const href = sanitizeUrl(mark.attrs?.href);
+				const href = sanitizeLinkUrl(mark.attrs?.href);
 				return (
 					<a
 						key={key}
@@ -105,9 +129,9 @@ function renderNode(
 	switch (node.type) {
 		case 'doc':
 			return (
-				<div key={key} className='prose-mirror-doc'>
+				<Fragment key={key}>
 					{renderChildren(node.content)}
-				</div>
+				</Fragment>
 			);
 
 		case 'paragraph':
@@ -231,7 +255,7 @@ function renderNode(
 
 		case 'image':
 		case 'image_block': {
-			const src = sanitizeUrl(node.attrs?.src);
+			const src = sanitizeImageUrl(node.attrs?.src);
 			if (!src || src === '#') return null;
 			const caption =
 				typeof node.attrs?.caption === 'string'
@@ -284,7 +308,7 @@ function renderNode(
 		default:
 			if (node.content && node.content.length > 0) {
 				return (
-					<div key={key}>{renderChildren(node.content)}</div>
+					<Fragment key={key}>{renderChildren(node.content)}</Fragment>
 				);
 			}
 			return null;
@@ -319,18 +343,10 @@ export interface ProseMirrorRendererProps {
 
 export const ProseMirrorRenderer: FC<ProseMirrorRendererProps> = memo(
 	({ doc, className }) => {
-		const [parsedDoc, setParsedDoc] = useState<ProseMirrorNodeJSON | null>(
-			() => parseDocInput(doc).parsed
+		const { parsed: parsedDoc, raw: rawText } = useMemo(
+			() => parseDocInput(doc),
+			[doc]
 		);
-		const [rawText, setRawText] = useState<string | null>(
-			() => parseDocInput(doc).raw
-		);
-
-		useEffect(() => {
-			const { parsed, raw } = parseDocInput(doc);
-			setParsedDoc(parsed);
-			setRawText(raw);
-		}, [doc]);
 
 		if (!doc) return null;
 

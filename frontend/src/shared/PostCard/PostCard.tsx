@@ -39,11 +39,20 @@ export const PostCard = ({
 }: Props) => {
 	const { profile } = useProfile();
 	const previewContent = useMemo(() => {
-		if (!content || typeof content !== 'object') return null;
-		const rawContent = (content as { content?: unknown[] }).content;
-		if (!Array.isArray(rawContent)) return content;
+		if (!content) return null;
+		let parsed: unknown = content;
+		if (typeof content === 'string') {
+			try {
+				parsed = JSON.parse(content);
+			} catch {
+				return content;
+			}
+		}
+		if (typeof parsed !== 'object' || !parsed) return content;
+		const rawContent = (parsed as { content?: unknown[] }).content;
+		if (!Array.isArray(rawContent)) return parsed;
 		return {
-			...content,
+			...parsed,
 			content: rawContent.slice(0, 2),
 		};
 	}, [content]);

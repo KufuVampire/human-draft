@@ -14,7 +14,6 @@
 		"test:watch": "vitest",
 		"test:cov": "vitest run --coverage",
 		"test:debug": "node --inspect-brk ./node_modules/vitest/vitest.mjs",
-		"test:e2e": "vitest run --config ./test/vitest-e2e.config.mts",
 		"db:push": "prisma db push",
 		"db:gen": "prisma generate",
 		"db:seed": "prisma db seed",

@@ -9,6 +9,7 @@ import {
 	useCallback,
 	useEffect,
 	useMemo,
+	useRef,
 	useState,
 } from 'react';
 import { useForm } from 'react-hook-form';
@@ -121,8 +122,11 @@ export const PostPage = () => {
 		}
 	}, [blog]);
 
+	const hasViewedRef = useRef(false);
+
 	useEffect(() => {
-		if (isLoading) return;
+		if (isLoading || hasViewedRef.current) return;
+		hasViewedRef.current = true;
 		const timer = setTimeout(() => {
 			updatePost({
 				variables: {
