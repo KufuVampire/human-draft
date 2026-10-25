@@ -61,7 +61,7 @@ export const CreateCommentField = ({
 			handleCancel();
 		},
 		onError(error) {
-			toast.error(error.message || 'Ошибка отправки комментария');
+			toast.error(error.message || t('comments.createError'));
 		},
 	});
 

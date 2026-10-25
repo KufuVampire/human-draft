@@ -21,11 +21,13 @@ export const useComments = create<InitialProps>((set, get) => ({
 		const { comments } = get();
 
 		const getAllCommentsFlatArr = (
-			items: readonly { replies?: readonly any[] | null }[]
+			items: readonly { replies?: unknown }[]
 		): readonly unknown[] => {
 			return items.flatMap((commentNode) => [
 				commentNode,
-				...(commentNode.replies ? getAllCommentsFlatArr(commentNode.replies) : []),
+				...(Array.isArray(commentNode.replies)
+					? getAllCommentsFlatArr(commentNode.replies)
+					: []),
 			]);
 		};
 
@@ -35,14 +37,16 @@ export const useComments = create<InitialProps>((set, get) => ({
 	deleteComment: (id: string) => {
 		const { comments } = get();
 
-		const removeComment = <T extends { id: string; replies?: any[] | null }>(
+		const removeComment = <T extends { id: string; replies?: unknown }>(
 			items: T[]
 		): T[] => {
 			return items
 				.filter((commentNode) => commentNode.id !== id)
 				.map((commentNode) => ({
 					...commentNode,
-					replies: commentNode.replies ? removeComment(commentNode.replies) : [],
+					...(Array.isArray(commentNode.replies)
+						? { replies: removeComment(commentNode.replies) }
+						: {}),
 				}));
 		};
 
@@ -51,20 +55,21 @@ export const useComments = create<InitialProps>((set, get) => ({
 	addComment: (newComment) => {
 		const { comments } = get();
 
-		const addReply = <T extends { id: string; replies?: any[] | null }>(
+		const addReply = <T extends { id: string; replies?: unknown }>(
 			items: T[]
 		): T[] => {
 			return items.map((commentNode) => {
 				if (commentNode.id === newComment.parentId) {
+					const existingReplies = Array.isArray(commentNode.replies)
+						? commentNode.replies
+						: [];
 					return {
 						...commentNode,
-						replies: commentNode.replies
-							? [...commentNode.replies, newComment]
-							: [newComment],
+						replies: [...existingReplies, newComment],
 					};
 				}
 
-				if (commentNode.replies?.length) {
+				if (Array.isArray(commentNode.replies) && commentNode.replies.length) {
 					return {
 						...commentNode,
 						replies: addReply(commentNode.replies),
@@ -86,7 +91,7 @@ export const useComments = create<InitialProps>((set, get) => ({
 		const { comments } = get();
 
 		const updateCommentInTree = <
-			T extends { id: string; text: string; replies?: any[] | null },
+			T extends { id: string; text: string; replies?: unknown },
 		>(
 			items: T[]
 		): T[] => {
@@ -98,7 +103,7 @@ export const useComments = create<InitialProps>((set, get) => ({
 					};
 				}
 
-				if (commentNode.replies?.length) {
+				if (Array.isArray(commentNode.replies) && commentNode.replies.length) {
 					return {
 						...commentNode,
 						replies: updateCommentInTree(commentNode.replies),

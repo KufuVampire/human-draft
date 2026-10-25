@@ -69,7 +69,7 @@ export const CommentItem = ({ comment, className }: Props) => {
 
 	const [updateComment, { loading: isUpdating }] = useUpdateCommentMutation({
 		onError(error) {
-			toast.error(error.message || 'Ошибка обновления комментария');
+			toast.error(error.message || t('comments.updateError'));
 		},
 	});
 
@@ -77,7 +77,7 @@ export const CommentItem = ({ comment, className }: Props) => {
 
 	const [deleteComment] = useDeleteCommentMutation({
 		onError(error) {
-			toast.error(error.message || 'Ошибка удаления комментария');
+			toast.error(error.message || t('comments.deleteError'));
 		},
 	});
 

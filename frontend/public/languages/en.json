@@ -1,4 +1,13 @@
 {
+	"404": {
+		"metadata": {
+			"title": "Page Not Found"
+		},
+		"title": "Oops! The page got lost",
+		"description": "But don’t worry, you’ve found the Debugging Duck. Try explaining out loud to the duck which article or author you were looking for. They say it helps to find a solution.",
+		"bottomText": "If the duck is silent, try returning to the main page.",
+		"goToMain": "Thank you, Duck, take me to the home page"
+	},
 	"btns": {
 		"createPost": "Create post",
 		"createBlog": "Create blog",
@@ -106,7 +115,10 @@
 		"leaveComment": "Save comment",
 		"updateComment": "Update comment",
 		"hideReplies": "Hide replies",
-		"replies": "{count, plural, one {# reply} other {# replies}}"
+		"replies": "{count, plural, one {# reply} other {# replies}}",
+		"createError": "Failed to send comment",
+		"updateError": "Failed to update comment",
+		"deleteError": "Failed to delete comment"
 	},
 	"homePage": {
 		"metadata": {
@@ -185,15 +197,6 @@
 		}
 	},
 	"loading": "Loading...",
-	"404": {
-		"metadata": {
-			"title": "Page Not Found"
-		},
-		"title": "Oops! The page got lost",
-		"description": "But don’t worry, you’ve found the Debugging Duck. Try explaining out loud to the duck which article or author you were looking for. They say it helps to find a solution.",
-		"bottomText": "If the duck is silent, try returning to the main page.",
-		"goToMain": "Thank you, Duck, take me to the home page"
-	},
 	"logoutSuccess": "You have successfully logged out of your account.",
 	"userAvatar": "User avatar",
 	"createPostPage": {
