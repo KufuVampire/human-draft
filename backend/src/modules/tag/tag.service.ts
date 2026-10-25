@@ -1,5 +1,7 @@
 import {
+	BadRequestException,
 	ConflictException,
+	ForbiddenException,
 	Injectable,
 	NotFoundException,
 } from '@nestjs/common';
@@ -37,24 +39,26 @@ export class TagService {
 		return tag;
 	}
 
-	async delete(name: string) {
-		const isExists = await this.findByName(normalizeTagName(name));
+	async updateTags(
+		authorId: string,
+		tags: string[],
+		to: UpdatePostOrBlogTagsInput
+	) {
+		const { postId, blogId } = to;
 
-		if (!isExists) {
-			throw new NotFoundException('Tag was not found');
+		if ((!postId && !blogId) || (postId && blogId)) {
+			throw new BadRequestException(
+				'Either postId or blogId must be provided, but not both'
+			);
 		}
 
-		await this.prismaService.tag.delete({
-			where: {
-				name,
-			},
-		});
-
-		return true;
-	}
-
-	async updateTags(tags: string[], to: UpdatePostOrBlogTagsInput) {
-		const { postId, blogId } = to;
+		const uniqueTags = [
+			...new Set(
+				tags
+					.map((tag) => normalizeTagName(tag))
+					.filter((tag) => tag.length > 0 && tag.length <= 50)
+			),
+		].slice(0, 10);
 
 		if (postId) {
 			const post = await this.prismaService.post.findUnique({
@@ -67,9 +71,13 @@ export class TagService {
 				throw new NotFoundException('Post not found');
 			}
 
-			const uniqueTags = [...new Set(tags)];
+			if (post.authorId !== authorId) {
+				throw new ForbiddenException(
+					'You are not the author of this post'
+				);
+			}
 
-			return this.prismaService.post.update({
+			await this.prismaService.post.update({
 				where: {
 					id: postId,
 				},
@@ -83,6 +91,8 @@ export class TagService {
 					},
 				},
 			});
+
+			return true;
 		}
 
 		if (blogId) {
@@ -93,12 +103,16 @@ export class TagService {
 			});
 
 			if (!blog) {
-				throw new NotFoundException('Post not found');
+				throw new NotFoundException('Blog not found');
 			}
 
-			const uniqueTags = [...new Set(tags)];
+			if (blog.authorId !== authorId) {
+				throw new ForbiddenException(
+					'You are not the author of this blog'
+				);
+			}
 
-			return this.prismaService.blog.update({
+			await this.prismaService.blog.update({
 				where: {
 					id: blogId,
 				},
@@ -112,7 +126,11 @@ export class TagService {
 					},
 				},
 			});
+
+			return true;
 		}
+
+		return false;
 	}
 
 	async findTags(search: string) {
@@ -120,7 +138,7 @@ export class TagService {
 			where: {
 				name: {
 					contains: search,
-					mode: 'insensitive'
+					mode: 'insensitive',
 				},
 			},
 		});

@@ -18,6 +18,12 @@ import {
 } from '@/src/inputs';
 import { UserModel } from '@/src/models';
 
+interface ContentNode {
+	type?: string;
+	attrs?: { src?: string };
+	content?: ContentNode[];
+}
+
 @Injectable()
 export class PostService {
 	constructor(
@@ -62,10 +68,14 @@ export class PostService {
 		});
 
 		if (!post) {
-			throw new NotFoundException('Post not found or you are not the author');
+			throw new NotFoundException('Post not found');
 		}
 
-		const { content, title, tags, likesCount, viewsCount } = input;
+		if (post.authorId !== authorId) {
+			throw new ForbiddenException('You are not the author of this post');
+		}
+
+		const { content, title, tags } = input;
 
 		await this.prismaService.post.update({
 			where: {
@@ -74,8 +84,6 @@ export class PostService {
 			data: {
 				title,
 				content,
-				likesCount,
-				viewsCount,
 				...(tags && {
 					tags: {
 						set: [],
@@ -98,11 +106,15 @@ export class PostService {
 			},
 		});
 
-		if (!post || post.authorId !== authorId) {
-			throw new NotFoundException('Post not found or you are not the author');
+		if (!post) {
+			throw new NotFoundException('Post not found');
 		}
 
-		const removeImages = async (nodes: any[]) => {
+		if (post.authorId !== authorId) {
+			throw new ForbiddenException('You are not the author of this post');
+		}
+
+		const removeImages = async (nodes: ContentNode[]) => {
 			for (const node of nodes) {
 				if (node.type === 'image' && node.attrs?.src) {
 					await this.storage.remove(node.attrs.src);
@@ -114,10 +126,11 @@ export class PostService {
 		};
 
 		if (post.content && typeof post.content === 'object') {
-			if (Array.isArray((post.content as any).content)) {
-				await removeImages((post.content as any).content);
+			const json = post.content as Record<string, unknown>;
+			if (Array.isArray(json.content)) {
+				await removeImages(json.content as ContentNode[]);
 			} else if (Array.isArray(post.content)) {
-				await removeImages(post.content);
+				await removeImages(post.content as ContentNode[]);
 			}
 		}
 
@@ -244,22 +257,22 @@ export class PostService {
 	}
 
 	async getAllPosts(
-		searchParams: SearchParamsInput,
+		searchParams: SearchParamsInput = {},
 		filters?: FiltersInput,
 		user?: UserModel
 	) {
 		const { page = PAGINATION_PAGE, perPage = PAGINATION_PER_PAGE } =
-			searchParams;
+			searchParams ?? {};
 
 		const skip = (page - 1) * perPage;
 
 		const where: PostWhereInput = {
 			...(filters?.search && {
-					title: {
-						contains: filters?.search,
-						mode: 'insensitive',
-					},
-				}),
+				title: {
+					contains: filters?.search,
+					mode: 'insensitive',
+				},
+			}),
 			...(filters?.onlySubscriptions &&
 				user && {
 					author: {
@@ -277,13 +290,13 @@ export class PostService {
 				where,
 				take: perPage,
 				skip,
-				orderBy: { id: 'asc' },
+				orderBy: { createdAt: 'desc' },
 				include: {
 					author: true,
 					tags: true,
 				},
 			}),
-			this.prismaService.post.count(),
+			this.prismaService.post.count({ where }),
 		]);
 
 		return {

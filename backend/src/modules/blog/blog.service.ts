@@ -37,13 +37,17 @@ export class BlogService {
 	) {
 		const { postIds, tags, title, description } = input;
 
-		const freePosts = await this.prismaService.post.findMany({
-			where: {
-				id: { in: postIds },
-				blogId: null,
-			},
-			select: { id: true },
-		});
+		const freePosts =
+			postIds && postIds.length
+				? await this.prismaService.post.findMany({
+						where: {
+							id: { in: postIds },
+							blogId: null,
+							authorId,
+						},
+						select: { id: true },
+				  })
+				: [];
 
 		const blog = await this.prismaService.blog.create({
 			data: {
@@ -54,7 +58,7 @@ export class BlogService {
 						id: authorId,
 					},
 				},
-				...(postIds.length && {
+				...(freePosts.length > 0 && {
 					posts: { connect: freePosts.map(({ id }) => ({ id })) },
 				}),
 				...(tags && {
@@ -198,12 +202,12 @@ export class BlogService {
 	}
 
 	async getAllBlogs(
-		searchParams: SearchParamsInput,
+		searchParams: SearchParamsInput = {},
 		filters?: FiltersInput,
 		user?: UserModel
 	) {
 		const { page = PAGINATION_PAGE, perPage = PAGINATION_PER_PAGE } =
-			searchParams;
+			searchParams ?? {};
 
 		const skip = (page - 1) * perPage;
 
@@ -231,13 +235,13 @@ export class BlogService {
 				where,
 				take: perPage,
 				skip,
-				orderBy: { id: 'asc' },
+				orderBy: { createdAt: 'desc' },
 				include: {
 					author: true,
 					tags: true,
 				},
 			}),
-			this.prismaService.blog.count(),
+			this.prismaService.blog.count({ where }),
 		]);
 
 		return {

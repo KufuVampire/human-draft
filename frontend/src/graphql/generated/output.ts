@@ -55,14 +55,14 @@ export type CommentModel = {
 
 export type CreateBlogInput = {
   description?: InputMaybe<Scalars['String']['input']>;
-  postIds: Array<Scalars['String']['input']>;
-  tags: Array<Scalars['String']['input']>;
+  postIds?: InputMaybe<Array<Scalars['String']['input']>>;
+  tags?: InputMaybe<Array<Scalars['String']['input']>>;
   title: Scalars['String']['input'];
 };
 
 export type CreatePostInput = {
   content: Scalars['JSON']['input'];
-  tags: Array<Scalars['String']['input']>;
+  tags?: InputMaybe<Array<Scalars['String']['input']>>;
   title: Scalars['String']['input'];
 };
 
@@ -84,7 +84,6 @@ export type Mutation = {
   deleteBlogPoster: Scalars['Boolean']['output'];
   deleteComment: Scalars['Boolean']['output'];
   deletePost: PostDeleteResponse;
-  deleteTag: Scalars['Boolean']['output'];
   pinPost: PostModel;
   pinPostToBlog: PostModel;
   removeProfileAvatar: UserModel;
@@ -162,11 +161,6 @@ export type MutationDeleteCommentArgs = {
 
 export type MutationDeletePostArgs = {
   postId: Scalars['String']['input'];
-};
-
-
-export type MutationDeleteTagArgs = {
-  name: Scalars['String']['input'];
 };
 
 
@@ -381,10 +375,8 @@ export type UpdateBlogInput = {
 
 export type UpdatePostInput = {
   content?: InputMaybe<Scalars['JSON']['input']>;
-  likesCount?: InputMaybe<Scalars['Int']['input']>;
   tags?: InputMaybe<Array<Scalars['String']['input']>>;
   title?: InputMaybe<Scalars['String']['input']>;
-  viewsCount?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type UpdatePostOrBlogTagsInput = {
@@ -393,10 +385,8 @@ export type UpdatePostOrBlogTagsInput = {
 };
 
 export type UpdateUserInput = {
-  avatarUrl?: InputMaybe<Scalars['String']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
   email?: InputMaybe<Scalars['String']['input']>;
-  posterUrl?: InputMaybe<Scalars['String']['input']>;
   username?: InputMaybe<Scalars['String']['input']>;
 };
 

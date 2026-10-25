@@ -83,4 +83,71 @@ describe('UserService', () => {
 			service.updateUser('user-1', { email: 'taken@example.com' })
 		).rejects.toThrow(ConflictException);
 	});
+
+	it('getAllUsers передает where в count и корректно рассчитывает totalPages', async () => {
+		const mockFindMany = vi.fn();
+		const mockCount = vi.fn();
+		const mockTransaction = vi.fn().mockImplementation(() => {
+			return Promise.resolve([
+				[{ id: 'user-2', username: 'alex' }],
+				25,
+			]);
+		});
+
+		const mockPrisma = {
+			user: {
+				findMany: mockFindMany,
+				count: mockCount,
+			},
+			$transaction: mockTransaction,
+		} as unknown as PrismaService;
+
+		const service = new UserService(mockPrisma);
+
+		const result = await service.getAllUsers({
+			searchParams: { page: 1, perPage: 10 },
+			searchStr: 'al',
+			userId: 'current-user-id',
+		});
+
+		expect(mockTransaction).toHaveBeenCalled();
+		expect(mockFindMany).toHaveBeenCalledWith({
+			take: 10,
+			skip: 0,
+			where: {
+				id: { not: 'current-user-id' },
+				username: { contains: 'al', mode: 'insensitive' },
+			},
+			orderBy: { username: 'asc' },
+		});
+		expect(mockCount).toHaveBeenCalledWith({
+			where: {
+				id: { not: 'current-user-id' },
+				username: { contains: 'al', mode: 'insensitive' },
+			},
+		});
+		expect(result.totalCount).toBe(25);
+		expect(result.totalPages).toBe(3);
+	});
+
+	it('не падает при вызове getAllUsers без аргументов', async () => {
+		const mockTransaction = vi.fn().mockImplementation(() => {
+			return Promise.resolve([[], 0]);
+		});
+
+		const mockPrisma = {
+			user: {
+				findMany: vi.fn(),
+				count: vi.fn(),
+			},
+			$transaction: mockTransaction,
+		} as unknown as PrismaService;
+
+		const service = new UserService(mockPrisma);
+
+		const result = await service.getAllUsers();
+
+		expect(result.page).toBe(1);
+		expect(result.perPage).toBe(10);
+	});
 });

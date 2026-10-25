@@ -25,7 +25,13 @@ async function bootstrap() {
 		})
 	);
 
-	app.useGlobalPipes(new ValidationPipe({ transform: true }));
+	app.useGlobalPipes(
+		new ValidationPipe({
+			transform: true,
+			whitelist: true,
+			forbidNonWhitelisted: true,
+		})
+	);
 
 	const maxAge = ms(config.getOrThrow<StringValue>('SESSION_MAX_AGE'));
 	app.use(
