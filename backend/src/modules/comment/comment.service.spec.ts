@@ -10,6 +10,32 @@ import { PrismaService } from '../prisma/prisma.service';
 
 describe('CommentService', () => {
 	describe('create', () => {
+		it('выбрасывает BadRequestException, если текст пустой или состоит из пробелов', async () => {
+			const mockPrisma = {} as unknown as PrismaService;
+			const service = new CommentService(mockPrisma);
+
+			await expect(
+				service.create('author-1', 'post-1', '   ')
+			).rejects.toThrow(new BadRequestException('Comment text cannot be empty'));
+
+			await expect(
+				service.create('author-1', 'post-1', '')
+			).rejects.toThrow(new BadRequestException('Comment text cannot be empty'));
+		});
+
+		it('выбрасывает BadRequestException, если длина текста превышает 2000 символов', async () => {
+			const mockPrisma = {} as unknown as PrismaService;
+			const service = new CommentService(mockPrisma);
+
+			const longText = 'a'.repeat(2001);
+
+			await expect(
+				service.create('author-1', 'post-1', longText)
+			).rejects.toThrow(
+				new BadRequestException('Comment text cannot exceed 2000 characters')
+			);
+		});
+
 		it('выбрасывает NotFoundException, если пост не найден', async () => {
 			const mockPrisma = {
 				post: {
@@ -61,7 +87,7 @@ describe('CommentService', () => {
 			).rejects.toThrow(BadRequestException);
 		});
 
-		it('создает корневой комментарий и инкрементирует commentsCount у поста', async () => {
+		it('создает корневой комментарий с trimmed текстом и инкрементирует commentsCount у поста', async () => {
 			const createdComment = {
 				id: 'comment-1',
 				text: 'Hello world',
@@ -87,7 +113,11 @@ describe('CommentService', () => {
 
 			const service = new CommentService(mockPrisma);
 
-			const result = await service.create('author-1', 'post-1', 'Hello world');
+			const result = await service.create(
+				'author-1',
+				'post-1',
+				'   Hello world   '
+			);
 
 			expect(result).toEqual(createdComment);
 			expect(mockCommentCreate).toHaveBeenCalledWith({
@@ -161,6 +191,28 @@ describe('CommentService', () => {
 	});
 
 	describe('update', () => {
+		it('выбрасывает BadRequestException, если обновленный текст пустой', async () => {
+			const mockPrisma = {} as unknown as PrismaService;
+			const service = new CommentService(mockPrisma);
+
+			await expect(
+				service.update('author-1', 'comment-1', '   ')
+			).rejects.toThrow(new BadRequestException('Comment text cannot be empty'));
+		});
+
+		it('выбрасывает BadRequestException, если длина текста превышает 2000 символов', async () => {
+			const mockPrisma = {} as unknown as PrismaService;
+			const service = new CommentService(mockPrisma);
+
+			const longText = 'x'.repeat(2001);
+
+			await expect(
+				service.update('author-1', 'comment-1', longText)
+			).rejects.toThrow(
+				new BadRequestException('Comment text cannot exceed 2000 characters')
+			);
+		});
+
 		it('выбрасывает NotFoundException, если комментарий не найден', async () => {
 			const mockPrisma = {
 				comment: {
@@ -189,10 +241,12 @@ describe('CommentService', () => {
 
 			await expect(
 				service.update('author-1', 'comment-1', 'Updated text')
-			).rejects.toThrow(ForbiddenException);
+			).rejects.toThrow(
+				new ForbiddenException('You are not the author of this comment')
+			);
 		});
 
-		it('успешно обновляет комментарий, если пользователь автор', async () => {
+		it('успешно обновляет комментарий с trimmed текстом, если пользователь автор', async () => {
 			const mockUpdate = vi.fn().mockResolvedValue({ id: 'comment-1' });
 			const mockPrisma = {
 				comment: {
@@ -209,7 +263,7 @@ describe('CommentService', () => {
 			const result = await service.update(
 				'author-1',
 				'comment-1',
-				'Updated text'
+				'   Updated text   '
 			);
 
 			expect(result).toBe(true);
@@ -248,14 +302,14 @@ describe('CommentService', () => {
 			const service = new CommentService(mockPrisma);
 
 			await expect(service.delete('author-1', 'comment-1')).rejects.toThrow(
-				ForbiddenException
+				new ForbiddenException('You are not the author of this comment')
 			);
 		});
 
 		it('удаляет одиночный комментарий и декрементирует commentsCount на 1', async () => {
 			const mockCommentDelete = vi.fn().mockResolvedValue({ id: 'comment-1' });
 			const mockPostUpdate = vi.fn().mockResolvedValue({ id: 'post-1' });
-			const mockFindMany = vi.fn().mockResolvedValue([]); // нет дочерних
+			const mockFindMany = vi.fn().mockResolvedValue([]);
 
 			const mockPrisma = {
 				comment: {
@@ -296,9 +350,6 @@ describe('CommentService', () => {
 			const mockCommentDelete = vi.fn().mockResolvedValue({ id: 'comment-1' });
 			const mockPostUpdate = vi.fn().mockResolvedValue({ id: 'post-1' });
 
-			// Уровень 1: у comment-1 есть replies: reply-1, reply-2
-			// Уровень 2: у reply-1 есть subreply-1; у reply-2 нет
-			// Уровень 3: у subreply-1 нет
 			const mockFindMany = vi
 				.fn()
 				.mockResolvedValueOnce([{ id: 'reply-1' }, { id: 'reply-2' }])
@@ -331,7 +382,6 @@ describe('CommentService', () => {
 			const result = await service.delete('author-1', 'comment-1');
 
 			expect(result).toBe(true);
-			// Всего 1 (корень) + 2 (реплаи) + 1 (субреплай) = 4
 			expect(mockPostUpdate).toHaveBeenCalledWith({
 				where: { id: 'post-1' },
 				data: { commentsCount: { decrement: 4 } },

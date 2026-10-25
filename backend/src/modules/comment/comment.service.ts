@@ -41,6 +41,17 @@ export class CommentService {
 		text: string,
 		parentId?: string
 	) {
+		const trimmedText = text?.trim();
+		if (!trimmedText) {
+			throw new BadRequestException('Comment text cannot be empty');
+		}
+
+		if (trimmedText.length > 2000) {
+			throw new BadRequestException(
+				'Comment text cannot exceed 2000 characters'
+			);
+		}
+
 		const post = await this.prismaService.post.findUnique({
 			where: { id: postId },
 		});
@@ -68,7 +79,7 @@ export class CommentService {
 		return this.prismaService.$transaction(async (tx) => {
 			const comment = await tx.comment.create({
 				data: {
-					text,
+					text: trimmedText,
 					author: {
 						connect: {
 							id: authorId,
@@ -106,6 +117,17 @@ export class CommentService {
 	}
 
 	async update(authorId: string, commentId: string, text: string) {
+		const trimmedText = text?.trim();
+		if (!trimmedText) {
+			throw new BadRequestException('Comment text cannot be empty');
+		}
+
+		if (trimmedText.length > 2000) {
+			throw new BadRequestException(
+				'Comment text cannot exceed 2000 characters'
+			);
+		}
+
 		const comment = await this.prismaService.comment.findUnique({
 			where: { id: commentId },
 		});
@@ -115,9 +137,7 @@ export class CommentService {
 		}
 
 		if (comment.authorId !== authorId) {
-			throw new ForbiddenException(
-				'Comment not found or you have no permission to update it'
-			);
+			throw new ForbiddenException('You are not the author of this comment');
 		}
 
 		await this.prismaService.comment.update({
@@ -125,7 +145,7 @@ export class CommentService {
 				id: commentId,
 			},
 			data: {
-				text,
+				text: trimmedText,
 			},
 		});
 
@@ -142,9 +162,7 @@ export class CommentService {
 		}
 
 		if (comment.authorId !== authorId) {
-			throw new ForbiddenException(
-				'This is not your comment, it cannot be deleted.'
-			);
+			throw new ForbiddenException('You are not the author of this comment');
 		}
 
 		await this.prismaService.$transaction(async (tx) => {
