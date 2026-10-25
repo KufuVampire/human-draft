@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
 import { Dispatch, SetStateAction } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 
 import { Button } from '../Button/Button';
 import { FormField } from '../FormField/FormField';
@@ -39,7 +40,12 @@ export const CreateCommentField = ({
 		formState: { isValid },
 		reset,
 		handleSubmit,
-	} = useForm<TypeCreateCommentSchema>();
+	} = useForm<TypeCreateCommentSchema>({
+		mode: 'onChange',
+		defaultValues: {
+			text: '',
+		},
+	});
 
 	const handleCancel = () => {
 		reset({ text: '' });
@@ -54,6 +60,9 @@ export const CreateCommentField = ({
 			addComment(data.createComment);
 			handleCancel();
 		},
+		onError(error) {
+			toast.error(error.message || t('comments.createError'));
+		},
 	});
 
 	if (!isAuth) {
@@ -63,12 +72,13 @@ export const CreateCommentField = ({
 	}
 
 	const onSubmit: SubmitHandler<TypeCreateCommentSchema> = ({ text }) => {
-		if (!text.trim()) return;
+		const trimmedText = text.trim();
+		if (!trimmedText) return;
 
 		createComment({
 			variables: {
 				postId,
-				text,
+				text: trimmedText,
 				parentId,
 			},
 		});
@@ -89,7 +99,10 @@ export const CreateCommentField = ({
 				<FormField
 					wrapperClassNames='w-full'
 					className='border-0 border-b rounded-none [&:not(:placeholder-shown)]:shadow-none px-0 pt-0'
-					{...register('text', { required: true })}
+					{...register('text', {
+						required: true,
+						validate: (value) => !!value?.trim(),
+					})}
 					placeholder={t('fields.comment')}
 				/>
 			</div>
@@ -105,7 +118,7 @@ export const CreateCommentField = ({
 					className={buttonStyles}
 					type='submit'
 					isLoading={isCreating}
-					disabled={isValid}>
+					disabled={!isValid || isCreating}>
 					{t('comments.leaveComment')}
 				</Button>
 			</div>

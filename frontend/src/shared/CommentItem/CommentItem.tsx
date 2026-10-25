@@ -1,9 +1,10 @@
 'use client';
 
-import { Check, ChevronDown, Pencil, Reply, Trash } from 'lucide-react';
+import { ChevronDown, Pencil, Reply, Trash, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 
 import {
 	CommentFieldsFragment,
@@ -36,18 +37,7 @@ export const CommentItem = ({ comment, className }: Props) => {
 	const [isEditMode, setEditMode] = useState(false);
 	const [isShowReplies, setShowReplies] = useState(false);
 	const t = useTranslations();
-	const { deleteComment: deleteComm } = useComments();
-
-	const {
-		register,
-		formState: { isValid, isDirty },
-		handleSubmit,
-		setValue,
-		watch,
-		setFocus,
-	} = useForm<TypeUpdateCommentSchema>();
-
-	const [updateComment, { loading: isUpdating }] = useUpdateCommentMutation();
+	const { deleteComment: deleteComm, updateComment: updateComm } = useComments();
 
 	const {
 		author: { username, avatarUrl },
@@ -58,14 +48,42 @@ export const CommentItem = ({ comment, className }: Props) => {
 		parentId,
 	} = comment;
 
+	const {
+		register,
+		formState: { isValid, isDirty },
+		handleSubmit,
+		reset,
+		setFocus,
+	} = useForm<TypeUpdateCommentSchema>({
+		mode: 'onChange',
+		defaultValues: {
+			text,
+		},
+	});
+
+	useEffect(() => {
+		if (isEditMode) {
+			setFocus('text');
+		}
+	}, [isEditMode, setFocus]);
+
+	const [updateComment, { loading: isUpdating }] = useUpdateCommentMutation({
+		onError(error) {
+			toast.error(error.message || t('comments.updateError'));
+		},
+	});
+
 	const isOwner = profile?.username === username;
 
-	const [deleteComment] = useDeleteCommentMutation();
+	const [deleteComment] = useDeleteCommentMutation({
+		onError(error) {
+			toast.error(error.message || t('comments.deleteError'));
+		},
+	});
 
 	const handleDeleteComment = (commentId: string) => {
 		setType('comment');
 		setCb(() => {
-			console.log(commentId);
 			deleteComm(commentId);
 			deleteComment({
 				variables: {
@@ -77,16 +95,30 @@ export const CommentItem = ({ comment, className }: Props) => {
 		setOpen(true);
 	};
 
-	const onSubmit: SubmitHandler<TypeUpdateCommentSchema> = ({ text }) => {
-		if (!text.trim()) return;
+	const handleToggleEditMode = () => {
+		if (isEditMode) {
+			reset({ text });
+		}
+		setEditMode((prev) => !prev);
+	};
+
+	const onSubmit: SubmitHandler<TypeUpdateCommentSchema> = ({
+		text: updatedText,
+	}) => {
+		const trimmedText = updatedText.trim();
+		if (!trimmedText) return;
 
 		updateComment({
 			variables: {
 				commentId: id,
-				text,
+				text: trimmedText,
+			},
+			onCompleted() {
+				updateComm(id, trimmedText);
+				reset({ text: trimmedText });
+				setEditMode(false);
 			},
 		});
-		setEditMode(false);
 	};
 
 	return (
@@ -113,19 +145,14 @@ export const CommentItem = ({ comment, className }: Props) => {
 					<div className='flex items-center gap-x-2'>
 						<Button
 							variant='clear'
-							title={isEditMode ? t('postPage.comments.exitEditMode') : t('postPage.comments.enterEditMode')}
-							onClick={() => {
-								if (!watch('text')) {
-									setValue('text', text);
-								}
-
-								setEditMode((prev) => !prev);
-								if (isEditMode) {
-									setFocus('text');
-								}
-							}}>
+							title={
+								isEditMode
+									? t('postPage.comments.exitEditMode')
+									: t('postPage.comments.enterEditMode')
+							}
+							onClick={handleToggleEditMode}>
 							{isEditMode ? (
-								<Check className='size-4' />
+								<X className='size-4' />
 							) : (
 								<Pencil className='size-4' />
 							)}
@@ -148,7 +175,10 @@ export const CommentItem = ({ comment, className }: Props) => {
 							<FormField
 								wrapperClassNames='w-full'
 								className='border-0 border-b rounded-none [&:not(:placeholder-shown)]:shadow-none px-0 pt-0'
-								{...register('text', { required: true })}
+								{...register('text', {
+									required: true,
+									validate: (value) => !!value?.trim(),
+								})}
 								placeholder={t('fields.comment')}
 							/>
 						</div>
@@ -157,15 +187,13 @@ export const CommentItem = ({ comment, className }: Props) => {
 								className={buttonStyles}
 								type='submit'
 								isLoading={isUpdating}
-								disabled={isValid}>
+								disabled={!isValid || !isDirty || isUpdating}>
 								{t('comments.updateComment')}
 							</Button>
 						</div>
 					</form>
 				) : (
-					<p className='leading-[150% tracking-[2%]'>
-						{isDirty ? watch('text') : text}
-					</p>
+					<p className='leading-[150%] tracking-[2%]'>{text}</p>
 				)}
 				{!isReply && (
 					<Button

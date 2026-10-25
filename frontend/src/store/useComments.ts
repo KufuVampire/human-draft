@@ -2,6 +2,8 @@ import { create } from 'zustand';
 
 import { GetAllPostCommentsQuery } from './../graphql/generated/output';
 
+type CommentItemType = GetAllPostCommentsQuery['getAllPostComments'][number];
+
 interface InitialProps {
 	comments: GetAllPostCommentsQuery['getAllPostComments'];
 	setComments: (
@@ -9,9 +11,8 @@ interface InitialProps {
 	) => void;
 	getCommentsCount: () => number;
 	deleteComment: (id: string) => void;
-	addComment: (
-		comment: GetAllPostCommentsQuery['getAllPostComments'][number]
-	) => void;
+	addComment: (newComment: CommentItemType) => void;
+	updateComment: (id: string, text: string) => void;
 }
 
 export const useComments = create<InitialProps>((set, get) => ({
@@ -19,10 +20,14 @@ export const useComments = create<InitialProps>((set, get) => ({
 	getCommentsCount: () => {
 		const { comments } = get();
 
-		const getAllCommentsFlatArr = (comments: any[]): any[] => {
-			return comments.flatMap((comment) => [
-				comment,
-				...(comment.replies ? getAllCommentsFlatArr(comment.replies) : []),
+		const getAllCommentsFlatArr = (
+			items: readonly { replies?: unknown }[]
+		): readonly unknown[] => {
+			return items.flatMap((commentNode) => [
+				commentNode,
+				...(Array.isArray(commentNode.replies)
+					? getAllCommentsFlatArr(commentNode.replies)
+					: []),
 			]);
 		};
 
@@ -32,47 +37,83 @@ export const useComments = create<InitialProps>((set, get) => ({
 	deleteComment: (id: string) => {
 		const { comments } = get();
 
-		const removeComment = (commentsList: any[]): any[] => {
-			return commentsList
-				.filter((comment) => comment.id !== id)
-				.map((comment) => ({
-					...comment,
-					replies: comment.replies ? removeComment(comment.replies) : [],
+		const removeComment = <T extends { id: string; replies?: unknown }>(
+			items: T[]
+		): T[] => {
+			return items
+				.filter((commentNode) => commentNode.id !== id)
+				.map((commentNode) => ({
+					...commentNode,
+					...(Array.isArray(commentNode.replies)
+						? { replies: removeComment(commentNode.replies) }
+						: {}),
 				}));
 		};
 
-		const filteredComments = removeComment(comments);
-
-		set({ comments: filteredComments as GetAllPostCommentsQuery['getAllPostComments'] });
+		set({ comments: removeComment(comments) });
 	},
-	addComment: (comment) => {
+	addComment: (newComment) => {
 		const { comments } = get();
 
-		const addReply = (commentsList: any[]): any[] => {
-			return commentsList.map((c) => {
-				if (c.id === comment.parentId) {
+		const addReply = <T extends { id: string; replies?: unknown }>(
+			items: T[]
+		): T[] => {
+			return items.map((commentNode) => {
+				if (commentNode.id === newComment.parentId) {
+					const existingReplies = Array.isArray(commentNode.replies)
+						? commentNode.replies
+						: [];
 					return {
-						...c,
-						replies: c.replies ? [...c.replies, comment] : [comment],
+						...commentNode,
+						replies: [...existingReplies, newComment],
 					};
 				}
 
-				if (c.replies?.length) {
+				if (Array.isArray(commentNode.replies) && commentNode.replies.length) {
 					return {
-						...c,
-						replies: addReply(c.replies),
+						...commentNode,
+						replies: addReply(commentNode.replies),
 					};
 				}
 
-				return c;
+				return commentNode;
 			});
 		};
 
-		if (comment.parentId) {
-			set({ comments: addReply(comments) as GetAllPostCommentsQuery['getAllPostComments'] });
+		if (newComment.parentId) {
+			set({ comments: addReply(comments) });
 			return;
 		}
 
-		set({ comments: [...comments, comment] });
+		set({ comments: [...comments, newComment] });
+	},
+	updateComment: (id: string, text: string) => {
+		const { comments } = get();
+
+		const updateCommentInTree = <
+			T extends { id: string; text: string; replies?: unknown },
+		>(
+			items: T[]
+		): T[] => {
+			return items.map((commentNode) => {
+				if (commentNode.id === id) {
+					return {
+						...commentNode,
+						text,
+					};
+				}
+
+				if (Array.isArray(commentNode.replies) && commentNode.replies.length) {
+					return {
+						...commentNode,
+						replies: updateCommentInTree(commentNode.replies),
+					};
+				}
+
+				return commentNode;
+			});
+		};
+
+		set({ comments: updateCommentInTree(comments) });
 	},
 }));
