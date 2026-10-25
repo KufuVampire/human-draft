@@ -1,4 +1,8 @@
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+	ConflictException,
+	ForbiddenException,
+	NotFoundException,
+} from '@nestjs/common';
 import { describe, expect, it, vi } from 'vitest';
 
 import { PostService } from './post.service';
@@ -6,6 +10,39 @@ import { AwsStorageService } from '../aws-storage/aws-storage.service';
 import { PrismaService } from '../prisma/prisma.service';
 
 describe('PostService', () => {
+	describe('create', () => {
+		it('нормализует и дедуплицирует теги при создании поста', async () => {
+			const mockCreate = vi.fn().mockResolvedValue({ id: 'post-1' });
+			const mockPrisma = {
+				post: {
+					create: mockCreate,
+				},
+			} as unknown as PrismaService;
+			const mockStorage = {} as unknown as AwsStorageService;
+
+			const service = new PostService(mockPrisma, mockStorage);
+
+			await service.create('author-1', {
+				title: 'Post Title',
+				content: { type: 'doc' },
+				tags: ['  React  ', 'react', '  '],
+			});
+
+			expect(mockCreate).toHaveBeenCalledWith({
+				data: expect.objectContaining({
+					title: 'Post Title',
+					content: { type: 'doc' },
+					author: { connect: { id: 'author-1' } },
+					tags: {
+						connectOrCreate: [
+							{ where: { name: 'react' }, create: { name: 'react' } },
+						],
+					},
+				}),
+			});
+		});
+	});
+
 	describe('update', () => {
 		it('выбрасывает NotFoundException, если пост не найден', async () => {
 			const mockFindUnique = vi.fn().mockResolvedValue(null);
@@ -45,7 +82,7 @@ describe('PostService', () => {
 			).rejects.toThrow(ForbiddenException);
 		});
 
-		it('успешно обновляет пост, если автор совпадает', async () => {
+		it('успешно обновляет пост и нормализует теги, если автор совпадает', async () => {
 			const mockFindUnique = vi.fn().mockResolvedValue({
 				id: 'post-1',
 				authorId: 'author-1',
@@ -63,7 +100,7 @@ describe('PostService', () => {
 
 			const result = await service.update('author-1', 'post-1', {
 				title: 'Updated title',
-				tags: ['tech', 'news'],
+				tags: ['  Tech ', 'TECH', 'news'],
 			});
 
 			expect(result).toBe(true);
@@ -167,6 +204,136 @@ describe('PostService', () => {
 			);
 			expect(mockDelete).toHaveBeenCalledWith({
 				where: { id: 'post-1' },
+			});
+		});
+	});
+
+	describe('unPinPostFromBlog', () => {
+		it('выбрасывает NotFoundException, если пост не найден', async () => {
+			const mockFindUniquePost = vi.fn().mockResolvedValue(null);
+			const mockPrisma = {
+				post: { findUnique: mockFindUniquePost },
+			} as unknown as PrismaService;
+			const mockStorage = {} as unknown as AwsStorageService;
+
+			const service = new PostService(mockPrisma, mockStorage);
+
+			await expect(
+				service.unPinPostFromBlog('author-1', 'post-1', 'blog-1')
+			).rejects.toThrow(NotFoundException);
+		});
+
+		it('выбрасывает ForbiddenException, если автор поста не совпадает', async () => {
+			const mockFindUniquePost = vi.fn().mockResolvedValue({
+				id: 'post-1',
+				authorId: 'other-author',
+			});
+			const mockPrisma = {
+				post: { findUnique: mockFindUniquePost },
+			} as unknown as PrismaService;
+			const mockStorage = {} as unknown as AwsStorageService;
+
+			const service = new PostService(mockPrisma, mockStorage);
+
+			await expect(
+				service.unPinPostFromBlog('author-1', 'post-1', 'blog-1')
+			).rejects.toThrow(ForbiddenException);
+		});
+
+		it('выбрасывает NotFoundException, если блог не найден', async () => {
+			const mockFindUniquePost = vi.fn().mockResolvedValue({
+				id: 'post-1',
+				authorId: 'author-1',
+			});
+			const mockFindUniqueBlog = vi.fn().mockResolvedValue(null);
+			const mockPrisma = {
+				post: { findUnique: mockFindUniquePost },
+				blog: { findUnique: mockFindUniqueBlog },
+			} as unknown as PrismaService;
+			const mockStorage = {} as unknown as AwsStorageService;
+
+			const service = new PostService(mockPrisma, mockStorage);
+
+			await expect(
+				service.unPinPostFromBlog('author-1', 'post-1', 'blog-1')
+			).rejects.toThrow(NotFoundException);
+		});
+
+		it('выбрасывает ForbiddenException, если автор блога не совпадает', async () => {
+			const mockFindUniquePost = vi.fn().mockResolvedValue({
+				id: 'post-1',
+				authorId: 'author-1',
+			});
+			const mockFindUniqueBlog = vi.fn().mockResolvedValue({
+				id: 'blog-1',
+				authorId: 'other-author',
+			});
+			const mockPrisma = {
+				post: { findUnique: mockFindUniquePost },
+				blog: { findUnique: mockFindUniqueBlog },
+			} as unknown as PrismaService;
+			const mockStorage = {} as unknown as AwsStorageService;
+
+			const service = new PostService(mockPrisma, mockStorage);
+
+			await expect(
+				service.unPinPostFromBlog('author-1', 'post-1', 'blog-1')
+			).rejects.toThrow(ForbiddenException);
+		});
+
+		it('выбрасывает ConflictException, если пост не привязан к данному блогу', async () => {
+			const mockFindUniquePost = vi.fn().mockResolvedValue({
+				id: 'post-1',
+				authorId: 'author-1',
+				blogId: 'other-blog',
+			});
+			const mockFindUniqueBlog = vi.fn().mockResolvedValue({
+				id: 'blog-1',
+				authorId: 'author-1',
+			});
+			const mockPrisma = {
+				post: { findUnique: mockFindUniquePost },
+				blog: { findUnique: mockFindUniqueBlog },
+			} as unknown as PrismaService;
+			const mockStorage = {} as unknown as AwsStorageService;
+
+			const service = new PostService(mockPrisma, mockStorage);
+
+			await expect(
+				service.unPinPostFromBlog('author-1', 'post-1', 'blog-1')
+			).rejects.toThrow(ConflictException);
+		});
+
+		it('успешно открепляет пост от блога при совпадении автора', async () => {
+			const mockFindUniquePost = vi.fn().mockResolvedValue({
+				id: 'post-1',
+				authorId: 'author-1',
+				blogId: 'blog-1',
+			});
+			const mockFindUniqueBlog = vi.fn().mockResolvedValue({
+				id: 'blog-1',
+				authorId: 'author-1',
+			});
+			const mockUpdatePost = vi.fn().mockResolvedValue({ id: 'post-1' });
+
+			const mockPrisma = {
+				post: {
+					findUnique: mockFindUniquePost,
+					update: mockUpdatePost,
+				},
+				blog: { findUnique: mockFindUniqueBlog },
+			} as unknown as PrismaService;
+			const mockStorage = {} as unknown as AwsStorageService;
+
+			const service = new PostService(mockPrisma, mockStorage);
+
+			await service.unPinPostFromBlog('author-1', 'post-1', 'blog-1');
+
+			expect(mockUpdatePost).toHaveBeenCalledWith({
+				where: { id: 'post-1' },
+				data: {
+					blog: { disconnect: true },
+				},
 			});
 		});
 	});

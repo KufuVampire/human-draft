@@ -9,7 +9,7 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 
 import { UpdatePostOrBlogTagsInput } from '@/src/inputs';
-import { normalizeTagName } from '@/src/utils';
+import { normalizeTagName, sanitizeTags } from '@/src/utils';
 
 @Injectable()
 export class TagService {
@@ -52,13 +52,7 @@ export class TagService {
 			);
 		}
 
-		const uniqueTags = [
-			...new Set(
-				tags
-					.map((tag) => normalizeTagName(tag))
-					.filter((tag) => tag.length > 0 && tag.length <= 50)
-			),
-		].slice(0, 10);
+		const uniqueTags = sanitizeTags(tags) ?? [];
 
 		if (postId) {
 			const post = await this.prismaService.post.findUnique({

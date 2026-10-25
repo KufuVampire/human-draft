@@ -17,6 +17,7 @@ import {
 	UpdatePostInput,
 } from '@/src/inputs';
 import { UserModel } from '@/src/models';
+import { sanitizeTags } from '@/src/utils';
 
 interface ContentNode {
 	type?: string;
@@ -33,6 +34,7 @@ export class PostService {
 
 	async create(authorId: string, input: CreatePostInput, blogId?: string) {
 		const { content, title, tags } = input;
+		const sanitizedTags = sanitizeTags(tags);
 
 		return this.prismaService.post.create({
 			data: {
@@ -43,14 +45,15 @@ export class PostService {
 						id: authorId,
 					},
 				},
-				...(tags && {
-					tags: {
-						connectOrCreate: tags.map((tag) => ({
-							where: { name: tag },
-							create: { name: tag },
-						})),
-					},
-				}),
+				...(sanitizedTags &&
+					sanitizedTags.length > 0 && {
+						tags: {
+							connectOrCreate: sanitizedTags.map((tag) => ({
+								where: { name: tag },
+								create: { name: tag },
+							})),
+						},
+					}),
 				...(blogId && {
 					blog: {
 						connect: { id: blogId },
@@ -76,6 +79,7 @@ export class PostService {
 		}
 
 		const { content, title, tags } = input;
+		const sanitizedTags = sanitizeTags(tags);
 
 		await this.prismaService.post.update({
 			where: {
@@ -84,10 +88,10 @@ export class PostService {
 			data: {
 				title,
 				content,
-				...(tags && {
+				...(sanitizedTags && {
 					tags: {
 						set: [],
-						connectOrCreate: tags.map((tag) => ({
+						connectOrCreate: sanitizedTags.map((tag) => ({
 							where: { name: tag },
 							create: { name: tag },
 						})),
@@ -199,14 +203,12 @@ export class PostService {
 			},
 		});
 
-		if (!post || post.authorId !== authorId) {
-			throw new NotFoundException('Post not found or you are not the author');
+		if (!post) {
+			throw new NotFoundException('Post not found');
 		}
 
-		if (post.blogId !== blogId) {
-			throw new ConflictException(
-				`Post is not pinned to this blog - ${blogId}`
-			);
+		if (post.authorId !== authorId) {
+			throw new ForbiddenException('You are not the author of this post');
 		}
 
 		const blog = await this.prismaService.blog.findUnique({
@@ -215,6 +217,16 @@ export class PostService {
 
 		if (!blog) {
 			throw new NotFoundException('Blog not found');
+		}
+
+		if (blog.authorId !== authorId) {
+			throw new ForbiddenException('You are not the author of this blog');
+		}
+
+		if (post.blogId !== blogId) {
+			throw new ConflictException(
+				`Post is not pinned to this blog - ${blogId}`
+			);
 		}
 
 		await this.prismaService.post.update({
