@@ -257,12 +257,12 @@ export class PostService {
 	}
 
 	async getAllPosts(
-		searchParams: SearchParamsInput,
+		searchParams: SearchParamsInput = {},
 		filters?: FiltersInput,
 		user?: UserModel
 	) {
 		const { page = PAGINATION_PAGE, perPage = PAGINATION_PER_PAGE } =
-			searchParams;
+			searchParams ?? {};
 
 		const skip = (page - 1) * perPage;
 

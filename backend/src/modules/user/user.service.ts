@@ -176,15 +176,20 @@ export class UserService {
 	}
 
 	public async getAllUsers(params: {
-		searchParams: SearchParamsInput;
+		searchParams?: SearchParamsInput;
 		searchStr?: string;
 		onlySubscriptions?: boolean;
 		userId?: string;
-	}) {
-		const { searchParams, onlySubscriptions, searchStr, userId } = params;
+	} = {}) {
+		const {
+			searchParams = {},
+			onlySubscriptions,
+			searchStr,
+			userId,
+		} = params ?? {};
 
 		const { page = PAGINATION_PAGE, perPage = PAGINATION_PER_PAGE } =
-			searchParams;
+			searchParams ?? {};
 
 		const skip = (page - 1) * perPage;
 

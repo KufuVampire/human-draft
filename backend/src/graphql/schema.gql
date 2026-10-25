@@ -34,14 +34,14 @@ type CommentModel {
 
 input CreateBlogInput {
   description: String
-  postIds: [String!]!
-  tags: [String!]!
+  postIds: [String!]
+  tags: [String!]
   title: String!
 }
 
 input CreatePostInput {
   content: JSON!
-  tags: [String!]!
+  tags: [String!]
   title: String!
 }
 
@@ -72,7 +72,6 @@ type Mutation {
   deleteBlogPoster(blogId: String!): Boolean!
   deleteComment(commentId: String!): Boolean!
   deletePost(postId: String!): PostDeleteResponse!
-  deleteTag(name: String!): Boolean!
   pinPost(blogId: String!, postId: String!): PostModel!
   pinPostToBlog(blogId: String!, postId: String!): PostModel!
   removeProfileAvatar: UserModel!
@@ -170,10 +169,8 @@ input UpdateBlogInput {
 
 input UpdatePostInput {
   content: JSON
-  likesCount: Int
   tags: [String!]
   title: String
-  viewsCount: Int
 }
 
 input UpdatePostOrBlogTagsInput {

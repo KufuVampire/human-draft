@@ -1,4 +1,8 @@
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+	BadRequestException,
+	ForbiddenException,
+	NotFoundException,
+} from '@nestjs/common';
 import { describe, expect, it, vi } from 'vitest';
 
 import { TagService } from './tag.service';
@@ -6,6 +10,27 @@ import { PrismaService } from '../prisma/prisma.service';
 
 describe('TagService', () => {
 	describe('updateTags', () => {
+		it('выбрасывает BadRequestException, если не указаны ни postId, ни blogId', async () => {
+			const mockPrisma = {} as unknown as PrismaService;
+			const service = new TagService(mockPrisma);
+
+			await expect(
+				service.updateTags('author-1', ['tag1'], {})
+			).rejects.toThrow(BadRequestException);
+		});
+
+		it('выбрасывает BadRequestException, если указаны и postId, и blogId', async () => {
+			const mockPrisma = {} as unknown as PrismaService;
+			const service = new TagService(mockPrisma);
+
+			await expect(
+				service.updateTags('author-1', ['tag1'], {
+					postId: 'post-1',
+					blogId: 'blog-1',
+				})
+			).rejects.toThrow(BadRequestException);
+		});
+
 		describe('for post', () => {
 			it('выбрасывает NotFoundException, если пост не существует', async () => {
 				const mockFindUnique = vi.fn().mockResolvedValue(null);
@@ -40,7 +65,7 @@ describe('TagService', () => {
 				).rejects.toThrow(ForbiddenException);
 			});
 
-			it('успешно обновляет теги поста, если автор совпадает', async () => {
+			it('успешно нормализует и обновляет теги поста, если автор совпадает', async () => {
 				const mockFindUnique = vi.fn().mockResolvedValue({
 					id: 'post-1',
 					authorId: 'author-1',
@@ -55,9 +80,11 @@ describe('TagService', () => {
 
 				const service = new TagService(mockPrisma);
 
-				const result = await service.updateTags('author-1', ['tag1', 'tag2'], {
-					postId: 'post-1',
-				});
+				const result = await service.updateTags(
+					'author-1',
+					['  Tech  ', 'TECH', '  ', 'News'],
+					{ postId: 'post-1' }
+				);
 
 				expect(result).toBe(true);
 				expect(mockUpdate).toHaveBeenCalledWith({
@@ -66,8 +93,8 @@ describe('TagService', () => {
 						tags: {
 							set: [],
 							connectOrCreate: [
-								{ where: { name: 'tag1' }, create: { name: 'tag1' } },
-								{ where: { name: 'tag2' }, create: { name: 'tag2' } },
+								{ where: { name: 'tech' }, create: { name: 'tech' } },
+								{ where: { name: 'news' }, create: { name: 'news' } },
 							],
 						},
 					},

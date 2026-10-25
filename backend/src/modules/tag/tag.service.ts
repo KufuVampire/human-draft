@@ -1,4 +1,5 @@
 import {
+	BadRequestException,
 	ConflictException,
 	ForbiddenException,
 	Injectable,
@@ -45,6 +46,20 @@ export class TagService {
 	) {
 		const { postId, blogId } = to;
 
+		if ((!postId && !blogId) || (postId && blogId)) {
+			throw new BadRequestException(
+				'Either postId or blogId must be provided, but not both'
+			);
+		}
+
+		const uniqueTags = [
+			...new Set(
+				tags
+					.map((tag) => normalizeTagName(tag))
+					.filter((tag) => tag.length > 0 && tag.length <= 50)
+			),
+		].slice(0, 10);
+
 		if (postId) {
 			const post = await this.prismaService.post.findUnique({
 				where: {
@@ -61,8 +76,6 @@ export class TagService {
 					'You are not the author of this post'
 				);
 			}
-
-			const uniqueTags = [...new Set(tags)];
 
 			await this.prismaService.post.update({
 				where: {
@@ -98,8 +111,6 @@ export class TagService {
 					'You are not the author of this blog'
 				);
 			}
-
-			const uniqueTags = [...new Set(tags)];
 
 			await this.prismaService.blog.update({
 				where: {

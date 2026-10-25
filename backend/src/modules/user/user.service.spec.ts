@@ -129,4 +129,25 @@ describe('UserService', () => {
 		expect(result.totalCount).toBe(25);
 		expect(result.totalPages).toBe(3);
 	});
+
+	it('не падает при вызове getAllUsers без аргументов', async () => {
+		const mockTransaction = vi.fn().mockImplementation(() => {
+			return Promise.resolve([[], 0]);
+		});
+
+		const mockPrisma = {
+			user: {
+				findMany: vi.fn(),
+				count: vi.fn(),
+			},
+			$transaction: mockTransaction,
+		} as unknown as PrismaService;
+
+		const service = new UserService(mockPrisma);
+
+		const result = await service.getAllUsers();
+
+		expect(result.page).toBe(1);
+		expect(result.perPage).toBe(10);
+	});
 });

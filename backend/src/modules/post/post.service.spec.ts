@@ -220,5 +220,27 @@ describe('PostService', () => {
 			expect(result.totalPages).toBe(1);
 			expect(result.totalCount).toBe(2);
 		});
+
+		it('не падает при вызове без searchParams', async () => {
+			const mockTransaction = vi.fn().mockImplementation(() => {
+				return Promise.resolve([[], 0]);
+			});
+
+			const mockPrisma = {
+				post: {
+					findMany: vi.fn(),
+					count: vi.fn(),
+				},
+				$transaction: mockTransaction,
+			} as unknown as PrismaService;
+			const mockStorage = {} as unknown as AwsStorageService;
+
+			const service = new PostService(mockPrisma, mockStorage);
+
+			const result = await service.getAllPosts(undefined);
+
+			expect(result.page).toBe(1);
+			expect(result.perPage).toBe(10);
+		});
 	});
 });
