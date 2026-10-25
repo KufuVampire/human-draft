@@ -5,14 +5,17 @@ model Comment {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   authorId String @map("author_id")
-  author   User   @relation(fields: [authorId], references: [id])
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
   parentId String?   @map("parent_id")
   parent   Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
   replies  Comment[] @relation("CommentReplies")
 
   postId String? @map("post_id")
-  post   Post?   @relation(fields: [postId], references: [id])
+  post   Post?   @relation(fields: [postId], references: [id], onDelete: Cascade)
 
+  @@index([postId])
+  @@index([parentId])
+  @@index([authorId])
   @@map("comments")
 }
