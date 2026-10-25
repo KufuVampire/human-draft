@@ -318,14 +318,15 @@ export class BlogService {
 		const blog = await this.prismaService.blog.findUnique({
 			where: {
 				id: blogId,
-				author: {
-					id: authorId,
-				},
 			},
 		});
 
 		if (!blog) {
 			throw new NotFoundException('Blog was not found');
+		}
+
+		if (blog.authorId !== authorId) {
+			throw new ForbiddenException('You are not the author of this blog');
 		}
 
 		if (!newPoster) {
@@ -371,14 +372,15 @@ export class BlogService {
 		const blog = await this.prismaService.blog.findUnique({
 			where: {
 				id: blogId,
-				author: {
-					id: authorId,
-				},
 			},
 		});
 
 		if (!blog) {
 			throw new NotFoundException('Blog was not found');
+		}
+
+		if (blog.authorId !== authorId) {
+			throw new ForbiddenException('You are not the author of this blog');
 		}
 
 		if (blog.posterUrl) {

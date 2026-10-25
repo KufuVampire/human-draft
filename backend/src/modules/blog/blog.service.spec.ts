@@ -1,4 +1,8 @@
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+	BadRequestException,
+	ForbiddenException,
+	NotFoundException,
+} from '@nestjs/common';
 import { describe, expect, it, vi } from 'vitest';
 
 import { BlogService } from './blog.service';
@@ -369,6 +373,150 @@ describe('BlogService', () => {
 
 			expect(result.page).toBe(1);
 			expect(result.perPage).toBe(10);
+		});
+	});
+
+	describe('changePoster', () => {
+		it('выбрасывает NotFoundException, если блог не существует', async () => {
+			const mockFindUnique = vi.fn().mockResolvedValue(null);
+			const mockPrisma = {
+				blog: { findUnique: mockFindUnique },
+			} as unknown as PrismaService;
+			const service = new BlogService(
+				mockPrisma,
+				{} as unknown as PostService,
+				{} as unknown as AwsStorageService
+			);
+
+			await expect(
+				service.changePoster('author-1', 'blog-1', {
+					filename: 'test.jpg',
+					mimetype: 'image/jpeg',
+					createReadStream: vi.fn(),
+				} as any)
+			).rejects.toThrow(NotFoundException);
+			expect(mockFindUnique).toHaveBeenCalledWith({
+				where: { id: 'blog-1' },
+			});
+		});
+
+		it('выбрасывает ForbiddenException, если пользователь не автор блога', async () => {
+			const mockFindUnique = vi.fn().mockResolvedValue({
+				id: 'blog-1',
+				authorId: 'other-author',
+			});
+			const mockPrisma = {
+				blog: { findUnique: mockFindUnique },
+			} as unknown as PrismaService;
+			const service = new BlogService(
+				mockPrisma,
+				{} as unknown as PostService,
+				{} as unknown as AwsStorageService
+			);
+
+			await expect(
+				service.changePoster('author-1', 'blog-1', {
+					filename: 'test.jpg',
+					mimetype: 'image/jpeg',
+					createReadStream: vi.fn(),
+				} as any)
+			).rejects.toThrow(ForbiddenException);
+		});
+
+		it('выбрасывает BadRequestException, если файл постера не передан', async () => {
+			const mockFindUnique = vi.fn().mockResolvedValue({
+				id: 'blog-1',
+				authorId: 'author-1',
+			});
+			const mockPrisma = {
+				blog: { findUnique: mockFindUnique },
+			} as unknown as PrismaService;
+			const service = new BlogService(
+				mockPrisma,
+				{} as unknown as PostService,
+				{} as unknown as AwsStorageService
+			);
+
+			await expect(
+				service.changePoster('author-1', 'blog-1', undefined as any)
+			).rejects.toThrow(BadRequestException);
+		});
+	});
+
+	describe('deletePoster', () => {
+		it('выбрасывает NotFoundException, если блог не существует', async () => {
+			const mockFindUnique = vi.fn().mockResolvedValue(null);
+			const mockPrisma = {
+				blog: { findUnique: mockFindUnique },
+			} as unknown as PrismaService;
+			const service = new BlogService(
+				mockPrisma,
+				{} as unknown as PostService,
+				{} as unknown as AwsStorageService
+			);
+
+			await expect(
+				service.deletePoster('author-1', 'blog-1')
+			).rejects.toThrow(NotFoundException);
+			expect(mockFindUnique).toHaveBeenCalledWith({
+				where: { id: 'blog-1' },
+			});
+		});
+
+		it('выбрасывает ForbiddenException, если пользователь не автор блога', async () => {
+			const mockFindUnique = vi.fn().mockResolvedValue({
+				id: 'blog-1',
+				authorId: 'other-author',
+			});
+			const mockPrisma = {
+				blog: { findUnique: mockFindUnique },
+			} as unknown as PrismaService;
+			const service = new BlogService(
+				mockPrisma,
+				{} as unknown as PostService,
+				{} as unknown as AwsStorageService
+			);
+
+			await expect(
+				service.deletePoster('author-1', 'blog-1')
+			).rejects.toThrow(ForbiddenException);
+		});
+
+		it('удаляет старый постер из хранилища и обновляет blog, если пользователь автор', async () => {
+			const mockFindUnique = vi.fn().mockResolvedValue({
+				id: 'blog-1',
+				authorId: 'author-1',
+				posterUrl: 'https://storage/blogs/blog-1-poster.webp',
+			});
+			const mockUpdate = vi.fn().mockResolvedValue({ id: 'blog-1' });
+			const mockRemove = vi.fn().mockResolvedValue(true);
+
+			const mockPrisma = {
+				blog: {
+					findUnique: mockFindUnique,
+					update: mockUpdate,
+				},
+			} as unknown as PrismaService;
+			const mockStorageService = {
+				remove: mockRemove,
+			} as unknown as AwsStorageService;
+
+			const service = new BlogService(
+				mockPrisma,
+				{} as unknown as PostService,
+				mockStorageService
+			);
+
+			const result = await service.deletePoster('author-1', 'blog-1');
+
+			expect(result).toBe(true);
+			expect(mockRemove).toHaveBeenCalledWith(
+				'https://storage/blogs/blog-1-poster.webp'
+			);
+			expect(mockUpdate).toHaveBeenCalledWith({
+				where: { id: 'blog-1' },
+				data: { posterUrl: null },
+			});
 		});
 	});
 });
