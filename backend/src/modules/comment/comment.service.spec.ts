@@ -308,6 +308,9 @@ describe('CommentService', () => {
 
 		it('удаляет одиночный комментарий и декрементирует commentsCount на 1', async () => {
 			const mockCommentDelete = vi.fn().mockResolvedValue({ id: 'comment-1' });
+			const mockPostFindUnique = vi
+				.fn()
+				.mockResolvedValue({ commentsCount: 5 });
 			const mockPostUpdate = vi.fn().mockResolvedValue({ id: 'post-1' });
 			const mockFindMany = vi.fn().mockResolvedValue([]);
 
@@ -326,6 +329,7 @@ describe('CommentService', () => {
 							delete: mockCommentDelete,
 						},
 						post: {
+							findUnique: mockPostFindUnique,
 							update: mockPostUpdate,
 						},
 					});
@@ -340,6 +344,10 @@ describe('CommentService', () => {
 			expect(mockCommentDelete).toHaveBeenCalledWith({
 				where: { id: 'comment-1' },
 			});
+			expect(mockPostFindUnique).toHaveBeenCalledWith({
+				where: { id: 'post-1' },
+				select: { commentsCount: true },
+			});
 			expect(mockPostUpdate).toHaveBeenCalledWith({
 				where: { id: 'post-1' },
 				data: { commentsCount: { decrement: 1 } },
@@ -348,6 +356,9 @@ describe('CommentService', () => {
 
 		it('удаляет комментарий с каскадными реплаями и декрементирует commentsCount на общее количество удалённых', async () => {
 			const mockCommentDelete = vi.fn().mockResolvedValue({ id: 'comment-1' });
+			const mockPostFindUnique = vi
+				.fn()
+				.mockResolvedValue({ commentsCount: 10 });
 			const mockPostUpdate = vi.fn().mockResolvedValue({ id: 'post-1' });
 
 			const mockFindMany = vi
@@ -371,6 +382,7 @@ describe('CommentService', () => {
 							delete: mockCommentDelete,
 						},
 						post: {
+							findUnique: mockPostFindUnique,
 							update: mockPostUpdate,
 						},
 					});
@@ -387,10 +399,48 @@ describe('CommentService', () => {
 				data: { commentsCount: { decrement: 4 } },
 			});
 		});
+
+		it('не декрементирует commentsCount ниже 0, если у поста счетчик меньше числа удаляемых', async () => {
+			const mockCommentDelete = vi.fn().mockResolvedValue({ id: 'comment-1' });
+			const mockPostFindUnique = vi
+				.fn()
+				.mockResolvedValue({ commentsCount: 0 });
+			const mockPostUpdate = vi.fn().mockResolvedValue({ id: 'post-1' });
+			const mockFindMany = vi.fn().mockResolvedValue([]);
+
+			const mockPrisma = {
+				comment: {
+					findUnique: vi.fn().mockResolvedValue({
+						id: 'comment-1',
+						authorId: 'author-1',
+						postId: 'post-1',
+					}),
+				},
+				$transaction: vi.fn().mockImplementation((callback) => {
+					return callback({
+						comment: {
+							findMany: mockFindMany,
+							delete: mockCommentDelete,
+						},
+						post: {
+							findUnique: mockPostFindUnique,
+							update: mockPostUpdate,
+						},
+					});
+				}),
+			} as unknown as PrismaService;
+
+			const service = new CommentService(mockPrisma);
+
+			const result = await service.delete('author-1', 'comment-1');
+
+			expect(result).toBe(true);
+			expect(mockPostUpdate).not.toHaveBeenCalled();
+		});
 	});
 
 	describe('allPostComments', () => {
-		it('возвращает только корневые комментарии статьи с parentId: null', async () => {
+		it('возвращает только корневые комментарии статьи с parentId: null и сортировкой по createdAt asc', async () => {
 			const mockFindMany = vi.fn().mockResolvedValue([
 				{ id: 'c1', text: 'Root 1', parentId: null },
 				{ id: 'c2', text: 'Root 2', parentId: null },
@@ -411,6 +461,9 @@ describe('CommentService', () => {
 				where: {
 					postId: 'post-1',
 					parentId: null,
+				},
+				orderBy: {
+					createdAt: 'asc',
 				},
 				include: {
 					author: true,

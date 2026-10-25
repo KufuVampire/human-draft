@@ -5,6 +5,7 @@ import {
 	NotFoundException,
 } from '@nestjs/common';
 
+import { Prisma } from '@/prisma/generated/client';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -12,14 +13,7 @@ export class CommentService {
 	constructor(private readonly prismaService: PrismaService) {}
 
 	private async countCommentsToDelete(
-		tx: {
-			comment: {
-				findMany: (args: {
-					where: { parentId: { in: string[] } };
-					select: { id: true };
-				}) => Promise<{ id: string }[]>;
-			};
-		},
+		tx: Prisma.TransactionClient,
 		rootCommentId: string
 	): Promise<number> {
 		let count = 1;
@@ -173,14 +167,24 @@ export class CommentService {
 			});
 
 			if (comment.postId) {
-				await tx.post.update({
+				const post = await tx.post.findUnique({
 					where: { id: comment.postId },
-					data: {
-						commentsCount: {
-							decrement: totalDeleted,
-						},
-					},
+					select: { commentsCount: true },
 				});
+
+				if (post) {
+					const decrement = Math.min(post.commentsCount, totalDeleted);
+					if (decrement > 0) {
+						await tx.post.update({
+							where: { id: comment.postId },
+							data: {
+								commentsCount: {
+									decrement,
+								},
+							},
+						});
+					}
+				}
 			}
 		});
 
@@ -192,6 +196,9 @@ export class CommentService {
 			where: {
 				postId,
 				parentId: null,
+			},
+			orderBy: {
+				createdAt: 'asc',
 			},
 			include: {
 				author: true,
