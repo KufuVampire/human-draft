@@ -68,12 +68,13 @@ export const CreateCommentField = ({
 	}
 
 	const onSubmit: SubmitHandler<TypeCreateCommentSchema> = ({ text }) => {
-		if (!text.trim()) return;
+		const trimmedText = text.trim();
+		if (!trimmedText) return;
 
 		createComment({
 			variables: {
 				postId,
-				text,
+				text: trimmedText,
 				parentId,
 			},
 		});

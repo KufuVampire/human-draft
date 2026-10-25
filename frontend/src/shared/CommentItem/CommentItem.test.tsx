@@ -9,6 +9,7 @@ import { CommentFieldsFragment } from '@/graphql/generated/output';
 const mockUpdateComment = vi.fn();
 const mockDeleteComment = vi.fn();
 const mockDeleteCommentStore = vi.fn();
+const mockUpdateCommentStore = vi.fn();
 const mockSetCb = vi.fn();
 const mockSetOpen = vi.fn();
 const mockSetType = vi.fn();
@@ -72,6 +73,7 @@ vi.mock('@/store', () => ({
 	}),
 	useComments: () => ({
 		deleteComment: mockDeleteCommentStore,
+		updateComment: mockUpdateCommentStore,
 		addComment: vi.fn(),
 	}),
 	useConfirmationDeletionModal: () => ({
@@ -87,9 +89,13 @@ vi.mock('@/graphql/generated/output', async (importOriginal) => {
 		...actual,
 		useUpdateCommentMutation: (options?: { onCompleted?: () => void }) => {
 			return [
-				(args: { variables: { commentId: string; text: string } }) => {
+				(args: {
+					variables: { commentId: string; text: string };
+					onCompleted?: () => void;
+				}) => {
 					mockUpdateComment(args);
 					options?.onCompleted?.();
+					args.onCompleted?.();
 				},
 				{ loading: false },
 			];
@@ -219,7 +225,7 @@ describe('CommentItem (colocated unit tests)', () => {
 		await user.type(input, 'Случайный черновик');
 		expect(input).toHaveValue('Случайный черновик');
 
-		// Отмена редактирования кликом по кнопке-галке
+		// Отмена редактирования кликом по кнопке с иконкой крестика
 		const exitEditBtn = screen.getByTitle('postPage.comments.exitEditMode');
 		await user.click(exitEditBtn);
 
@@ -235,7 +241,7 @@ describe('CommentItem (colocated unit tests)', () => {
 		expect(reOpenedInput).toHaveValue('Первоначальный текст комментария');
 	});
 
-	it('отправка обновления вызывает мутацию и выходит из режима редактирования', async () => {
+	it('отправка обновления вызывает мутацию, обновляет стор и выходит из режима редактирования', async () => {
 		const user = userEvent.setup();
 		const comment = createComment();
 		render(<CommentItem comment={comment} />);
@@ -245,21 +251,68 @@ describe('CommentItem (colocated unit tests)', () => {
 
 		const input = screen.getByPlaceholderText('fields.comment');
 		await user.clear(input);
-		await user.type(input, 'Успешно обновленный текст');
+		await user.type(input, '  Успешно обновленный текст  ');
 
 		const saveBtn = screen.getByRole('button', { name: 'comments.updateComment' });
 		await user.click(saveBtn);
 
 		await waitFor(() => {
-			expect(mockUpdateComment).toHaveBeenCalledWith({
-				variables: {
-					commentId: 'comment-1',
-					text: 'Успешно обновленный текст',
-				},
-			});
+			expect(mockUpdateComment).toHaveBeenCalledWith(
+				expect.objectContaining({
+					variables: {
+						commentId: 'comment-1',
+						text: 'Успешно обновленный текст',
+					},
+				})
+			);
+			expect(mockUpdateCommentStore).toHaveBeenCalledWith('comment-1', 'Успешно обновленный текст');
 			// После onCompleted режим редактирования закрывается
 			expect(screen.queryByPlaceholderText('fields.comment')).not.toBeInTheDocument();
 		});
+	});
+
+	it('сохраняет обновленное значение и позволяет повторно редактировать без сброса текста', async () => {
+		const user = userEvent.setup();
+		const comment = createComment({ text: 'Версия 1' });
+		const { rerender } = render(<CommentItem comment={comment} />);
+
+		// 1. Первое редактирование
+		const editBtn = screen.getByTitle('postPage.comments.enterEditMode');
+		await user.click(editBtn);
+
+		const input = screen.getByPlaceholderText('fields.comment');
+		await user.clear(input);
+		await user.type(input, 'Версия 2');
+
+		const saveBtn = screen.getByRole('button', { name: 'comments.updateComment' });
+		await user.click(saveBtn);
+
+		expect(mockUpdateComment).toHaveBeenCalledWith(
+			expect.objectContaining({
+				variables: {
+					commentId: 'comment-1',
+					text: 'Версия 2',
+				},
+			})
+		);
+		expect(mockUpdateCommentStore).toHaveBeenCalledWith('comment-1', 'Версия 2');
+
+		// Симулируем обновление пропа comment от стора
+		rerender(<CommentItem comment={{ ...comment, text: 'Версия 2' }} />);
+		expect(screen.getByText('Версия 2')).toBeInTheDocument();
+
+		// 2. Повторное открытие режима редактирования
+		const reEditBtn = screen.getByTitle('postPage.comments.enterEditMode');
+		await user.click(reEditBtn);
+
+		const reOpenedInput = screen.getByPlaceholderText('fields.comment');
+		expect(reOpenedInput).toHaveValue('Версия 2');
+
+		// 3. Отмена повторного редактирования — текст остается 'Версия 2'
+		const cancelBtn = screen.getByTitle('postPage.comments.exitEditMode');
+		await user.click(cancelBtn);
+
+		expect(screen.getByText('Версия 2')).toBeInTheDocument();
 	});
 
 	it('удаление комментария вызывает модалку подтверждения и выполняет коллбэк', async () => {

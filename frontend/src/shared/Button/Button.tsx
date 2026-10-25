@@ -16,9 +16,9 @@ const styles: LinkAndButtonVariantType = {
 	secondary:
 		'bg-transparent text-primary border border-primary hover:bg-primary-hover hover:border-primary-hover focus-visible:bg-primary-hover focus-visible:border-primary-hover hover:text-secondary focus-visible:text-primary dark:text-secondary',
 	disabled:
-		'bg-disabled hover:bg-disabled backdrop-blur-disabled text-[var(--text-color-main)] cursor-auto',
+		'bg-disabled hover:bg-disabled backdrop-blur-disabled text-[var(--text-color-main)]',
 	clear:
-		'outline-0 border-0 bg-transparent hover:text-primary-hover focus-visible:text-primary-hover',
+		'outline-0 border-0 bg-transparent hover:text-primary-hover focus-visible:text-primary-hover disabled:pointer-events-none disabled:opacity-50',
 	light:
 		'bg-disabled hover:bg-disabled backdrop-blur-disabled hover:text-primary-hover focus-visible:text-primary-hover text-[var(--text-color-main)] cursor-pointer',
 };
@@ -39,7 +39,7 @@ export const Button = ({
 			disabled={isDisabled}
 			className={cn(
 				'transition-colors flex items-center justify-center text-center',
-				isDisabled ? 'cursor-default' : 'cursor-pointer',
+				isDisabled ? 'cursor-not-allowed' : 'cursor-pointer',
 				isLoading || (variant !== 'clear' && isDisabled)
 					? styles['disabled']
 					: styles[variant],

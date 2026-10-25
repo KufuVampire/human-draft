@@ -1,6 +1,6 @@
 'use client';
 
-import { Check, ChevronDown, Pencil, Reply, Trash } from 'lucide-react';
+import { ChevronDown, Pencil, Reply, Trash, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
@@ -36,7 +36,7 @@ export const CommentItem = ({ comment, className }: Props) => {
 	const [isEditMode, setEditMode] = useState(false);
 	const [isShowReplies, setShowReplies] = useState(false);
 	const t = useTranslations();
-	const { deleteComment: deleteComm } = useComments();
+	const { deleteComment: deleteComm, updateComment: updateComm } = useComments();
 
 	const {
 		author: { username, avatarUrl },
@@ -51,9 +51,7 @@ export const CommentItem = ({ comment, className }: Props) => {
 		register,
 		formState: { isValid, isDirty },
 		handleSubmit,
-		setValue,
 		reset,
-		watch,
 		setFocus,
 	} = useForm<TypeUpdateCommentSchema>({
 		mode: 'onChange',
@@ -68,11 +66,7 @@ export const CommentItem = ({ comment, className }: Props) => {
 		}
 	}, [isEditMode, setFocus]);
 
-	const [updateComment, { loading: isUpdating }] = useUpdateCommentMutation({
-		onCompleted() {
-			setEditMode(false);
-		},
-	});
+	const [updateComment, { loading: isUpdating }] = useUpdateCommentMutation();
 
 	const isOwner = profile?.username === username;
 
@@ -93,24 +87,25 @@ export const CommentItem = ({ comment, className }: Props) => {
 	};
 
 	const handleToggleEditMode = () => {
-		if (isEditMode) {
-			reset({ text });
-			setEditMode(false);
-		} else {
-			setValue('text', text);
-			setEditMode(true);
-		}
+		reset({ text });
+		setEditMode((prev) => !prev);
 	};
 
 	const onSubmit: SubmitHandler<TypeUpdateCommentSchema> = ({
 		text: updatedText,
 	}) => {
-		if (!updatedText.trim()) return;
+		const trimmedText = updatedText.trim();
+		if (!trimmedText) return;
 
 		updateComment({
 			variables: {
 				commentId: id,
-				text: updatedText,
+				text: trimmedText,
+			},
+			onCompleted() {
+				updateComm(id, trimmedText);
+				reset({ text: trimmedText });
+				setEditMode(false);
 			},
 		});
 	};
@@ -146,7 +141,7 @@ export const CommentItem = ({ comment, className }: Props) => {
 							}
 							onClick={handleToggleEditMode}>
 							{isEditMode ? (
-								<Check className='size-4' />
+								<X className='size-4' />
 							) : (
 								<Pencil className='size-4' />
 							)}
@@ -187,9 +182,7 @@ export const CommentItem = ({ comment, className }: Props) => {
 						</div>
 					</form>
 				) : (
-					<p className='leading-[150%] tracking-[2%]'>
-						{isDirty ? watch('text') : text}
-					</p>
+					<p className='leading-[150%] tracking-[2%]'>{text}</p>
 				)}
 				{!isReply && (
 					<Button

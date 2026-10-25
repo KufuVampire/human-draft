@@ -131,7 +131,7 @@ describe('CreateCommentField (colocated unit tests)', () => {
 		render(<CreateCommentField />);
 
 		const input = screen.getByPlaceholderText('fields.comment');
-		await user.type(input, 'Полезный материал');
+		await user.type(input, '  Полезный материал  ');
 
 		const submitBtn = screen.getByRole('button', { name: 'comments.leaveComment' });
 		await user.click(submitBtn);
