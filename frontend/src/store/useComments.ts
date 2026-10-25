@@ -2,6 +2,16 @@ import { create } from 'zustand';
 
 import { GetAllPostCommentsQuery } from './../graphql/generated/output';
 
+type CommentItemType = GetAllPostCommentsQuery['getAllPostComments'][number];
+
+type CommentTreeItem = {
+	id: string;
+	text: string;
+	parentId?: string | null;
+	replies?: CommentTreeItem[] | null;
+	[key: string]: unknown;
+};
+
 interface InitialProps {
 	comments: GetAllPostCommentsQuery['getAllPostComments'];
 	setComments: (
@@ -9,9 +19,7 @@ interface InitialProps {
 	) => void;
 	getCommentsCount: () => number;
 	deleteComment: (id: string) => void;
-	addComment: (
-		comment: GetAllPostCommentsQuery['getAllPostComments'][number]
-	) => void;
+	addComment: (comment: CommentItemType) => void;
 	updateComment: (id: string, text: string) => void;
 }
 
@@ -21,23 +29,21 @@ export const useComments = create<InitialProps>((set, get) => ({
 		const { comments } = get();
 
 		const getAllCommentsFlatArr = (
-			commentsList: GetAllPostCommentsQuery['getAllPostComments']
-		): GetAllPostCommentsQuery['getAllPostComments'] => {
+			commentsList: readonly CommentTreeItem[]
+		): readonly CommentTreeItem[] => {
 			return commentsList.flatMap((comment) => [
 				comment,
 				...(comment.replies ? getAllCommentsFlatArr(comment.replies) : []),
 			]);
 		};
 
-		return getAllCommentsFlatArr(comments).length;
+		return getAllCommentsFlatArr(comments as unknown as CommentTreeItem[]).length;
 	},
 	setComments: (comments) => set({ comments }),
 	deleteComment: (id: string) => {
 		const { comments } = get();
 
-		const removeComment = (
-			commentsList: GetAllPostCommentsQuery['getAllPostComments']
-		): GetAllPostCommentsQuery['getAllPostComments'] => {
+		const removeComment = <T extends CommentTreeItem>(commentsList: T[]): T[] => {
 			return commentsList
 				.filter((comment) => comment.id !== id)
 				.map((comment) => ({
@@ -46,16 +52,18 @@ export const useComments = create<InitialProps>((set, get) => ({
 				}));
 		};
 
-		const filteredComments = removeComment(comments);
+		const filteredComments = removeComment(
+			comments as unknown as CommentTreeItem[]
+		);
 
-		set({ comments: filteredComments });
+		set({
+			comments: filteredComments as GetAllPostCommentsQuery['getAllPostComments'],
+		});
 	},
 	addComment: (comment) => {
 		const { comments } = get();
 
-		const addReply = (
-			commentsList: GetAllPostCommentsQuery['getAllPostComments']
-		): GetAllPostCommentsQuery['getAllPostComments'] => {
+		const addReply = <T extends CommentTreeItem>(commentsList: T[]): T[] => {
 			return commentsList.map((c) => {
 				if (c.id === comment.parentId) {
 					return {
@@ -76,7 +84,11 @@ export const useComments = create<InitialProps>((set, get) => ({
 		};
 
 		if (comment.parentId) {
-			set({ comments: addReply(comments) });
+			set({
+				comments: addReply(
+					comments as unknown as CommentTreeItem[]
+				) as GetAllPostCommentsQuery['getAllPostComments'],
+			});
 			return;
 		}
 
@@ -85,9 +97,9 @@ export const useComments = create<InitialProps>((set, get) => ({
 	updateComment: (id: string, text: string) => {
 		const { comments } = get();
 
-		const updateCommentInTree = (
-			commentsList: GetAllPostCommentsQuery['getAllPostComments']
-		): GetAllPostCommentsQuery['getAllPostComments'] => {
+		const updateCommentInTree = <T extends CommentTreeItem>(
+			commentsList: T[]
+		): T[] => {
 			return commentsList.map((c) => {
 				if (c.id === id) {
 					return {
@@ -107,6 +119,12 @@ export const useComments = create<InitialProps>((set, get) => ({
 			});
 		};
 
-		set({ comments: updateCommentInTree(comments) });
+		const updated = updateCommentInTree(
+			comments as unknown as CommentTreeItem[]
+		);
+
+		set({
+			comments: updated as GetAllPostCommentsQuery['getAllPostComments'],
+		});
 	},
 }));
