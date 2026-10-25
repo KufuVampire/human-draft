@@ -11,6 +11,7 @@ export class CommentsLoader {
     async (parentIds: readonly string[]) => {
       const comments = await this.prisma.comment.findMany({
         where: { parentId: { in: [...parentIds] } },
+        orderBy: { createdAt: 'asc' },
         include: { author: true },
       });
 

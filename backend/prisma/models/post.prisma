@@ -12,10 +12,13 @@ model Post {
   authorId String  @map("author_id")
 
   blog   Blog? @relation(fields: [blogId], references: [id])
-  author User  @relation(fields: [authorId], references: [id])
+  author User  @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
   comments Comment[]
   tags     Tag[]
 
+  @@index([authorId])
+  @@index([blogId])
+  @@index([createdAt])
   @@map("posts")
 }

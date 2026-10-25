@@ -6,9 +6,10 @@ model Subscription {
   fromUserId String @map("from_user_id")
   toUserId   String @map("to_user_id")
 
-  fromUser User @relation("subscriptionsFrom", fields: [fromUserId], references: [id])
-  toUser   User @relation("subscriptionsTo", fields: [toUserId], references: [id])
+  fromUser User @relation("subscriptionsFrom", fields: [fromUserId], references: [id], onDelete: Cascade)
+  toUser   User @relation("subscriptionsTo", fields: [toUserId], references: [id], onDelete: Cascade)
 
   @@unique([fromUserId, toUserId])
+  @@index([toUserId])
   @@map("subscriptions")
 }

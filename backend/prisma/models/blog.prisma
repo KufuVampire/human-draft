@@ -7,10 +7,11 @@ model Blog {
   updatedAt   DateTime @updatedAt @map("updated_at")
 
   authorId String @map("author_id")
-  author   User   @relation(fields: [authorId], references: [id])
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
   posts Post[]
   tags  Tag[]
 
+  @@index([authorId])
   @@map("blogs")
 }
