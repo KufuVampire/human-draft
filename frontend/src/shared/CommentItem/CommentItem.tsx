@@ -4,6 +4,7 @@ import { ChevronDown, Pencil, Reply, Trash, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 
 import {
 	CommentFieldsFragment,
@@ -66,11 +67,19 @@ export const CommentItem = ({ comment, className }: Props) => {
 		}
 	}, [isEditMode, setFocus]);
 
-	const [updateComment, { loading: isUpdating }] = useUpdateCommentMutation();
+	const [updateComment, { loading: isUpdating }] = useUpdateCommentMutation({
+		onError(error) {
+			toast.error(error.message || 'Ошибка обновления комментария');
+		},
+	});
 
 	const isOwner = profile?.username === username;
 
-	const [deleteComment] = useDeleteCommentMutation();
+	const [deleteComment] = useDeleteCommentMutation({
+		onError(error) {
+			toast.error(error.message || 'Ошибка удаления комментария');
+		},
+	});
 
 	const handleDeleteComment = (commentId: string) => {
 		setType('comment');
@@ -87,7 +96,9 @@ export const CommentItem = ({ comment, className }: Props) => {
 	};
 
 	const handleToggleEditMode = () => {
-		reset({ text });
+		if (isEditMode) {
+			reset({ text });
+		}
 		setEditMode((prev) => !prev);
 	};
 

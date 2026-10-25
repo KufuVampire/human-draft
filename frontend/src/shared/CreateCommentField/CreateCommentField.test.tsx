@@ -6,7 +6,16 @@ import { CreateCommentField } from './CreateCommentField';
 
 const mockCreateComment = vi.fn();
 const mockAddComment = vi.fn();
+const mockToastError = vi.fn();
 let mockIsAuth = true;
+let mockShouldFail = false;
+
+vi.mock('sonner', () => ({
+	toast: {
+		error: (msg: string) => mockToastError(msg),
+		success: vi.fn(),
+	},
+}));
 
 vi.mock('next-intl', () => ({
 	useTranslations: () => (key: string) => key,
@@ -40,10 +49,15 @@ vi.mock('@/graphql/generated/output', () => ({
 				replies: [];
 			};
 		}) => void;
+		onError?: (error: Error) => void;
 	}) => {
 		return [
 			(args: { variables: { postId: string; text: string; parentId?: string } }) => {
 				mockCreateComment(args);
+				if (mockShouldFail) {
+					options?.onError?.(new Error('Сетевая ошибка'));
+					return;
+				}
 				options?.onCompleted?.({
 					createComment: {
 						id: 'new-comment-1',
@@ -67,6 +81,7 @@ describe('CreateCommentField (colocated unit tests)', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
 		mockIsAuth = true;
+		mockShouldFail = false;
 	});
 
 	it('неавторизованный пользователь видит сообщение о необходимости входа', async () => {
@@ -146,6 +161,22 @@ describe('CreateCommentField (colocated unit tests)', () => {
 			});
 			expect(mockAddComment).toHaveBeenCalled();
 			expect(input).toHaveValue('');
+		});
+	});
+
+	it('показывает toast при ошибке мутации', async () => {
+		mockShouldFail = true;
+		const user = userEvent.setup();
+		render(<CreateCommentField />);
+
+		const input = screen.getByPlaceholderText('fields.comment');
+		await user.type(input, 'Текст с ошибкой');
+
+		const submitBtn = screen.getByRole('button', { name: 'comments.leaveComment' });
+		await user.click(submitBtn);
+
+		await waitFor(() => {
+			expect(mockToastError).toHaveBeenCalledWith('Сетевая ошибка');
 		});
 	});
 });

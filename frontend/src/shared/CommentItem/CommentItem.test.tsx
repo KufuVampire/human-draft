@@ -13,7 +13,16 @@ const mockUpdateCommentStore = vi.fn();
 const mockSetCb = vi.fn();
 const mockSetOpen = vi.fn();
 const mockSetType = vi.fn();
+const mockToastError = vi.fn();
 let mockCurrentUsername: string | undefined = 'alice';
+let mockUpdateShouldFail = false;
+
+vi.mock('sonner', () => ({
+	toast: {
+		error: (msg: string) => mockToastError(msg),
+		success: vi.fn(),
+	},
+}));
 
 vi.mock('next-intl', () => ({
 	useTranslations: () => (key: string) => key,
@@ -87,13 +96,20 @@ vi.mock('@/graphql/generated/output', async (importOriginal) => {
 	const actual = await importOriginal<typeof import('@/graphql/generated/output')>();
 	return {
 		...actual,
-		useUpdateCommentMutation: (options?: { onCompleted?: () => void }) => {
+		useUpdateCommentMutation: (options?: {
+			onCompleted?: () => void;
+			onError?: (error: Error) => void;
+		}) => {
 			return [
 				(args: {
 					variables: { commentId: string; text: string };
 					onCompleted?: () => void;
 				}) => {
 					mockUpdateComment(args);
+					if (mockUpdateShouldFail) {
+						options?.onError?.(new Error('Сетевая ошибка'));
+						return;
+					}
 					options?.onCompleted?.();
 					args.onCompleted?.();
 				},
@@ -130,6 +146,7 @@ describe('CommentItem (colocated unit tests)', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
 		mockCurrentUsername = 'alice';
+		mockUpdateShouldFail = false;
 	});
 
 	it('отображает текст комментария с исправленными классами типографики', async () => {
@@ -313,6 +330,27 @@ describe('CommentItem (colocated unit tests)', () => {
 		await user.click(cancelBtn);
 
 		expect(screen.getByText('Версия 2')).toBeInTheDocument();
+	});
+
+	it('показывает toast при ошибке обновления комментария', async () => {
+		mockUpdateShouldFail = true;
+		const user = userEvent.setup();
+		const comment = createComment();
+		render(<CommentItem comment={comment} />);
+
+		const editBtn = screen.getByTitle('postPage.comments.enterEditMode');
+		await user.click(editBtn);
+
+		const input = screen.getByPlaceholderText('fields.comment');
+		await user.clear(input);
+		await user.type(input, 'Новый текст');
+
+		const saveBtn = screen.getByRole('button', { name: 'comments.updateComment' });
+		await user.click(saveBtn);
+
+		await waitFor(() => {
+			expect(mockToastError).toHaveBeenCalledWith('Сетевая ошибка');
+		});
 	});
 
 	it('удаление комментария вызывает модалку подтверждения и выполняет коллбэк', async () => {

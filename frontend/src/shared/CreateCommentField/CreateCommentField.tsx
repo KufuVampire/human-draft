@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
 import { Dispatch, SetStateAction } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 
 import { Button } from '../Button/Button';
 import { FormField } from '../FormField/FormField';
@@ -58,6 +59,9 @@ export const CreateCommentField = ({
 		onCompleted(data) {
 			addComment(data.createComment);
 			handleCancel();
+		},
+		onError(error) {
+			toast.error(error.message || 'Ошибка отправки комментария');
 		},
 	});
 
