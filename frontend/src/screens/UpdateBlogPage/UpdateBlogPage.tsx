@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 
 import { routesConfig } from '@/config';
 import {
+	GetAllFreePostsForPinDocument,
 	useGetAllFreePostsForPinQuery,
 	useUpdateBlogMutation,
 } from '@/graphql/generated/output';
@@ -46,6 +47,7 @@ export const UpdateBlogPage = () => {
 	});
 
 	const [updateBlog, { loading: isUpdating }] = useUpdateBlogMutation({
+		refetchQueries: [{ query: GetAllFreePostsForPinDocument }],
 		onCompleted(data) {
 			if (data.updateBlog) {
 				toast.success(t('blogPage.blogUpdatedSuccess'));

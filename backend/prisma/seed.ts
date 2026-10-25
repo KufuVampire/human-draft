@@ -46,10 +46,10 @@ async function main() {
 	}
 
 	for (let i = 0; i < tags.length; i++) {
-		await prisma.tag.create({
-			data: {
-				name: tags[i],
-			},
+		await prisma.tag.upsert({
+			where: { name: tags[i] },
+			update: {},
+			create: { name: tags[i] },
 		});
 	}
 }

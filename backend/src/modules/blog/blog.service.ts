@@ -1,6 +1,6 @@
 import {
 	BadRequestException,
-	ConflictException,
+	ForbiddenException,
 	Injectable,
 	NotFoundException,
 } from '@nestjs/common';
@@ -20,7 +20,7 @@ import {
 	UpdateBlogInput,
 } from '@/src/inputs';
 import { UserModel } from '@/src/models';
-import { readStreamWithLimit, validateNoGif } from '@/src/utils';
+import { readStreamWithLimit, sanitizeTags, validateNoGif } from '@/src/utils';
 
 @Injectable()
 export class BlogService {
@@ -49,6 +49,8 @@ export class BlogService {
 				  })
 				: [];
 
+		const sanitizedTags = sanitizeTags(tags);
+
 		const blog = await this.prismaService.blog.create({
 			data: {
 				title,
@@ -61,14 +63,15 @@ export class BlogService {
 				...(freePosts.length > 0 && {
 					posts: { connect: freePosts.map(({ id }) => ({ id })) },
 				}),
-				...(tags && {
-					tags: {
-						connectOrCreate: tags.map((tag) => ({
-							where: { name: tag },
-							create: { name: tag },
-						})),
-					},
-				}),
+				...(sanitizedTags &&
+					sanitizedTags.length > 0 && {
+						tags: {
+							connectOrCreate: sanitizedTags.map((tag) => ({
+								where: { name: tag },
+								create: { name: tag },
+							})),
+						},
+					}),
 			},
 		});
 
@@ -108,24 +111,48 @@ export class BlogService {
 		input: UpdateBlogInput,
 		posterFile?: FileUpload
 	) {
+		const blog = await this.prismaService.blog.findUnique({
+			where: { id: blogId },
+		});
+
+		if (!blog) {
+			throw new NotFoundException('Blog was not found');
+		}
+
+		if (blog.authorId !== authorId) {
+			throw new ForbiddenException('You are not the author of this blog');
+		}
+
 		const { description, postIds, title, tags } = input;
 
-		const blog = await this.prismaService.blog.update({
+		const freePosts =
+			postIds && postIds.length
+				? await this.prismaService.post.findMany({
+						where: {
+							id: { in: postIds },
+							authorId,
+							OR: [{ blogId: null }, { blogId }],
+						},
+						select: { id: true },
+				  })
+				: [];
+
+		const sanitizedTags = sanitizeTags(tags);
+
+		await this.prismaService.blog.update({
 			where: {
 				id: blogId,
-				authorId,
 			},
 			data: {
 				description,
 				title,
-				...(postIds &&
-					postIds.length && {
-						posts: { connect: postIds.map((id) => ({ id })) },
-					}),
-				...(tags && {
+				...(freePosts.length > 0 && {
+					posts: { connect: freePosts.map(({ id }) => ({ id })) },
+				}),
+				...(sanitizedTags && {
 					tags: {
 						set: [],
-						connectOrCreate: tags.map((tag) => ({
+						connectOrCreate: sanitizedTags.map((tag) => ({
 							where: { name: tag },
 							create: { name: tag },
 						})),
@@ -178,7 +205,7 @@ export class BlogService {
 		}
 
 		if (isExists.authorId !== authorId) {
-			throw new ConflictException('You are not an author of this blog');
+			throw new ForbiddenException('You are not the author of this blog');
 		}
 
 		await this.prismaService.blog.delete({
@@ -291,14 +318,15 @@ export class BlogService {
 		const blog = await this.prismaService.blog.findUnique({
 			where: {
 				id: blogId,
-				author: {
-					id: authorId,
-				},
 			},
 		});
 
 		if (!blog) {
 			throw new NotFoundException('Blog was not found');
+		}
+
+		if (blog.authorId !== authorId) {
+			throw new ForbiddenException('You are not the author of this blog');
 		}
 
 		if (!newPoster) {
@@ -344,14 +372,15 @@ export class BlogService {
 		const blog = await this.prismaService.blog.findUnique({
 			where: {
 				id: blogId,
-				author: {
-					id: authorId,
-				},
 			},
 		});
 
 		if (!blog) {
 			throw new NotFoundException('Blog was not found');
+		}
+
+		if (blog.authorId !== authorId) {
+			throw new ForbiddenException('You are not the author of this blog');
 		}
 
 		if (blog.posterUrl) {
