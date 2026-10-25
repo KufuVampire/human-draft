@@ -2,7 +2,7 @@
 
 import { Check, ChevronDown, Pencil, Reply, Trash } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
 import {
@@ -39,17 +39,6 @@ export const CommentItem = ({ comment, className }: Props) => {
 	const { deleteComment: deleteComm } = useComments();
 
 	const {
-		register,
-		formState: { isValid, isDirty },
-		handleSubmit,
-		setValue,
-		watch,
-		setFocus,
-	} = useForm<TypeUpdateCommentSchema>();
-
-	const [updateComment, { loading: isUpdating }] = useUpdateCommentMutation();
-
-	const {
 		author: { username, avatarUrl },
 		createdAt,
 		id,
@@ -58,6 +47,33 @@ export const CommentItem = ({ comment, className }: Props) => {
 		parentId,
 	} = comment;
 
+	const {
+		register,
+		formState: { isValid, isDirty },
+		handleSubmit,
+		setValue,
+		reset,
+		watch,
+		setFocus,
+	} = useForm<TypeUpdateCommentSchema>({
+		mode: 'onChange',
+		defaultValues: {
+			text,
+		},
+	});
+
+	useEffect(() => {
+		if (isEditMode) {
+			setFocus('text');
+		}
+	}, [isEditMode, setFocus]);
+
+	const [updateComment, { loading: isUpdating }] = useUpdateCommentMutation({
+		onCompleted() {
+			setEditMode(false);
+		},
+	});
+
 	const isOwner = profile?.username === username;
 
 	const [deleteComment] = useDeleteCommentMutation();
@@ -65,7 +81,6 @@ export const CommentItem = ({ comment, className }: Props) => {
 	const handleDeleteComment = (commentId: string) => {
 		setType('comment');
 		setCb(() => {
-			console.log(commentId);
 			deleteComm(commentId);
 			deleteComment({
 				variables: {
@@ -77,16 +92,27 @@ export const CommentItem = ({ comment, className }: Props) => {
 		setOpen(true);
 	};
 
-	const onSubmit: SubmitHandler<TypeUpdateCommentSchema> = ({ text }) => {
-		if (!text.trim()) return;
+	const handleToggleEditMode = () => {
+		if (isEditMode) {
+			reset({ text });
+			setEditMode(false);
+		} else {
+			setValue('text', text);
+			setEditMode(true);
+		}
+	};
+
+	const onSubmit: SubmitHandler<TypeUpdateCommentSchema> = ({
+		text: updatedText,
+	}) => {
+		if (!updatedText.trim()) return;
 
 		updateComment({
 			variables: {
 				commentId: id,
-				text,
+				text: updatedText,
 			},
 		});
-		setEditMode(false);
 	};
 
 	return (
@@ -113,17 +139,12 @@ export const CommentItem = ({ comment, className }: Props) => {
 					<div className='flex items-center gap-x-2'>
 						<Button
 							variant='clear'
-							title={isEditMode ? t('postPage.comments.exitEditMode') : t('postPage.comments.enterEditMode')}
-							onClick={() => {
-								if (!watch('text')) {
-									setValue('text', text);
-								}
-
-								setEditMode((prev) => !prev);
-								if (isEditMode) {
-									setFocus('text');
-								}
-							}}>
+							title={
+								isEditMode
+									? t('postPage.comments.exitEditMode')
+									: t('postPage.comments.enterEditMode')
+							}
+							onClick={handleToggleEditMode}>
 							{isEditMode ? (
 								<Check className='size-4' />
 							) : (
@@ -148,7 +169,10 @@ export const CommentItem = ({ comment, className }: Props) => {
 							<FormField
 								wrapperClassNames='w-full'
 								className='border-0 border-b rounded-none [&:not(:placeholder-shown)]:shadow-none px-0 pt-0'
-								{...register('text', { required: true })}
+								{...register('text', {
+									required: true,
+									validate: (value) => !!value?.trim(),
+								})}
 								placeholder={t('fields.comment')}
 							/>
 						</div>
@@ -157,13 +181,13 @@ export const CommentItem = ({ comment, className }: Props) => {
 								className={buttonStyles}
 								type='submit'
 								isLoading={isUpdating}
-								disabled={isValid}>
+								disabled={!isValid || !isDirty || isUpdating}>
 								{t('comments.updateComment')}
 							</Button>
 						</div>
 					</form>
 				) : (
-					<p className='leading-[150% tracking-[2%]'>
+					<p className='leading-[150%] tracking-[2%]'>
 						{isDirty ? watch('text') : text}
 					</p>
 				)}

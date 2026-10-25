@@ -28,15 +28,21 @@ export const Button = ({
 	children,
 	variant = 'primary',
 	isLoading = false,
+	disabled,
 	...props
 }: PropsWithChildren<Props>) => {
+	const isDisabled = Boolean(disabled || isLoading || variant === 'disabled');
+
 	return (
 		<button
 			{...props}
-			disabled={isLoading || variant === 'disabled'}
+			disabled={isDisabled}
 			className={cn(
-				'transition-colors cursor-pointer flex items-center justify-center text-center',
-				isLoading ? styles['disabled'] : styles[variant],
+				'transition-colors flex items-center justify-center text-center',
+				isDisabled ? 'cursor-default' : 'cursor-pointer',
+				isLoading || (variant !== 'clear' && isDisabled)
+					? styles['disabled']
+					: styles[variant],
 				props.className
 			)}>
 			{!isLoading ? (
