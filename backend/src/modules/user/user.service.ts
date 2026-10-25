@@ -188,32 +188,37 @@ export class UserService {
 
 		const skip = (page - 1) * perPage;
 
+		const where: Prisma.UserWhereInput = {
+			...(userId && { id: { not: userId } }),
+			...(searchStr && {
+				username: {
+					contains: searchStr,
+					mode: 'insensitive',
+				},
+			}),
+			...(onlySubscriptions &&
+				userId && {
+					subscribers: {
+						some: {
+							fromUserId: userId,
+						},
+					},
+				}),
+		};
+
 		const [users, totalCount] = await this.prismaService.$transaction([
 			this.prismaService.user.findMany({
 				take: perPage,
 				skip,
-				where: {
-					id: { not: userId },
-					username: {
-						contains: searchStr,
-						mode: 'insensitive',
-					},
-					...(onlySubscriptions && {
-						subscribers: {
-							some: {
-								fromUserId: userId,
-							},
-						},
-					}),
-				},
+				where,
 				orderBy: { username: 'asc' },
 			}),
-			this.prismaService.user.count(),
+			this.prismaService.user.count({ where }),
 		]);
 
 		return {
 			data: users,
-			totalCount: userId ? totalCount - 1 : totalCount,
+			totalCount,
 			page,
 			perPage,
 			totalPages: Math.ceil(totalCount / perPage),

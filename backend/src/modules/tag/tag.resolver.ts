@@ -1,7 +1,7 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 
 import { TagService } from './tag.service';
-import { Auth } from '@/src/decorators';
+import { Auth, Authorized } from '@/src/decorators';
 import { UpdatePostOrBlogTagsInput } from '@/src/inputs';
 import { TagModel } from '@/src/models';
 
@@ -16,18 +16,13 @@ export class TagResolver {
 	}
 
 	@Auth()
-	@Mutation(() => Boolean, { name: 'deleteTag' })
-	async delete(@Args('name') name: string) {
-		return this.tagService.delete(name);
-	}
-
-	@Auth()
 	@Mutation(() => Boolean, { name: 'updatePostOrBlogTags' })
 	async updatePostOrBlogTags(
+		@Authorized('id') authorId: string,
 		@Args('tags', { type: () => [String] }) tags: string[],
 		@Args('to') to: UpdatePostOrBlogTagsInput
 	) {
-		return this.tagService.updateTags(tags, to);
+		return this.tagService.updateTags(authorId, tags, to);
 	}
 
 	@Query(() => [TagModel], { name: 'findTagsBySearchString' })

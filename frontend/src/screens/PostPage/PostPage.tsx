@@ -9,7 +9,6 @@ import {
 	useCallback,
 	useEffect,
 	useMemo,
-	useRef,
 	useState,
 } from 'react';
 import { useForm } from 'react-hook-form';
@@ -17,11 +16,9 @@ import { toast } from 'sonner';
 
 import { routesConfig } from '@/config';
 import {
-	GetPostByIdDocument,
 	useDeletePostMutation,
 	useGetBlogsForPinQuery,
 	useTogglePinBlogMutation,
-	useUpdatePostMutation,
 } from '@/graphql/generated/output';
 import { useDebounce, useLocalStorage, usePost } from '@/hooks';
 import { TypeSearchSchema } from '@/schemas';
@@ -99,15 +96,6 @@ export const PostPage = () => {
 			router.push(routesConfig.home);
 		},
 	});
-	const [updatePost, { loading: isUpdating }] = useUpdatePostMutation({
-		refetchQueries: [
-			{
-				query: GetPostByIdDocument,
-				variables: { postId },
-			},
-		],
-		awaitRefetchQueries: true,
-	});
 	const [togglePin] = useTogglePinBlogMutation({
 		onCompleted(data) {
 			if (data.pinPostToBlog.blog) {
@@ -121,24 +109,6 @@ export const PostPage = () => {
 			setPinnedBlogId(blog.id);
 		}
 	}, [blog]);
-
-	const viewedPostIdRef = useRef<string | null>(null);
-
-	useEffect(() => {
-		if (isLoading || viewedPostIdRef.current === postId) return;
-		const timer = setTimeout(() => {
-			viewedPostIdRef.current = postId;
-			updatePost({
-				variables: {
-					postId,
-					data: {
-						viewsCount: viewsCount ? viewsCount + 1 : 1,
-					},
-				},
-			});
-		}, 10000);
-		return () => clearTimeout(timer);
-	}, [isLoading, postId, updatePost, viewsCount]);
 
 	const searchStr = useDebounce(watch('search'));
 
@@ -194,32 +164,24 @@ export const PostPage = () => {
 		});
 		setOpen(true);
 	}, [deletePost, postId, setCb, setOpen, setType]);
+
 	const handleLike = useCallback(() => {
 		if (!isAuth) {
 			setNeedAuthOpen(true);
 			return;
 		}
 
-		const likedAtObj = likedAt.find((el) => el.postId === postId);
+		const currentLiked = likedAt.find((el) => el.postId === postId);
 
 		if (
-			likedAtObj &&
-			likedAtObj.isLiked &&
-			!isLikeExpired(likedAtObj.date) &&
-			likedAtObj.postId === postId &&
-			likedAtObj.userId === profile?.id
+			currentLiked &&
+			currentLiked.isLiked &&
+			!isLikeExpired(currentLiked.date) &&
+			currentLiked.postId === postId &&
+			currentLiked.userId === profile?.id
 		) {
 			return;
 		}
-
-		updatePost({
-			variables: {
-				postId,
-				data: {
-					likesCount: likesCount ? likesCount + 1 : 1,
-				},
-			},
-		});
 
 		setLikedAt((prev) => {
 			const filteredPrev = prev.filter((o) => o.postId !== postId);
@@ -233,16 +195,8 @@ export const PostPage = () => {
 				},
 			];
 		});
-	}, [
-		isAuth,
-		likedAt,
-		likesCount,
-		postId,
-		profile,
-		setLikedAt,
-		setNeedAuthOpen,
-		updatePost,
-	]);
+	}, [isAuth, likedAt, postId, profile, setLikedAt, setNeedAuthOpen]);
+
 	const handleTogglePinBlog = useCallback(
 		(e: MouseEvent<HTMLUListElement>) => {
 			const target = e.target as HTMLElement;
@@ -342,11 +296,10 @@ export const PostPage = () => {
 									likedAtObj?.isLiked && 'hover:text-[--text-color-main]'
 								)}
 								disabled={
-									isUpdating ||
-									(likedAtObj?.isLiked &&
-										!isLikeExpired(likedAtObj.date) &&
-										likedAtObj.userId === profile?.id &&
-										likedAtObj.postId === postId)
+									likedAtObj?.isLiked &&
+									!isLikeExpired(likedAtObj.date) &&
+									likedAtObj.userId === profile?.id &&
+									likedAtObj.postId === postId
 								}
 								onClick={handleLike}>
 								<Heart

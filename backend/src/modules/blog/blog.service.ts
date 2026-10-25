@@ -54,9 +54,10 @@ export class BlogService {
 						id: authorId,
 					},
 				},
-				...(postIds.length && {
-					posts: { connect: freePosts.map(({ id }) => ({ id })) },
-				}),
+				...(postIds &&
+					postIds.length && {
+						posts: { connect: freePosts.map(({ id }) => ({ id })) },
+					}),
 				...(tags && {
 					tags: {
 						connectOrCreate: tags.map((tag) => ({
@@ -231,13 +232,13 @@ export class BlogService {
 				where,
 				take: perPage,
 				skip,
-				orderBy: { id: 'asc' },
+				orderBy: { createdAt: 'desc' },
 				include: {
 					author: true,
 					tags: true,
 				},
 			}),
-			this.prismaService.blog.count(),
+			this.prismaService.blog.count({ where }),
 		]);
 
 		return {

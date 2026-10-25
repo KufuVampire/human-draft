@@ -1,5 +1,6 @@
 import {
 	ConflictException,
+	ForbiddenException,
 	Injectable,
 	NotFoundException,
 } from '@nestjs/common';
@@ -37,23 +38,11 @@ export class TagService {
 		return tag;
 	}
 
-	async delete(name: string) {
-		const isExists = await this.findByName(normalizeTagName(name));
-
-		if (!isExists) {
-			throw new NotFoundException('Tag was not found');
-		}
-
-		await this.prismaService.tag.delete({
-			where: {
-				name,
-			},
-		});
-
-		return true;
-	}
-
-	async updateTags(tags: string[], to: UpdatePostOrBlogTagsInput) {
+	async updateTags(
+		authorId: string,
+		tags: string[],
+		to: UpdatePostOrBlogTagsInput
+	) {
 		const { postId, blogId } = to;
 
 		if (postId) {
@@ -67,9 +56,15 @@ export class TagService {
 				throw new NotFoundException('Post not found');
 			}
 
+			if (post.authorId !== authorId) {
+				throw new ForbiddenException(
+					'You are not the author of this post'
+				);
+			}
+
 			const uniqueTags = [...new Set(tags)];
 
-			return this.prismaService.post.update({
+			await this.prismaService.post.update({
 				where: {
 					id: postId,
 				},
@@ -83,6 +78,8 @@ export class TagService {
 					},
 				},
 			});
+
+			return true;
 		}
 
 		if (blogId) {
@@ -93,12 +90,18 @@ export class TagService {
 			});
 
 			if (!blog) {
-				throw new NotFoundException('Post not found');
+				throw new NotFoundException('Blog not found');
+			}
+
+			if (blog.authorId !== authorId) {
+				throw new ForbiddenException(
+					'You are not the author of this blog'
+				);
 			}
 
 			const uniqueTags = [...new Set(tags)];
 
-			return this.prismaService.blog.update({
+			await this.prismaService.blog.update({
 				where: {
 					id: blogId,
 				},
@@ -112,7 +115,11 @@ export class TagService {
 					},
 				},
 			});
+
+			return true;
 		}
+
+		return false;
 	}
 
 	async findTags(search: string) {
@@ -120,7 +127,7 @@ export class TagService {
 			where: {
 				name: {
 					contains: search,
-					mode: 'insensitive'
+					mode: 'insensitive',
 				},
 			},
 		});
