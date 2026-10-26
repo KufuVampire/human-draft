@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 
+import { GuestGuard } from '@/guards';
 import { AuthTabLinks } from '@/modules';
 import { GoToHomeButton } from '@/shared';
 
@@ -9,7 +10,7 @@ export default function Layout({ children }: { children: ReactNode }) {
 			<div className='flex flex-col w-full max-w-[30rem] gap-y-5'>
 				<GoToHomeButton />
 				<AuthTabLinks />
-				{children}
+				<GuestGuard>{children}</GuestGuard>
 			</div>
 		</main>
 	);

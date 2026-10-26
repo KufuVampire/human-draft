@@ -50,45 +50,20 @@ describe('proxy helper functions', () => {
 });
 
 describe('proxy execution and redirects', () => {
-	it('redirects authenticated user away from /sign-in to /', () => {
+	it('does not block /sign-in at edge even if session cookie exists (no deadlock)', () => {
 		const req = createMockRequest('/sign-in', { sessionCookie: 'valid-session' });
 		const response = proxy(req);
 
-		expect(response.status).toBe(307);
-		expect(response.headers.get('location')).toBe('http://localhost:3000/');
+		expect(response.headers.get('location')).toBeNull();
+		expect(response.status).toBe(200);
 	});
 
-	it('redirects authenticated user away from /sign-up to /', () => {
+	it('does not block /sign-up at edge even if session cookie exists', () => {
 		const req = createMockRequest('/sign-up', { sessionCookie: 'valid-session' });
 		const response = proxy(req);
 
-		expect(response.status).toBe(307);
-		expect(response.headers.get('location')).toBe('http://localhost:3000/');
-	});
-
-	it('allows user with stale cookie to access /sign-in?expired=true and deletes cookie', () => {
-		const req = createMockRequest('/sign-in?expired=true', {
-			sessionCookie: 'stale-session',
-		});
-		const response = proxy(req);
-
 		expect(response.headers.get('location')).toBeNull();
 		expect(response.status).toBe(200);
-		// Cookie is removed
-		const setCookie = response.headers.get('set-cookie');
-		expect(setCookie).toContain('h_draft_sid=;');
-	});
-
-	it('allows user with stale cookie to access /sign-in?logout=true and deletes cookie', () => {
-		const req = createMockRequest('/sign-in?logout=true', {
-			sessionCookie: 'stale-session',
-		});
-		const response = proxy(req);
-
-		expect(response.headers.get('location')).toBeNull();
-		expect(response.status).toBe(200);
-		const setCookie = response.headers.get('set-cookie');
-		expect(setCookie).toContain('h_draft_sid=;');
 	});
 
 	it('redirects unauthenticated user from protected /post/create to /sign-in', () => {

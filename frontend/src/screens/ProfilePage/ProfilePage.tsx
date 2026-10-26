@@ -7,7 +7,10 @@ import { MouseEvent, useEffect, useMemo, useState } from 'react';
 
 import { ProfilePoster } from './ProfilePoster/ProfilePoster';
 import { routesConfig } from '@/config';
-import { useGetUserByUsernameQuery } from '@/graphql/generated/output';
+import {
+	GetUserByUsernameQuery,
+	useGetUserByUsernameQuery,
+} from '@/graphql/generated/output';
 import { useProfile } from '@/hooks';
 import { SubscribeUnsubscribeButtons } from '@/modules';
 import {
@@ -24,9 +27,10 @@ import { isNotFoundError } from '@/utils';
 
 interface Props {
 	username: string;
+	initialData?: GetUserByUsernameQuery['getUserByUsername'];
 }
 
-export const ProfilePage = ({ username }: Props) => {
+export const ProfilePage = ({ username, initialData }: Props) => {
 	const router = useRouter();
 	const [isOpen, setOpen] = useState(false);
 	const {
@@ -47,6 +51,7 @@ export const ProfilePage = ({ username }: Props) => {
 
 	const { data, loading, error } = useGetUserByUsernameQuery({
 		variables: { username },
+		skip: !!initialData,
 	});
 
 	const dropdownList = useMemo(() => {
@@ -175,17 +180,17 @@ export const ProfilePage = ({ username }: Props) => {
 		}
 	};
 
-	const user = data?.getUserByUsername;
+	const user = data?.getUserByUsername ?? initialData;
 
 	useEffect(() => {
-		if (loading) return;
+		if (loading && !user) return;
 		if (error) {
 			if (isNotFoundError(error)) {
 				notFound();
 			}
 			return;
 		}
-		if (!data || !user) {
+		if (!user) {
 			notFound();
 		}
 	}, [loading, data, user, error, router]);
@@ -194,8 +199,12 @@ export const ProfilePage = ({ username }: Props) => {
 		throw error;
 	}
 
-	if (loading || !user) {
+	if (loading && !user) {
 		return <ProfilePageSkeleton isOwner={isOwner} />;
+	}
+
+	if (!user) {
+		return null;
 	}
 
 	const userBlogsAndPosts = [...user.posts, ...user.blogs];

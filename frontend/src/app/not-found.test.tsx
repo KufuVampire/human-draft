@@ -1,7 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import ContentNotFound from './(content)/not-found';
 import NotFound from './not-found';
 
 vi.mock('next-intl/server', () => ({
@@ -15,6 +14,12 @@ vi.mock('next-intl/server', () => ({
 			};
 			return translations[key] ?? key;
 		}),
+}));
+
+vi.mock('./(content)/not-found', () => ({
+	default: () => (
+		<div data-testid='content-not-found'>Упс! Страница потерялась</div>
+	),
 }));
 
 vi.mock('next/image', () => ({
@@ -56,7 +61,11 @@ vi.mock('@/shared', () => ({
 
 describe('NotFound components (404 Page)', () => {
 	it('ContentNotFound renders Duck illustration and link without duplicating layout', async () => {
-		const component = await ContentNotFound();
+		const { default: ActualContentNotFound } =
+			await vi.importActual<typeof import('./(content)/not-found')>(
+				'./(content)/not-found'
+			);
+		const component = await ActualContentNotFound();
 		render(component);
 
 		expect(screen.getByText('Упс! Страница потерялась')).toBeInTheDocument();
@@ -75,9 +84,8 @@ describe('NotFound components (404 Page)', () => {
 		expect(homeLink).toHaveAttribute('href', '/');
 	});
 
-	it('Root NotFound renders full layout with Header, Sidebar Dashboard, and Footer', async () => {
-		const component = await NotFound();
-		render(component);
+	it('Root NotFound renders full layout with Header, Sidebar Dashboard, and Footer', () => {
+		render(<NotFound />);
 
 		expect(screen.getByTestId('header')).toBeInTheDocument();
 		expect(screen.getByTestId('sidebar')).toBeInTheDocument();

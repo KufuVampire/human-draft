@@ -14,10 +14,10 @@ export async function generateMetadata(): Promise<Metadata> {
 	};
 }
 
-export default async function NotFound() {
+export default function NotFound() {
 	return (
 		<ContentLayout>
-			{await ContentNotFound()}
+			<ContentNotFound />
 		</ContentLayout>
 	);
 }

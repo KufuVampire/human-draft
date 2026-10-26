@@ -49,24 +49,7 @@ export const isProtectedRoute = (pathname: string): boolean => {
 
 export function proxy(req: NextRequest) {
 	const session = req.cookies.get(SESSION_COOKIE_NAME)?.value;
-	const { pathname, searchParams } = req.nextUrl;
-
-	if (isAuthRoute(pathname)) {
-		const isResetRequested =
-			searchParams.has('logout') ||
-			searchParams.has('expired') ||
-			searchParams.has('reset');
-
-		if (isResetRequested) {
-			const response = NextResponse.next();
-			response.cookies.delete(SESSION_COOKIE_NAME);
-			return response;
-		}
-
-		if (session) {
-			return NextResponse.redirect(new URL(routesConfig.home, req.url));
-		}
-	}
+	const { pathname } = req.nextUrl;
 
 	if (!session && isProtectedRoute(pathname)) {
 		return NextResponse.redirect(new URL(routesConfig.signin, req.url));
