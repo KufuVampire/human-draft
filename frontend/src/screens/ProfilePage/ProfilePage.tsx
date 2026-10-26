@@ -2,7 +2,7 @@
 
 import { EllipsisVertical } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useRouter } from 'next/navigation';
+import { notFound, useRouter } from 'next/navigation';
 import { MouseEvent, useEffect, useMemo, useState } from 'react';
 
 import { ProfilePoster } from './ProfilePoster/ProfilePoster';
@@ -178,7 +178,7 @@ export const ProfilePage = ({ username }: Props) => {
 
 	useEffect(() => {
 		if (!loading && (!data || !user)) {
-			router.replace(routesConfig.notFound);
+			notFound();
 		}
 	}, [loading, data, user, router]);
 
@@ -264,7 +264,7 @@ export const ProfilePage = ({ username }: Props) => {
 					)}
 				</div>
 			</Section>
-			<CreatePostBlogLinks />
+			{isOwner && <CreatePostBlogLinks />}
 			{sortedUserBlogsAndPosts.length > 0 && (
 				<PostsAndBlogsList data={sortedUserBlogsAndPosts} />
 			)}

@@ -8,6 +8,12 @@
 		"bottomText": "If the duck is silent, try returning to the main page.",
 		"goToMain": "Thank you, Duck, take me to the home page"
 	},
+	"500": {
+		"title": "Something went wrong",
+		"description": "An unexpected error occurred on the server or while rendering the page. Debugging Duck is already trying to figure out this failure",
+		"tryAgain": "Try again",
+		"goToMain": "Back to home"
+	},
 	"btns": {
 		"createPost": "Create post",
 		"createBlog": "Create blog",

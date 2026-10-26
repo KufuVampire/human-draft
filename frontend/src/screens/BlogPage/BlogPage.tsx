@@ -2,7 +2,7 @@
 
 import { ChevronDown, Search, Trash } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useParams, useRouter } from 'next/navigation';
+import { notFound, useParams, useRouter } from 'next/navigation';
 import {
 	ChangeEvent,
 	MouseEvent,
@@ -201,7 +201,7 @@ export const BlogPage = memo(() => {
 
 	useEffect(() => {
 		if (!isBlogLoading && (!data || !blog)) {
-			router.replace(routesConfig.notFound);
+			notFound();
 		}
 	}, [isBlogLoading, data, blog, router]);
 
