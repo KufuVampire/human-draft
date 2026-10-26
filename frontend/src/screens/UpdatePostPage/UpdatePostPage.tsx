@@ -4,7 +4,7 @@ import { editorViewCtx } from '@milkdown/core';
 import { Crepe } from '@milkdown/crepe';
 import { Milkdown, useEditor } from '@milkdown/react';
 import { useTranslations } from 'next-intl';
-import { useParams, useRouter } from 'next/navigation';
+import { notFound, useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -15,14 +15,38 @@ import { useUpdatePostMutation } from '@/graphql/generated/output';
 import { usePost } from '@/hooks';
 import { TypeUpdatePostSchema } from '@/schemas';
 import { Button, Container, FormField, Section, TagsPicker } from '@/shared';
-import { convertImageBlockToImage, convertImageToImageBlock } from '@/utils';
+import {
+	convertImageBlockToImage,
+	convertImageToImageBlock,
+	isNotFoundError,
+} from '@/utils';
 
 export const UpdatePostPage = () => {
 	const t = useTranslations();
 	const router = useRouter();
 	const [isContentLoaded, setIsContentLoaded] = useState(false);
 	const { postId } = useParams<{ postId: string }>();
-	const { title, rawContent, tags: postTags } = usePost(postId);
+	const { title, rawContent, tags: postTags, isLoading, post, error } =
+		usePost(postId);
+
+	useEffect(() => {
+		if (isLoading) return;
+
+		if (error) {
+			if (isNotFoundError(error)) {
+				notFound();
+			}
+			return;
+		}
+
+		if (!post) {
+			notFound();
+		}
+	}, [isLoading, post, error]);
+
+	if (error && !isNotFoundError(error)) {
+		throw error;
+	}
 	const {
 		handleSubmit,
 		register,

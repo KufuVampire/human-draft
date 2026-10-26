@@ -1,4 +1,6 @@
 import { type Metadata } from 'next';
+import { notFound } from 'next/navigation';
+import { cache } from 'react';
 
 import { routesConfig } from '@/config';
 import {
@@ -7,22 +9,37 @@ import {
 } from '@/graphql/generated/output';
 import { apolloClient } from '@/libs';
 import { PostPage } from '@/screens';
+import { isNotFoundError } from '@/utils';
 
 interface Params {
 	params: Promise<{ postId: string }>;
 }
 
+const getPost = cache(async (postId: string) => {
+	try {
+		const { data }: { data: GetPostByIdQuery } = await apolloClient.query({
+			query: GetPostByIdDocument,
+			variables: {
+				postId,
+			},
+		});
+
+		return data?.getPostById;
+	} catch (err) {
+		if (isNotFoundError(err)) {
+			return null;
+		}
+		throw err;
+	}
+});
+
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
 	const { postId } = await params;
+	const post = await getPost(postId);
 
-	const { data }: { data: GetPostByIdQuery } = await apolloClient.query({
-		query: GetPostByIdDocument,
-		variables: {
-			postId,
-		},
-	});
-
-	const post = data.getPostById;
+	if (!post) {
+		notFound();
+	}
 
 	return {
 		title: post.title,
@@ -48,6 +65,13 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 	};
 }
 
-export default function Post() {
-	return <PostPage />;
+export default async function Post({ params }: Params) {
+	const { postId } = await params;
+	const post = await getPost(postId);
+
+	if (!post) {
+		notFound();
+	}
+
+	return <PostPage initialData={post} />;
 }

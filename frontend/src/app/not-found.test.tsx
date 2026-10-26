@@ -1,0 +1,95 @@
+import { render, screen } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
+
+import NotFound from './not-found';
+
+vi.mock('next-intl/server', () => ({
+	getTranslations: () =>
+		Promise.resolve((key: string) => {
+			const translations: Record<string, string> = {
+				title: 'Упс! Страница потерялась',
+				description: 'Но не волнуйтесь, вы нашли Отладочную Уточку',
+				bottomText: 'Если уточка молчит, попробуйте вернуться на главную',
+				goToMain: 'Спасибо, Уточка, я на главную',
+			};
+			return translations[key] ?? key;
+		}),
+}));
+
+vi.mock('./(content)/not-found', () => ({
+	default: () => (
+		<div data-testid='content-not-found'>Упс! Страница потерялась</div>
+	),
+}));
+
+vi.mock('next/image', () => ({
+	default: ({
+		priority: _priority,
+		...props
+	}: React.ImgHTMLAttributes<HTMLImageElement> & { priority?: boolean }) => (
+		// eslint-disable-next-line @next/next/no-img-element
+		<img {...props} alt={props.alt || ''} />
+	),
+}));
+
+vi.mock('@/modules', () => ({
+	Dashboard: () => <aside data-testid='sidebar'>Sidebar Dashboard</aside>,
+	ConfirmationChangesModal: () => null,
+	ConfirmationDeletionModal: () => null,
+	CropperModal: () => null,
+	NeedAuthModal: () => null,
+}));
+
+vi.mock('@/shared', () => ({
+	Header: () => <header data-testid='header'>Header</header>,
+	Footer: () => <footer data-testid='footer'>Footer</footer>,
+	Main: ({ children }: { children: React.ReactNode }) => <main>{children}</main>,
+	Container: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+	CustomLink: ({
+		children,
+		href,
+		...props
+	}: {
+		children: React.ReactNode;
+		href: string;
+	}) => (
+		<a href={href} {...props}>
+			{children}
+		</a>
+	),
+}));
+
+describe('NotFound components (404 Page)', () => {
+	it('ContentNotFound renders Duck illustration and link without duplicating layout', async () => {
+		const { default: ActualContentNotFound } =
+			await vi.importActual<typeof import('./(content)/not-found')>(
+				'./(content)/not-found'
+			);
+		const component = await ActualContentNotFound();
+		render(component);
+
+		expect(screen.getByText('Упс! Страница потерялась')).toBeInTheDocument();
+		expect(
+			screen.getByText('Но не волнуйтесь, вы нашли Отладочную Уточку')
+		).toBeInTheDocument();
+		expect(screen.getByAltText('duck')).toBeInTheDocument();
+
+		// ContentNotFound should NOT render extra Header/Footer (layout provides them)
+		expect(screen.queryByTestId('header')).not.toBeInTheDocument();
+		expect(screen.queryByTestId('footer')).not.toBeInTheDocument();
+
+		const homeLink = screen.getByRole('link', {
+			name: 'Спасибо, Уточка, я на главную',
+		});
+		expect(homeLink).toHaveAttribute('href', '/');
+	});
+
+	it('Root NotFound renders full layout with Header, Sidebar Dashboard, and Footer', () => {
+		render(<NotFound />);
+
+		expect(screen.getByTestId('header')).toBeInTheDocument();
+		expect(screen.getByTestId('sidebar')).toBeInTheDocument();
+		expect(screen.getByTestId('footer')).toBeInTheDocument();
+		expect(screen.getByText('Упс! Страница потерялась')).toBeInTheDocument();
+	});
+});

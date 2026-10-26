@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { ChevronDown, Plus, Search } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
-import { useParams, useRouter } from 'next/navigation';
+import { notFound, useParams, useRouter } from 'next/navigation';
 import { ChangeEvent, MouseEvent, useEffect, useMemo, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -18,12 +18,31 @@ import {
 import { useBlog, useDebounce } from '@/hooks';
 import { TypeUpdateBlogSchema, createBlogSchema } from '@/schemas';
 import { Button, Dropdown, FormField, Section, TagsPicker } from '@/shared';
-import { cn } from '@/utils';
+import { cn, isNotFoundError } from '@/utils';
 
 export const UpdateBlogPage = () => {
 	const router = useRouter();
 	const { blogId } = useParams<{ blogId: string }>();
-	const { data, loading: isBlogLoading } = useBlog(blogId);
+	const { data, loading: isBlogLoading, error } = useBlog(blogId);
+
+	useEffect(() => {
+		if (isBlogLoading) return;
+
+		if (error) {
+			if (isNotFoundError(error)) {
+				notFound();
+			}
+			return;
+		}
+
+		if (!data?.getBlogById) {
+			notFound();
+		}
+	}, [isBlogLoading, data, error]);
+
+	if (error && !isNotFoundError(error)) {
+		throw error;
+	}
 	const [tags, setTags] = useState<string[]>([]);
 	const [poster, setPoster] = useState<File | null>(null);
 	const [posterUrl, setPosterUrl] = useState<string | null | undefined>(null);

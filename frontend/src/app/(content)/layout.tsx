@@ -9,8 +9,6 @@ import {
 } from '@/modules';
 import { Container, Footer, Header, Main } from '@/shared';
 
-import '@/app/globals.css';
-
 export default function ContentLayout({
 	children,
 }: Readonly<{

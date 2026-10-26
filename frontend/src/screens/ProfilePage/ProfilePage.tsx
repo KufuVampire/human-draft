@@ -2,12 +2,15 @@
 
 import { EllipsisVertical } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useRouter } from 'next/navigation';
+import { notFound, useRouter } from 'next/navigation';
 import { MouseEvent, useEffect, useMemo, useState } from 'react';
 
 import { ProfilePoster } from './ProfilePoster/ProfilePoster';
 import { routesConfig } from '@/config';
-import { useGetUserByUsernameQuery } from '@/graphql/generated/output';
+import {
+	GetUserByUsernameQuery,
+	useGetUserByUsernameQuery,
+} from '@/graphql/generated/output';
 import { useProfile } from '@/hooks';
 import { SubscribeUnsubscribeButtons } from '@/modules';
 import {
@@ -20,12 +23,14 @@ import {
 	Section,
 	UserAvatar,
 } from '@/shared';
+import { isNotFoundError } from '@/utils';
 
 interface Props {
 	username: string;
+	initialData?: GetUserByUsernameQuery['getUserByUsername'];
 }
 
-export const ProfilePage = ({ username }: Props) => {
+export const ProfilePage = ({ username, initialData }: Props) => {
 	const router = useRouter();
 	const [isOpen, setOpen] = useState(false);
 	const {
@@ -44,8 +49,9 @@ export const ProfilePage = ({ username }: Props) => {
 
 	const isOwner = profile?.username === username;
 
-	const { data, loading } = useGetUserByUsernameQuery({
+	const { data, loading, error } = useGetUserByUsernameQuery({
 		variables: { username },
+		skip: !!initialData,
 	});
 
 	const dropdownList = useMemo(() => {
@@ -174,16 +180,31 @@ export const ProfilePage = ({ username }: Props) => {
 		}
 	};
 
-	const user = data?.getUserByUsername;
+	const user = data?.getUserByUsername ?? initialData;
 
 	useEffect(() => {
-		if (!loading && (!data || !user)) {
-			router.replace(routesConfig.notFound);
+		if (loading && !user) return;
+		if (error) {
+			if (isNotFoundError(error)) {
+				notFound();
+			}
+			return;
 		}
-	}, [loading, data, user, router]);
+		if (!user) {
+			notFound();
+		}
+	}, [loading, data, user, error, router]);
 
-	if (loading || !user) {
+	if (error && !isNotFoundError(error)) {
+		throw error;
+	}
+
+	if (loading && !user) {
 		return <ProfilePageSkeleton isOwner={isOwner} />;
+	}
+
+	if (!user) {
+		return null;
 	}
 
 	const userBlogsAndPosts = [...user.posts, ...user.blogs];
@@ -264,7 +285,7 @@ export const ProfilePage = ({ username }: Props) => {
 					)}
 				</div>
 			</Section>
-			<CreatePostBlogLinks />
+			{isOwner && <CreatePostBlogLinks />}
 			{sortedUserBlogsAndPosts.length > 0 && (
 				<PostsAndBlogsList data={sortedUserBlogsAndPosts} />
 			)}

@@ -2,7 +2,7 @@
 
 import { ChevronDown, Eye, Heart, MessageSquare, Search } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useParams, useRouter } from 'next/navigation';
+import { notFound, useParams, useRouter } from 'next/navigation';
 import {
 	MouseEvent,
 	lazy,
@@ -16,6 +16,7 @@ import { toast } from 'sonner';
 
 import { routesConfig } from '@/config';
 import {
+	GetPostByIdQuery,
 	useDeletePostMutation,
 	useGetBlogsForPinQuery,
 	useTogglePinBlogMutation,
@@ -37,7 +38,7 @@ import {
 	useNeedAuthModal,
 	useProfile,
 } from '@/store';
-import { cn } from '@/utils';
+import { cn, isNotFoundError } from '@/utils';
 
 const isLikeExpired = (date: number) => {
 	if (!date) return true;
@@ -57,7 +58,11 @@ interface ILikedAt {
 
 const CommentsLazy = lazy(() => import('@/modules/Comments/Comments'));
 
-export const PostPage = () => {
+interface Props {
+	initialData?: GetPostByIdQuery['getPostById'];
+}
+
+export const PostPage = ({ initialData }: Props = {}) => {
 	const t = useTranslations();
 	const router = useRouter();
 	const { postId } = useParams<{ postId: string }>();
@@ -75,6 +80,8 @@ export const PostPage = () => {
 	});
 	const {
 		isLoading,
+		error,
+		post,
 		content,
 		title,
 		author,
@@ -83,7 +90,7 @@ export const PostPage = () => {
 		likesCount,
 		viewsCount,
 		blog,
-	} = usePost(postId);
+	} = usePost(postId, initialData);
 
 	const isOwner = profile?.username === author?.username;
 
@@ -216,7 +223,26 @@ export const PostPage = () => {
 		[postId, togglePin]
 	);
 
-	if (isLoading) {
+	useEffect(() => {
+		if (isLoading) return;
+
+		if (error) {
+			if (isNotFoundError(error)) {
+				notFound();
+			}
+			return;
+		}
+
+		if (!post) {
+			notFound();
+		}
+	}, [isLoading, post, error]);
+
+	if (error && !isNotFoundError(error)) {
+		throw error;
+	}
+
+	if (isLoading || !post) {
 		return null;
 	}
 

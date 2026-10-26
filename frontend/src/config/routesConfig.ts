@@ -18,7 +18,7 @@ class RoutesConfig {
 	publicOffer = 'public-offer';
 	aboutUs = 'about-us';
 
-	notFound = '/404';
+
 
 	profileUsername = (username: string) => `/${username}`
 	profileSettings = (username: string) => `/${username}/${this.settings}`;
