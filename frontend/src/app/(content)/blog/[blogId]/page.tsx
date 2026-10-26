@@ -1,4 +1,5 @@
 import { type Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 
 import { routesConfig } from '@/config';
 import {
@@ -29,16 +30,18 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 		blog = data?.getBlogById;
 	} catch (err) {
 		if (isNotFoundError(err)) {
+			const t = await getTranslations('404.metadata');
 			return {
-				title: 'Страница не найдена',
+				title: t('title'),
 			};
 		}
 		throw err;
 	}
 
 	if (!blog) {
+		const t = await getTranslations('404.metadata');
 		return {
-			title: 'Страница не найдена',
+			title: t('title'),
 		};
 	}
 
