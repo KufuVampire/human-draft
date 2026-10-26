@@ -15,7 +15,11 @@ import { useUpdatePostMutation } from '@/graphql/generated/output';
 import { usePost } from '@/hooks';
 import { TypeUpdatePostSchema } from '@/schemas';
 import { Button, Container, FormField, Section, TagsPicker } from '@/shared';
-import { convertImageBlockToImage, convertImageToImageBlock } from '@/utils';
+import {
+	convertImageBlockToImage,
+	convertImageToImageBlock,
+	isNotFoundError,
+} from '@/utils';
 
 export const UpdatePostPage = () => {
 	const t = useTranslations();
@@ -26,10 +30,23 @@ export const UpdatePostPage = () => {
 		usePost(postId);
 
 	useEffect(() => {
-		if (!isLoading && (!post || error)) {
+		if (isLoading) return;
+
+		if (error) {
+			if (isNotFoundError(error)) {
+				notFound();
+			}
+			return;
+		}
+
+		if (!post) {
 			notFound();
 		}
 	}, [isLoading, post, error]);
+
+	if (error && !isNotFoundError(error)) {
+		throw error;
+	}
 	const {
 		handleSubmit,
 		register,

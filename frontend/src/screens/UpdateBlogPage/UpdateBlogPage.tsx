@@ -18,7 +18,7 @@ import {
 import { useBlog, useDebounce } from '@/hooks';
 import { TypeUpdateBlogSchema, createBlogSchema } from '@/schemas';
 import { Button, Dropdown, FormField, Section, TagsPicker } from '@/shared';
-import { cn } from '@/utils';
+import { cn, isNotFoundError } from '@/utils';
 
 export const UpdateBlogPage = () => {
 	const router = useRouter();
@@ -26,10 +26,23 @@ export const UpdateBlogPage = () => {
 	const { data, loading: isBlogLoading, error } = useBlog(blogId);
 
 	useEffect(() => {
-		if (!isBlogLoading && (!data?.getBlogById || error)) {
+		if (isBlogLoading) return;
+
+		if (error) {
+			if (isNotFoundError(error)) {
+				notFound();
+			}
+			return;
+		}
+
+		if (!data?.getBlogById) {
 			notFound();
 		}
 	}, [isBlogLoading, data, error]);
+
+	if (error && !isNotFoundError(error)) {
+		throw error;
+	}
 	const [tags, setTags] = useState<string[]>([]);
 	const [poster, setPoster] = useState<File | null>(null);
 	const [posterUrl, setPosterUrl] = useState<string | null | undefined>(null);

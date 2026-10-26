@@ -2,7 +2,6 @@ import { LazyMotion, domAnimation } from 'motion/react';
 import type { Metadata } from 'next';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
-import { ThemeProvider } from 'next-themes';
 import { Roboto, Ubuntu } from 'next/font/google';
 import { ReactNode } from 'react';
 import { Toaster } from 'sonner';
@@ -12,6 +11,7 @@ import {
 	ApolloClientProvider,
 	AuthProvider,
 	MilkdownProvider,
+	ThemeProvider,
 } from '@/providers';
 import { cn } from '@/utils';
 

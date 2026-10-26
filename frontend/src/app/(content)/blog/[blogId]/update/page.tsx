@@ -7,12 +7,13 @@ import {
 import { AuthGuard } from '@/guards';
 import { apolloClient } from '@/libs';
 import { UpdateBlogPage } from '@/screens';
+import { isNotFoundError } from '@/utils';
 
 interface Params {
 	params: Promise<{ blogId: string }>;
 }
 
-export default async function UpdateBlog({ params }: Params) {
+export default async function BlogUpdate({ params }: Params) {
 	const { blogId } = await params;
 
 	let blog: GetBlogByIdQuery['getBlogById'] | undefined;
@@ -26,8 +27,11 @@ export default async function UpdateBlog({ params }: Params) {
 		});
 
 		blog = data?.getBlogById;
-	} catch {
-		notFound();
+	} catch (err) {
+		if (isNotFoundError(err)) {
+			notFound();
+		}
+		throw err;
 	}
 
 	if (!blog) {

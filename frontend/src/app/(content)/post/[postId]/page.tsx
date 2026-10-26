@@ -8,6 +8,7 @@ import {
 } from '@/graphql/generated/output';
 import { apolloClient } from '@/libs';
 import { PostPage } from '@/screens';
+import { isNotFoundError } from '@/utils';
 
 interface Params {
 	params: Promise<{ postId: string }>;
@@ -27,8 +28,11 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 		});
 
 		post = data?.getPostById;
-	} catch {
-		notFound();
+	} catch (err) {
+		if (isNotFoundError(err)) {
+			notFound();
+		}
+		throw err;
 	}
 
 	if (!post) {
@@ -73,8 +77,11 @@ export default async function Post({ params }: Params) {
 		});
 
 		post = data?.getPostById;
-	} catch {
-		notFound();
+	} catch (err) {
+		if (isNotFoundError(err)) {
+			notFound();
+		}
+		throw err;
 	}
 
 	if (!post) {

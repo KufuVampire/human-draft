@@ -8,6 +8,7 @@ import {
 } from '@/graphql/generated/output';
 import { apolloClient } from '@/libs';
 import { BlogPage } from '@/screens';
+import { isNotFoundError } from '@/utils';
 
 interface Params {
 	params: Promise<{ blogId: string }>;
@@ -27,8 +28,11 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 		});
 
 		blog = data?.getBlogById;
-	} catch {
-		notFound();
+	} catch (err) {
+		if (isNotFoundError(err)) {
+			notFound();
+		}
+		throw err;
 	}
 
 	if (!blog) {
@@ -73,8 +77,11 @@ export default async function Blog({ params }: Params) {
 		});
 
 		blog = data?.getBlogById;
-	} catch {
-		notFound();
+	} catch (err) {
+		if (isNotFoundError(err)) {
+			notFound();
+		}
+		throw err;
 	}
 
 	if (!blog) {

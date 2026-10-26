@@ -20,6 +20,7 @@ import {
 	Section,
 	UserAvatar,
 } from '@/shared';
+import { isNotFoundError } from '@/utils';
 
 interface Props {
 	username: string;
@@ -44,7 +45,7 @@ export const ProfilePage = ({ username }: Props) => {
 
 	const isOwner = profile?.username === username;
 
-	const { data, loading } = useGetUserByUsernameQuery({
+	const { data, loading, error } = useGetUserByUsernameQuery({
 		variables: { username },
 	});
 
@@ -177,10 +178,21 @@ export const ProfilePage = ({ username }: Props) => {
 	const user = data?.getUserByUsername;
 
 	useEffect(() => {
-		if (!loading && (!data || !user)) {
+		if (loading) return;
+		if (error) {
+			if (isNotFoundError(error)) {
+				notFound();
+			}
+			return;
+		}
+		if (!data || !user) {
 			notFound();
 		}
-	}, [loading, data, user, router]);
+	}, [loading, data, user, error, router]);
+
+	if (error && !isNotFoundError(error)) {
+		throw error;
+	}
 
 	if (loading || !user) {
 		return <ProfilePageSkeleton isOwner={isOwner} />;

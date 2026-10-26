@@ -37,7 +37,7 @@ import {
 	useNeedAuthModal,
 	useProfile,
 } from '@/store';
-import { cn } from '@/utils';
+import { cn, isNotFoundError } from '@/utils';
 
 const isLikeExpired = (date: number) => {
 	if (!date) return true;
@@ -219,10 +219,23 @@ export const PostPage = () => {
 	);
 
 	useEffect(() => {
-		if (!isLoading && (!post || error)) {
+		if (isLoading) return;
+
+		if (error) {
+			if (isNotFoundError(error)) {
+				notFound();
+			}
+			return;
+		}
+
+		if (!post) {
 			notFound();
 		}
 	}, [isLoading, post, error]);
+
+	if (error && !isNotFoundError(error)) {
+		throw error;
+	}
 
 	if (isLoading || !post) {
 		return null;

@@ -41,7 +41,7 @@ import {
 	TagsList,
 } from '@/shared';
 import { useConfirmationDeletionModal } from '@/store';
-import { cn } from '@/utils';
+import { cn, isNotFoundError } from '@/utils';
 
 const btnStyles = 'px-3 py-2 leading-[150%] font-bold rounded-lg';
 
@@ -200,10 +200,21 @@ export const BlogPage = memo(() => {
 	);
 
 	useEffect(() => {
-		if (!isBlogLoading && (!data || !blog || error)) {
+		if (isBlogLoading) return;
+		if (error) {
+			if (isNotFoundError(error)) {
+				notFound();
+			}
+			return;
+		}
+		if (!data || !blog) {
 			notFound();
 		}
 	}, [isBlogLoading, data, blog, error, router]);
+
+	if (error && !isNotFoundError(error)) {
+		throw error;
+	}
 
 	if (isBlogLoading || !blog) {
 		return (

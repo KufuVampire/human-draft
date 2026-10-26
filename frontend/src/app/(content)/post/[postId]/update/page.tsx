@@ -7,6 +7,7 @@ import {
 import { AuthGuard } from '@/guards';
 import { apolloClient } from '@/libs';
 import { UpdatePostPage } from '@/screens';
+import { isNotFoundError } from '@/utils';
 
 interface Params {
 	params: Promise<{ postId: string }>;
@@ -26,8 +27,11 @@ export default async function PostUpdate({ params }: Params) {
 		});
 
 		post = data?.getPostById;
-	} catch {
-		notFound();
+	} catch (err) {
+		if (isNotFoundError(err)) {
+			notFound();
+		}
+		throw err;
 	}
 
 	if (!post) {

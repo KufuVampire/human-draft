@@ -26,15 +26,7 @@ vi.mock('next/image', () => ({
 	),
 }));
 
-vi.mock('@/modules', () => ({
-	Dashboard: () => <aside data-testid='sidebar'>Sidebar Dashboard</aside>,
-}));
-
 vi.mock('@/shared', () => ({
-	Header: () => <header data-testid='header'>Header</header>,
-	Footer: () => <footer data-testid='footer'>Footer</footer>,
-	Main: ({ children }: { children: React.ReactNode }) => <main>{children}</main>,
-	Container: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 	Button: ({
 		children,
 		onClick,
@@ -74,19 +66,17 @@ describe('ErrorPage components (500 Error Boundary)', () => {
 
 		expect(screen.getByText('Что-то пошло не так')).toBeInTheDocument();
 		expect(screen.getByText('Попробовать снова')).toBeInTheDocument();
-		expect(screen.queryByTestId('header')).not.toBeInTheDocument();
-		expect(screen.queryByTestId('footer')).not.toBeInTheDocument();
 	});
 
-	it('Root ErrorPage renders complete layout with Header, Sidebar, and Footer', () => {
+	it('Root ErrorPage renders standalone fullscreen error without header, sidebar, or footer', () => {
 		const mockReset = vi.fn();
 		const mockError = new Error('Root layout failure');
 
 		render(<ErrorPage error={mockError} reset={mockReset} />);
 
-		expect(screen.getByTestId('header')).toBeInTheDocument();
-		expect(screen.getByTestId('sidebar')).toBeInTheDocument();
-		expect(screen.getByTestId('footer')).toBeInTheDocument();
+		expect(screen.queryByTestId('header')).not.toBeInTheDocument();
+		expect(screen.queryByTestId('sidebar')).not.toBeInTheDocument();
+		expect(screen.queryByTestId('footer')).not.toBeInTheDocument();
 		expect(screen.getByText('Что-то пошло не так')).toBeInTheDocument();
 	});
 
