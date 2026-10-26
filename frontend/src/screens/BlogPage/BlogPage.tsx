@@ -217,9 +217,9 @@ export const BlogPage = memo(() => {
 	}
 
 	if (isBlogLoading || !blog) {
-		return (
-			<BlogPageSkeleton isOwner={profile?.username === blog?.author.username} />
-		);
+		return null;
+
+
 	}
 
 	const handleDeletePost = (e: MouseEvent<HTMLUListElement>) => {
