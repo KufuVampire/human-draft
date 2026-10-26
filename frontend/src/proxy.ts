@@ -18,10 +18,6 @@ const SYSTEM_PREFIXES = new Set([
 	'graphql',
 ]);
 
-export const isAuthRoute = (pathname: string): boolean => {
-	return pathname === routesConfig.signin || pathname === routesConfig.signup;
-};
-
 export const isProtectedRoute = (pathname: string): boolean => {
 	if (pathname === '/post/create' || pathname.startsWith('/post/create/')) {
 		return true;

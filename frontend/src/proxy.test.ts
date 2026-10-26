@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { describe, expect, it } from 'vitest';
 
-import { isAuthRoute, isProtectedRoute, proxy } from './proxy';
+import { isProtectedRoute, proxy } from './proxy';
 
 const createMockRequest = (
 	pathname: string,
@@ -18,14 +18,6 @@ const createMockRequest = (
 };
 
 describe('proxy helper functions', () => {
-	it('identifies authentication routes correctly', () => {
-		expect(isAuthRoute('/sign-in')).toBe(true);
-		expect(isAuthRoute('/sign-up')).toBe(true);
-		expect(isAuthRoute('/')).toBe(false);
-		expect(isAuthRoute('/users')).toBe(false);
-		expect(isAuthRoute('/post/create')).toBe(false);
-	});
-
 	it('identifies protected routes correctly', () => {
 		expect(isProtectedRoute('/post/create')).toBe(true);
 		expect(isProtectedRoute('/post/create/blog-123')).toBe(true);
