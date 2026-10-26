@@ -1,4 +1,5 @@
-import { Metadata } from 'next';
+import { type Metadata } from 'next';
+import { notFound } from 'next/navigation';
 
 import { routesConfig } from '@/config';
 import {
@@ -15,31 +16,41 @@ interface Params {
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
 	const { blogId } = await params;
 
-	const { data }: { data: GetBlogByIdQuery } = await apolloClient.query({
-		query: GetBlogByIdDocument,
-		variables: {
-			blogId,
-		},
-	});
+	let blog: GetBlogByIdQuery['getBlogById'] | undefined;
 
-	const post = data.getBlogById;
+	try {
+		const { data }: { data: GetBlogByIdQuery } = await apolloClient.query({
+			query: GetBlogByIdDocument,
+			variables: {
+				blogId,
+			},
+		});
+
+		blog = data?.getBlogById;
+	} catch {
+		notFound();
+	}
+
+	if (!blog) {
+		notFound();
+	}
 
 	return {
-		title: post.title,
+		title: blog.title,
 		authors: [
 			{
-				name: post.author.username,
-				url: routesConfig.profileUsername(post.author.username),
+				name: blog.author.username,
+				url: routesConfig.profileUsername(blog.author.username),
 			},
 		],
 		openGraph: {
 			type: 'article',
-			title: post.title,
-			authors: [post.author.username],
-			publishedTime: new Date(post.createdAt).toString(),
+			title: blog.title,
+			authors: [blog.author.username],
+			publishedTime: new Date(blog.createdAt).toString(),
 			siteName: 'HUMAN DRAFT',
-			tags: post.tags.map((t) => t.name),
-			url: `https://human-draft.com/post/${post.id}`,
+			tags: blog.tags.map((t) => t.name),
+			url: `https://human-draft.com/blog/${blog.id}`,
 		},
 		robots: {
 			index: true,
@@ -48,6 +59,27 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 	};
 }
 
-export default function Blog() {
+export default async function Blog({ params }: Params) {
+	const { blogId } = await params;
+
+	let blog: GetBlogByIdQuery['getBlogById'] | undefined;
+
+	try {
+		const { data } = await apolloClient.query<GetBlogByIdQuery>({
+			query: GetBlogByIdDocument,
+			variables: {
+				blogId,
+			},
+		});
+
+		blog = data?.getBlogById;
+	} catch {
+		notFound();
+	}
+
+	if (!blog) {
+		notFound();
+	}
+
 	return <BlogPage />;
 }

@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { ChevronDown, Plus, Search } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
-import { useParams, useRouter } from 'next/navigation';
+import { notFound, useParams, useRouter } from 'next/navigation';
 import { ChangeEvent, MouseEvent, useEffect, useMemo, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -23,7 +23,13 @@ import { cn } from '@/utils';
 export const UpdateBlogPage = () => {
 	const router = useRouter();
 	const { blogId } = useParams<{ blogId: string }>();
-	const { data, loading: isBlogLoading } = useBlog(blogId);
+	const { data, loading: isBlogLoading, error } = useBlog(blogId);
+
+	useEffect(() => {
+		if (!isBlogLoading && (!data?.getBlogById || error)) {
+			notFound();
+		}
+	}, [isBlogLoading, data, error]);
 	const [tags, setTags] = useState<string[]>([]);
 	const [poster, setPoster] = useState<File | null>(null);
 	const [posterUrl, setPosterUrl] = useState<string | null | undefined>(null);

@@ -4,7 +4,7 @@ import { editorViewCtx } from '@milkdown/core';
 import { Crepe } from '@milkdown/crepe';
 import { Milkdown, useEditor } from '@milkdown/react';
 import { useTranslations } from 'next-intl';
-import { useParams, useRouter } from 'next/navigation';
+import { notFound, useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -22,7 +22,14 @@ export const UpdatePostPage = () => {
 	const router = useRouter();
 	const [isContentLoaded, setIsContentLoaded] = useState(false);
 	const { postId } = useParams<{ postId: string }>();
-	const { title, rawContent, tags: postTags } = usePost(postId);
+	const { title, rawContent, tags: postTags, isLoading, post, error } =
+		usePost(postId);
+
+	useEffect(() => {
+		if (!isLoading && (!post || error)) {
+			notFound();
+		}
+	}, [isLoading, post, error]);
 	const {
 		handleSubmit,
 		register,

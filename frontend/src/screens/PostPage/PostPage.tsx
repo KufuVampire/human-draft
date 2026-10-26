@@ -2,7 +2,7 @@
 
 import { ChevronDown, Eye, Heart, MessageSquare, Search } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useParams, useRouter } from 'next/navigation';
+import { notFound, useParams, useRouter } from 'next/navigation';
 import {
 	MouseEvent,
 	lazy,
@@ -75,6 +75,8 @@ export const PostPage = () => {
 	});
 	const {
 		isLoading,
+		error,
+		post,
 		content,
 		title,
 		author,
@@ -216,7 +218,13 @@ export const PostPage = () => {
 		[postId, togglePin]
 	);
 
-	if (isLoading) {
+	useEffect(() => {
+		if (!isLoading && (!post || error)) {
+			notFound();
+		}
+	}, [isLoading, post, error]);
+
+	if (isLoading || !post) {
 		return null;
 	}
 

@@ -3,7 +3,7 @@
 import { useGetPostByIdQuery } from '@/graphql/generated/output';
 
 export const usePost = (postId: string) => {
-	const { data, loading } = useGetPostByIdQuery({
+	const { data, loading, error } = useGetPostByIdQuery({
 		variables: {
 			postId,
 		},
@@ -13,6 +13,8 @@ export const usePost = (postId: string) => {
 
 	return {
 		isLoading: loading,
+		error,
+		post,
 		...post,
 		rawContent: post?.content,
 		content: post?.content,

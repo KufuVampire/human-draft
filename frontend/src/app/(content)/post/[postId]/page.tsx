@@ -1,4 +1,5 @@
 import { type Metadata } from 'next';
+import { notFound } from 'next/navigation';
 
 import { routesConfig } from '@/config';
 import {
@@ -15,14 +16,24 @@ interface Params {
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
 	const { postId } = await params;
 
-	const { data }: { data: GetPostByIdQuery } = await apolloClient.query({
-		query: GetPostByIdDocument,
-		variables: {
-			postId,
-		},
-	});
+	let post: GetPostByIdQuery['getPostById'] | undefined;
 
-	const post = data.getPostById;
+	try {
+		const { data }: { data: GetPostByIdQuery } = await apolloClient.query({
+			query: GetPostByIdDocument,
+			variables: {
+				postId,
+			},
+		});
+
+		post = data?.getPostById;
+	} catch {
+		notFound();
+	}
+
+	if (!post) {
+		notFound();
+	}
 
 	return {
 		title: post.title,
@@ -48,6 +59,27 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 	};
 }
 
-export default function Post() {
+export default async function Post({ params }: Params) {
+	const { postId } = await params;
+
+	let post: GetPostByIdQuery['getPostById'] | undefined;
+
+	try {
+		const { data } = await apolloClient.query<GetPostByIdQuery>({
+			query: GetPostByIdDocument,
+			variables: {
+				postId,
+			},
+		});
+
+		post = data?.getPostById;
+	} catch {
+		notFound();
+	}
+
+	if (!post) {
+		notFound();
+	}
+
 	return <PostPage />;
 }

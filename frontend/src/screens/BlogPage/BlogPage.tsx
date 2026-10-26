@@ -66,7 +66,7 @@ export const BlogPage = memo(() => {
 		},
 	});
 
-	const { data, loading: isBlogLoading } = useBlog(blogId);
+	const { data, loading: isBlogLoading, error } = useBlog(blogId);
 	const { data: postsData, refetch } = useGetAllFreePostsForPinQuery({
 		skip: !isOpen,
 	});
@@ -200,10 +200,10 @@ export const BlogPage = memo(() => {
 	);
 
 	useEffect(() => {
-		if (!isBlogLoading && (!data || !blog)) {
+		if (!isBlogLoading && (!data || !blog || error)) {
 			notFound();
 		}
-	}, [isBlogLoading, data, blog, router]);
+	}, [isBlogLoading, data, blog, error, router]);
 
 	if (isBlogLoading || !blog) {
 		return (
