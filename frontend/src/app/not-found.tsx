@@ -24,38 +24,38 @@ export default async function NotFound() {
 			<Main>
 				<Container className='flex gap-x-4'>
 					<Dashboard />
-					<div className='flex flex-col gap-x-4 items-center justify-center w-full min-h-[calc(100vh-16rem)] py-8'>
-						<h1 className='flex justify-center items-center font-title mb-2.5'>
-							<span className='text-[7rem] md:text-[14rem] lg:text-[16rem] leading-[100%]'>
+					<div className='flex flex-col items-center justify-center w-full py-4 my-auto'>
+						<h1 className='flex justify-center items-center font-title mb-2 select-none'>
+							<span className='text-6xl md:text-8xl lg:text-9xl font-bold leading-none'>
 								4
 							</span>
 							<Image
 								src='/duck.webp'
 								alt='duck'
-								width={440}
-								height={440}
-								className='h-[7rem] md:h-[14rem] lg:h-[16rem] max-w-[7rem] md:max-w-[14rem] lg:max-w-[16rem] w-full object-contain'
+								width={180}
+								height={180}
+								className='h-20 w-20 md:h-28 md:w-28 lg:h-36 lg:w-36 object-contain mx-1'
 								priority
 							/>
-							<span className='text-[7rem] md:text-[14rem] lg:text-[16rem] leading-[100%]'>
+							<span className='text-6xl md:text-8xl lg:text-9xl font-bold leading-none'>
 								4
 							</span>
 						</h1>
-						<div className='max-w-[38rem] mb-[1.875rem] text-center'>
-							<h2 className='text-center mb-6 font-bold font-title text-xl md:text-3xl leading-10'>
+						<div className='max-w-xl mb-5 text-center'>
+							<h2 className='text-center mb-3 font-bold font-title text-lg md:text-2xl leading-tight'>
 								{t('title')}
 							</h2>
-							<p className='text-center mb-3 md:text-lg leading-6'>
+							<p className='text-center mb-2 text-sm md:text-base leading-snug'>
 								{t('description')}
 							</p>
-							<p className='text-center leading-6 text-xs md:text-[1rem] text-placeholder'>
+							<p className='text-center text-xs md:text-sm text-placeholder leading-snug'>
 								{t('bottomText')}
 							</p>
 						</div>
 						<CustomLink
 							variant='primary'
 							href='/'
-							className='px-4 py-2 rounded-xl text-xs md:text-lg font-bold leading-6 tracking-widest uppercase text-center'>
+							className='px-5 py-2.5 rounded-xl text-xs md:text-sm font-bold tracking-wider uppercase text-center'>
 							{t('goToMain')}
 						</CustomLink>
 					</div>
