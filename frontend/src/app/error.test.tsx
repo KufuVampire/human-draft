@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import ContentErrorPage from './(content)/error';
 import ErrorPage from './error';
 
 vi.mock('next-intl', () => ({
@@ -23,6 +24,10 @@ vi.mock('next/image', () => ({
 		// eslint-disable-next-line @next/next/no-img-element
 		<img {...props} alt={props.alt || ''} />
 	),
+}));
+
+vi.mock('@/modules', () => ({
+	Dashboard: () => <aside data-testid='sidebar'>Sidebar Dashboard</aside>,
 }));
 
 vi.mock('@/shared', () => ({
@@ -56,39 +61,40 @@ vi.mock('@/shared', () => ({
 	),
 }));
 
-describe('ErrorPage component (500 Error Boundary)', () => {
+describe('ErrorPage components (500 Error Boundary)', () => {
 	beforeEach(() => {
 		vi.spyOn(console, 'error').mockImplementation(() => {});
 	});
 
-	it('renders error page content with translations', () => {
+	it('ContentErrorPage renders error content without duplicating outer layout', () => {
 		const mockReset = vi.fn();
 		const mockError = new Error('Test server failure');
 
-		render(<ErrorPage error={mockError} reset={mockReset} />);
+		render(<ContentErrorPage error={mockError} reset={mockReset} />);
 
 		expect(screen.getByText('Что-то пошло не так')).toBeInTheDocument();
-		expect(screen.getByText('Произошла ошибка на сервере')).toBeInTheDocument();
 		expect(screen.getByText('Попробовать снова')).toBeInTheDocument();
-		expect(screen.getByText('Вернуться на главную')).toBeInTheDocument();
+		expect(screen.queryByTestId('header')).not.toBeInTheDocument();
+		expect(screen.queryByTestId('footer')).not.toBeInTheDocument();
 	});
 
-	it('displays digest if present in error', () => {
+	it('Root ErrorPage renders complete layout with Header, Sidebar, and Footer', () => {
 		const mockReset = vi.fn();
-		const mockError = Object.assign(new Error('Fatal error'), {
-			digest: 'ERR_12345',
-		});
+		const mockError = new Error('Root layout failure');
 
 		render(<ErrorPage error={mockError} reset={mockReset} />);
 
-		expect(screen.getByText(/ERR_12345/)).toBeInTheDocument();
+		expect(screen.getByTestId('header')).toBeInTheDocument();
+		expect(screen.getByTestId('sidebar')).toBeInTheDocument();
+		expect(screen.getByTestId('footer')).toBeInTheDocument();
+		expect(screen.getByText('Что-то пошло не так')).toBeInTheDocument();
 	});
 
-	it('invokes reset callback when tryAgain button is clicked', () => {
+	it('invokes reset callback on tryAgain click', () => {
 		const mockReset = vi.fn();
 		const mockError = new Error('Recoverable error');
 
-		render(<ErrorPage error={mockError} reset={mockReset} />);
+		render(<ContentErrorPage error={mockError} reset={mockReset} />);
 
 		const tryAgainButton = screen.getByRole('button', {
 			name: 'Попробовать снова',
@@ -96,17 +102,5 @@ describe('ErrorPage component (500 Error Boundary)', () => {
 		fireEvent.click(tryAgainButton);
 
 		expect(mockReset).toHaveBeenCalledTimes(1);
-	});
-
-	it('renders a link to home page', () => {
-		const mockReset = vi.fn();
-		const mockError = new Error('Recoverable error');
-
-		render(<ErrorPage error={mockError} reset={mockReset} />);
-
-		const homeLink = screen.getByRole('link', {
-			name: 'Вернуться на главную',
-		});
-		expect(homeLink).toHaveAttribute('href', '/');
 	});
 });

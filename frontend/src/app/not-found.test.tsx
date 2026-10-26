@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
+import ContentNotFound from './(content)/not-found';
 import NotFound from './not-found';
 
 vi.mock('next-intl/server', () => ({
@@ -26,6 +27,10 @@ vi.mock('next/image', () => ({
 	),
 }));
 
+vi.mock('@/modules', () => ({
+	Dashboard: () => <aside data-testid='sidebar'>Sidebar Dashboard</aside>,
+}));
+
 vi.mock('@/shared', () => ({
 	Header: () => <header data-testid='header'>Header</header>,
 	Footer: () => <footer data-testid='footer'>Footer</footer>,
@@ -45,9 +50,9 @@ vi.mock('@/shared', () => ({
 	),
 }));
 
-describe('NotFound component (404 Page)', () => {
-	it('renders not found page with Duck content and link to home', async () => {
-		const component = await NotFound();
+describe('NotFound components (404 Page)', () => {
+	it('ContentNotFound renders Duck illustration and link without duplicating layout', async () => {
+		const component = await ContentNotFound();
 		render(component);
 
 		expect(screen.getByText('Упс! Страница потерялась')).toBeInTheDocument();
@@ -56,9 +61,23 @@ describe('NotFound component (404 Page)', () => {
 		).toBeInTheDocument();
 		expect(screen.getByAltText('duck')).toBeInTheDocument();
 
+		// ContentNotFound should NOT render extra Header/Footer (layout provides them)
+		expect(screen.queryByTestId('header')).not.toBeInTheDocument();
+		expect(screen.queryByTestId('footer')).not.toBeInTheDocument();
+
 		const homeLink = screen.getByRole('link', {
 			name: 'Спасибо, Уточка, я на главную',
 		});
 		expect(homeLink).toHaveAttribute('href', '/');
+	});
+
+	it('Root NotFound renders full layout with Header, Sidebar Dashboard, and Footer', async () => {
+		const component = await NotFound();
+		render(component);
+
+		expect(screen.getByTestId('header')).toBeInTheDocument();
+		expect(screen.getByTestId('sidebar')).toBeInTheDocument();
+		expect(screen.getByTestId('footer')).toBeInTheDocument();
+		expect(screen.getByText('Упс! Страница потерялась')).toBeInTheDocument();
 	});
 });
