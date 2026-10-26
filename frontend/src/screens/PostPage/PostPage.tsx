@@ -16,6 +16,7 @@ import { toast } from 'sonner';
 
 import { routesConfig } from '@/config';
 import {
+	GetPostByIdQuery,
 	useDeletePostMutation,
 	useGetBlogsForPinQuery,
 	useTogglePinBlogMutation,
@@ -57,7 +58,11 @@ interface ILikedAt {
 
 const CommentsLazy = lazy(() => import('@/modules/Comments/Comments'));
 
-export const PostPage = () => {
+interface Props {
+	initialData?: GetPostByIdQuery['getPostById'];
+}
+
+export const PostPage = ({ initialData }: Props = {}) => {
 	const t = useTranslations();
 	const router = useRouter();
 	const { postId } = useParams<{ postId: string }>();
@@ -85,7 +90,7 @@ export const PostPage = () => {
 		likesCount,
 		viewsCount,
 		blog,
-	} = usePost(postId);
+	} = usePost(postId, initialData);
 
 	const isOwner = profile?.username === author?.username;
 

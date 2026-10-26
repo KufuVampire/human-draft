@@ -1,5 +1,6 @@
 import { type Metadata } from 'next';
-import { getTranslations } from 'next-intl/server';
+import { notFound } from 'next/navigation';
+import { cache } from 'react';
 
 import { routesConfig } from '@/config';
 import {
@@ -14,11 +15,7 @@ interface Params {
 	params: Promise<{ postId: string }>;
 }
 
-export async function generateMetadata({ params }: Params): Promise<Metadata> {
-	const { postId } = await params;
-
-	let post: GetPostByIdQuery['getPostById'] | undefined;
-
+const getPost = cache(async (postId: string) => {
 	try {
 		const { data }: { data: GetPostByIdQuery } = await apolloClient.query({
 			query: GetPostByIdDocument,
@@ -27,22 +24,21 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 			},
 		});
 
-		post = data?.getPostById;
+		return data?.getPostById;
 	} catch (err) {
 		if (isNotFoundError(err)) {
-			const t = await getTranslations('404.metadata');
-			return {
-				title: t('title'),
-			};
+			return null;
 		}
 		throw err;
 	}
+});
+
+export async function generateMetadata({ params }: Params): Promise<Metadata> {
+	const { postId } = await params;
+	const post = await getPost(postId);
 
 	if (!post) {
-		const t = await getTranslations('404.metadata');
-		return {
-			title: t('title'),
-		};
+		notFound();
 	}
 
 	return {
@@ -69,6 +65,13 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 	};
 }
 
-export default function Post() {
-	return <PostPage />;
+export default async function Post({ params }: Params) {
+	const { postId } = await params;
+	const post = await getPost(postId);
+
+	if (!post) {
+		notFound();
+	}
+
+	return <PostPage initialData={post} />;
 }

@@ -26,7 +26,30 @@ describe('isNotFoundError', () => {
 		expect(isNotFoundError(err)).toBe(true);
 	});
 
-	it('возвращает false для сетевой ошибки бэкенда', () => {
+	it('возвращает true для GraphQL ошибки с code NOT_FOUND', () => {
+		const err = {
+			graphQLErrors: [
+				{
+					message: 'Entity not found',
+					extensions: {
+						code: 'NOT_FOUND',
+					},
+				},
+			],
+		};
+		expect(isNotFoundError(err)).toBe(true);
+	});
+
+	it('возвращает true для сетевой ошибки шлюза со статусом 404', () => {
+		const err = {
+			networkError: {
+				statusCode: 404,
+			},
+		};
+		expect(isNotFoundError(err)).toBe(true);
+	});
+
+	it('возвращает false для сетевой ошибки бэкенда (500)', () => {
 		const err = {
 			networkError: {
 				statusCode: 500,
@@ -51,8 +74,23 @@ describe('isNotFoundError', () => {
 		expect(isNotFoundError(err)).toBe(false);
 	});
 
-	it('возвращает true для ошибки со словом "not found" или "не найден"', () => {
-		expect(isNotFoundError(new Error('Post was not found'))).toBe(true);
-		expect(isNotFoundError(new Error('Пост не найден'))).toBe(true);
+	it('не считает ошибку 404 по случайному вхождению подстроки в системную ошибку', () => {
+		const dbErr = {
+			graphQLErrors: [
+				{
+					message: 'Foreign key not found in table users',
+					extensions: {
+						status: 500,
+						code: 'INTERNAL_SERVER_ERROR',
+					},
+				},
+			],
+		};
+		expect(isNotFoundError(dbErr)).toBe(false);
+	});
+
+	it('возвращает true для обычного объекта с statusCode: 404', () => {
+		expect(isNotFoundError({ statusCode: 404 })).toBe(true);
+		expect(isNotFoundError({ status: 404 })).toBe(true);
 	});
 });

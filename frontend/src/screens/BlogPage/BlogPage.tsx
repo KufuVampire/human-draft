@@ -19,6 +19,7 @@ import { toast } from 'sonner';
 import { blogPostsReducer } from './blog-posts.reducer';
 import { routesConfig } from '@/config';
 import {
+	GetBlogByIdQuery,
 	useChangeBlogPosterMutation,
 	useDeleteBlogMutation,
 	useDeleteBlogPosterMutation,
@@ -45,12 +46,21 @@ import { cn, isNotFoundError } from '@/utils';
 
 const btnStyles = 'px-3 py-2 leading-[150%] font-bold rounded-lg';
 
-export const BlogPage = memo(() => {
+interface Props {
+	initialData?: GetBlogByIdQuery['getBlogById'];
+}
+
+export const BlogPage = memo(({ initialData }: Props = {}) => {
 	const router = useRouter();
 	const { blogId } = useParams<{ blogId: string }>();
-	const [blogPosts, dispatch] = useReducer(blogPostsReducer, []);
+	const [blogPosts, dispatch] = useReducer(
+		blogPostsReducer,
+		initialData?.posts ?? []
+	);
 	const [posterFile, setPosterFile] = useState<File | null>(null);
-	const [posterUrl, setPosterUrl] = useState<string | null>(null);
+	const [posterUrl, setPosterUrl] = useState<string | null>(
+		initialData?.posterUrl ?? null
+	);
 	const [isOpen, setOpen] = useState(false);
 	const { profile } = useProfile();
 	const t = useTranslations();
@@ -66,7 +76,7 @@ export const BlogPage = memo(() => {
 		},
 	});
 
-	const { data, loading: isBlogLoading, error } = useBlog(blogId);
+	const { data, loading: isBlogLoading, error } = useBlog(blogId, initialData);
 	const { data: postsData, refetch } = useGetAllFreePostsForPinQuery({
 		skip: !isOpen,
 	});

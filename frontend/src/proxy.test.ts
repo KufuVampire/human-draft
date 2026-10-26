@@ -42,6 +42,10 @@ describe('proxy helper functions', () => {
 		expect(isProtectedRoute('/blog/blog-abc')).toBe(false);
 		expect(isProtectedRoute('/sign-in')).toBe(false);
 		expect(isProtectedRoute('/sign-up')).toBe(false);
+
+		// System routes with settings subpath should NOT be matched as user settings
+		expect(isProtectedRoute('/users/settings')).toBe(false);
+		expect(isProtectedRoute('/about-us/settings')).toBe(false);
 	});
 });
 
@@ -60,6 +64,31 @@ describe('proxy execution and redirects', () => {
 
 		expect(response.status).toBe(307);
 		expect(response.headers.get('location')).toBe('http://localhost:3000/');
+	});
+
+	it('allows user with stale cookie to access /sign-in?expired=true and deletes cookie', () => {
+		const req = createMockRequest('/sign-in?expired=true', {
+			sessionCookie: 'stale-session',
+		});
+		const response = proxy(req);
+
+		expect(response.headers.get('location')).toBeNull();
+		expect(response.status).toBe(200);
+		// Cookie is removed
+		const setCookie = response.headers.get('set-cookie');
+		expect(setCookie).toContain('h_draft_sid=;');
+	});
+
+	it('allows user with stale cookie to access /sign-in?logout=true and deletes cookie', () => {
+		const req = createMockRequest('/sign-in?logout=true', {
+			sessionCookie: 'stale-session',
+		});
+		const response = proxy(req);
+
+		expect(response.headers.get('location')).toBeNull();
+		expect(response.status).toBe(200);
+		const setCookie = response.headers.get('set-cookie');
+		expect(setCookie).toContain('h_draft_sid=;');
 	});
 
 	it('redirects unauthenticated user from protected /post/create to /sign-in', () => {
@@ -102,8 +131,8 @@ describe('proxy execution and redirects', () => {
 		expect(response.status).toBe(200);
 	});
 
-	it('allows unauthenticated user to access /sign-in', () => {
-		const req = createMockRequest('/sign-in');
+	it('allows unauthenticated user to access public system subpaths', () => {
+		const req = createMockRequest('/users/settings');
 		const response = proxy(req);
 
 		expect(response.headers.get('location')).toBeNull();

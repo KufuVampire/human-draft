@@ -7,6 +7,17 @@ const SESSION_COOKIE_NAME =
 	process.env.SESSION_NAME ||
 	'h_draft_sid';
 
+const SYSTEM_PREFIXES = new Set([
+	'users',
+	'about-us',
+	'post',
+	'blog',
+	'sign-in',
+	'sign-up',
+	'api',
+	'graphql',
+]);
+
 export const isAuthRoute = (pathname: string): boolean => {
 	return pathname === routesConfig.signin || pathname === routesConfig.signup;
 };
@@ -24,6 +35,12 @@ export const isProtectedRoute = (pathname: string): boolean => {
 	if (/^\/blog\/[^/]+\/update(?:\/.*)?$/.test(pathname)) {
 		return true;
 	}
+
+	const firstSegment = pathname.split('/')[1];
+	if (SYSTEM_PREFIXES.has(firstSegment)) {
+		return false;
+	}
+
 	if (/^\/[^/]+\/settings(?:\/.*)?$/.test(pathname)) {
 		return true;
 	}
@@ -32,10 +49,23 @@ export const isProtectedRoute = (pathname: string): boolean => {
 
 export function proxy(req: NextRequest) {
 	const session = req.cookies.get(SESSION_COOKIE_NAME)?.value;
-	const { pathname } = req.nextUrl;
+	const { pathname, searchParams } = req.nextUrl;
 
-	if (session && isAuthRoute(pathname)) {
-		return NextResponse.redirect(new URL(routesConfig.home, req.url));
+	if (isAuthRoute(pathname)) {
+		const isResetRequested =
+			searchParams.has('logout') ||
+			searchParams.has('expired') ||
+			searchParams.has('reset');
+
+		if (isResetRequested) {
+			const response = NextResponse.next();
+			response.cookies.delete(SESSION_COOKIE_NAME);
+			return response;
+		}
+
+		if (session) {
+			return NextResponse.redirect(new URL(routesConfig.home, req.url));
+		}
 	}
 
 	if (!session && isProtectedRoute(pathname)) {

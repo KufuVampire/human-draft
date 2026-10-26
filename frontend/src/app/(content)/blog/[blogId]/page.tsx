@@ -1,5 +1,6 @@
 import { type Metadata } from 'next';
-import { getTranslations } from 'next-intl/server';
+import { notFound } from 'next/navigation';
+import { cache } from 'react';
 
 import { routesConfig } from '@/config';
 import {
@@ -14,11 +15,7 @@ interface Params {
 	params: Promise<{ blogId: string }>;
 }
 
-export async function generateMetadata({ params }: Params): Promise<Metadata> {
-	const { blogId } = await params;
-
-	let blog: GetBlogByIdQuery['getBlogById'] | undefined;
-
+const getBlog = cache(async (blogId: string) => {
 	try {
 		const { data }: { data: GetBlogByIdQuery } = await apolloClient.query({
 			query: GetBlogByIdDocument,
@@ -27,22 +24,21 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 			},
 		});
 
-		blog = data?.getBlogById;
+		return data?.getBlogById;
 	} catch (err) {
 		if (isNotFoundError(err)) {
-			const t = await getTranslations('404.metadata');
-			return {
-				title: t('title'),
-			};
+			return null;
 		}
 		throw err;
 	}
+});
+
+export async function generateMetadata({ params }: Params): Promise<Metadata> {
+	const { blogId } = await params;
+	const blog = await getBlog(blogId);
 
 	if (!blog) {
-		const t = await getTranslations('404.metadata');
-		return {
-			title: t('title'),
-		};
+		notFound();
 	}
 
 	return {
@@ -69,6 +65,13 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 	};
 }
 
-export default function Blog() {
-	return <BlogPage />;
+export default async function Blog({ params }: Params) {
+	const { blogId } = await params;
+	const blog = await getBlog(blogId);
+
+	if (!blog) {
+		notFound();
+	}
+
+	return <BlogPage initialData={blog} />;
 }

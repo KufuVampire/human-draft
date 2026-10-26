@@ -29,6 +29,10 @@ vi.mock('next/image', () => ({
 
 vi.mock('@/modules', () => ({
 	Dashboard: () => <aside data-testid='sidebar'>Sidebar Dashboard</aside>,
+	ConfirmationChangesModal: () => null,
+	ConfirmationDeletionModal: () => null,
+	CropperModal: () => null,
+	NeedAuthModal: () => null,
 }));
 
 vi.mock('@/shared', () => ({

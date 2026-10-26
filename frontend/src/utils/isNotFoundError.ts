@@ -7,7 +7,7 @@ export const isNotFoundError = (error: unknown): boolean => {
 				message?: string;
 				extensions?: {
 					status?: number | string;
-					code?: string;
+					code?: string | number;
 					originalError?: {
 						statusCode?: number;
 						message?: string;
@@ -20,26 +20,25 @@ export const isNotFoundError = (error: unknown): boolean => {
 			};
 			status?: number;
 			statusCode?: number;
-			message?: string;
+			code?: string | number;
 		};
 
 		if (err.networkError) {
-			return false;
+			return err.networkError.statusCode === 404;
 		}
 
 		if (Array.isArray(err.graphQLErrors) && err.graphQLErrors.length > 0) {
 			return err.graphQLErrors.some((gqlErr) => {
 				const status =
 					gqlErr?.extensions?.originalError?.statusCode ||
-					gqlErr?.extensions?.status ||
-					gqlErr?.extensions?.code;
-				const message = String(gqlErr?.message || '').toLowerCase();
+					gqlErr?.extensions?.status;
+				const code = gqlErr?.extensions?.code;
 
 				return (
 					status === 404 ||
 					status === 'NOT_FOUND' ||
-					message.includes('not found') ||
-					message.includes('не найден')
+					code === 'NOT_FOUND' ||
+					code === 404
 				);
 			});
 		}
@@ -47,8 +46,7 @@ export const isNotFoundError = (error: unknown): boolean => {
 		const status = err.status || err.statusCode;
 		if (status === 404) return true;
 
-		const message = String(err.message || '').toLowerCase();
-		return message.includes('not found') || message.includes('не найден');
+		if (err.code === 'NOT_FOUND' || err.code === 404) return true;
 	}
 
 	return false;
