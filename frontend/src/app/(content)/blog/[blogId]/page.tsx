@@ -1,5 +1,4 @@
 import { type Metadata } from 'next';
-import { notFound } from 'next/navigation';
 
 import { routesConfig } from '@/config';
 import {
@@ -30,13 +29,17 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 		blog = data?.getBlogById;
 	} catch (err) {
 		if (isNotFoundError(err)) {
-			notFound();
+			return {
+				title: 'Страница не найдена',
+			};
 		}
 		throw err;
 	}
 
 	if (!blog) {
-		notFound();
+		return {
+			title: 'Страница не найдена',
+		};
 	}
 
 	return {
@@ -63,30 +66,6 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 	};
 }
 
-export default async function Blog({ params }: Params) {
-	const { blogId } = await params;
-
-	let blog: GetBlogByIdQuery['getBlogById'] | undefined;
-
-	try {
-		const { data } = await apolloClient.query<GetBlogByIdQuery>({
-			query: GetBlogByIdDocument,
-			variables: {
-				blogId,
-			},
-		});
-
-		blog = data?.getBlogById;
-	} catch (err) {
-		if (isNotFoundError(err)) {
-			notFound();
-		}
-		throw err;
-	}
-
-	if (!blog) {
-		notFound();
-	}
-
+export default function Blog() {
 	return <BlogPage />;
 }

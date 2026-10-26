@@ -1,5 +1,4 @@
 import { type Metadata } from 'next';
-import { notFound } from 'next/navigation';
 
 import { routesConfig } from '@/config';
 import {
@@ -30,13 +29,17 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 		post = data?.getPostById;
 	} catch (err) {
 		if (isNotFoundError(err)) {
-			notFound();
+			return {
+				title: 'Страница не найдена',
+			};
 		}
 		throw err;
 	}
 
 	if (!post) {
-		notFound();
+		return {
+			title: 'Страница не найдена',
+		};
 	}
 
 	return {
@@ -63,30 +66,6 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 	};
 }
 
-export default async function Post({ params }: Params) {
-	const { postId } = await params;
-
-	let post: GetPostByIdQuery['getPostById'] | undefined;
-
-	try {
-		const { data } = await apolloClient.query<GetPostByIdQuery>({
-			query: GetPostByIdDocument,
-			variables: {
-				postId,
-			},
-		});
-
-		post = data?.getPostById;
-	} catch (err) {
-		if (isNotFoundError(err)) {
-			notFound();
-		}
-		throw err;
-	}
-
-	if (!post) {
-		notFound();
-	}
-
+export default function Post() {
 	return <PostPage />;
 }
