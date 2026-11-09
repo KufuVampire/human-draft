@@ -95,6 +95,14 @@ export const BlogPage = memo(({ initialData }: Props = {}) => {
 		}
 	}, [data]);
 
+	useEffect(() => {
+		return () => {
+			if (posterUrl && posterUrl.startsWith('blob:')) {
+				URL.revokeObjectURL(posterUrl);
+			}
+		};
+	}, [posterUrl]);
+
 	const postsSearchStr = useDebounce(watch('search') || '');
 
 	const [pinPosts] = usePinPostMutation({
@@ -308,14 +316,6 @@ export const BlogPage = memo(({ initialData }: Props = {}) => {
 		});
 		setModalOpen(true);
 	};
-
-	useEffect(() => {
-		return () => {
-			if (posterUrl && posterUrl.startsWith('blob:')) {
-				URL.revokeObjectURL(posterUrl);
-			}
-		};
-	}, [posterUrl]);
 
 	const isOwner = profile?.username === blog.author.username;
 
