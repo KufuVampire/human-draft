@@ -25,10 +25,12 @@ export const CropperModal = () => {
 	useClickOutside(cropperModalRef, setCloseCropper);
 
 	return (
-		<Modal isOpen={isCropperOpen}>
+		<Modal
+			isOpen={isCropperOpen}
+			onClose={setCloseCropper}>
 			<div
 				ref={cropperModalRef}
-				className='flex flex-col bg-[var(--background-color-card)] px-3 md:px-5 py-6 max-w-112.5 w-full rounded-2xl overflow-hidden gap-y-6'>
+				className='flex flex-col bg-[var(--background-color-card)] px-3 md:px-5 py-6 max-w-112.5 w-full rounded-t-2xl sm:rounded-2xl max-h-[90vh] overflow-y-auto gap-y-6'>
 				{avatarImage && (
 					<div className='relative aspect-square rounded-2xl overflow-hidden'>
 						<Cropper

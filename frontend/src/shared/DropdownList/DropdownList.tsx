@@ -12,16 +12,16 @@ interface Props extends Omit<HTMLAttributes<HTMLUListElement>, 'className'> {
 	displayDirection: DisplayDropdownDirection;
 }
 
-const originMap: Record<DisplayDropdownDirection, string> = {
-	top: 'origin-top',
-	'top-left': 'origin-top-left',
-	'top-right': 'origin-top-right',
-	bottom: 'origin-bottom',
-	'bottom-left': 'origin-bottom-left',
-	'bottom-right': 'origin-bottom-right',
-	left: 'origin-left',
-	right: 'origin-right',
-	center: 'origin-center',
+const directionPositionMap: Record<DisplayDropdownDirection, string> = {
+	top: 'bottom-[calc(100%+0.5rem)] top-auto left-0 origin-bottom',
+	'top-left': 'top-[calc(100%+0.75rem)] left-0 origin-top-left',
+	'top-right': 'top-[calc(100%+0.75rem)] right-0 origin-top-right',
+	bottom: 'top-[calc(100%+0.5rem)] left-0 origin-top',
+	'bottom-left': 'bottom-[calc(100%+0.75rem)] left-0 top-auto origin-bottom-left',
+	'bottom-right': 'bottom-[calc(100%+0.75rem)] right-0 top-auto origin-bottom-right',
+	left: 'right-[calc(100%+0.5rem)] top-0 origin-right',
+	right: 'left-[calc(100%+0.5rem)] top-0 origin-left',
+	center: 'top-[calc(100%+0.5rem)] left-1/2 -translate-x-1/2 origin-center',
 };
 
 export const DropdownList = memo(
@@ -37,8 +37,8 @@ export const DropdownList = memo(
 			<ul
 				{...props}
 				className={cn(
-					'absolute top-[calc(100%+0.75rem)] right-0 z-dropdown flex flex-col min-w-max rounded-xl bg-[var(--background-color-card)] scale-0 transition-all opacity-0 duration-200 shadow-primary',
-					originMap[displayDirection],
+					'absolute z-dropdown flex flex-col w-max max-w-[calc(100vw-2rem)] max-h-72 overflow-y-auto rounded-xl bg-[var(--background-color-card)] scale-0 transition-all opacity-0 duration-200 shadow-primary',
+					directionPositionMap[displayDirection],
 					{
 						['scale-100 opacity-100']: isOpen,
 					},

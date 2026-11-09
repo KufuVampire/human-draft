@@ -131,18 +131,18 @@ body {
 }
 
 .ProseMirror {
-	@apply pl-16! pr-0! py-0! md:py-0! md:px-0!;
+	@apply px-3! py-2! md:py-0! md:px-0!;
 }
 
 .milkdown-block-handle[data-show='false'] {
-	@apply opacity-100! md:opacity-0! left-0! md:-left-10!;
+	@apply opacity-0! left-0! md:-left-10!;
 }
 .milkdown-block-handle[data-show='true'] {
 	@apply left-0! md:-left-19!;
 }
 
 .milkdown-block-handle {
-	@apply gap-x-1! md:gap-x-0.5;
+	@apply hidden! md:flex! md:gap-x-0.5;
 }
 
 .milkdown-block-handle .operation-item {
