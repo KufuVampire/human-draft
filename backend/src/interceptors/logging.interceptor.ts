@@ -27,29 +27,24 @@ export class LoggingInterceptor implements NestInterceptor {
 		const parentType = info.parentType?.name;
 		const fieldName = info.fieldName;
 
-		if (parentType !== 'Mutation' && parentType !== 'Query') {
+		if (parentType !== 'Mutation') {
 			return next.handle();
 		}
 
-		const isMutation = parentType === 'Mutation';
 		const start = Date.now();
 
 		return next.handle().pipe(
 			tap({
 				next: () => {
 					const duration = Date.now() - start;
-					if (isMutation) {
-						this.logger.log(`[Mutation] ${fieldName} executed in ${duration}ms`);
-					}
+					this.logger.log(`[Mutation] ${fieldName} executed in ${duration}ms`);
 				},
 				error: (err: unknown) => {
 					const duration = Date.now() - start;
 					const errMessage = err instanceof Error ? err.message : String(err);
-					if (isMutation) {
-						this.logger.error(
-							`[Mutation] ${fieldName} failed in ${duration}ms: ${errMessage}`
-						);
-					}
+					this.logger.error(
+						`[Mutation] ${fieldName} failed in ${duration}ms: ${errMessage}`
+					);
 				},
 			})
 		);

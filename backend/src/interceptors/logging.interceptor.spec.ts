@@ -84,6 +84,29 @@ describe('LoggingInterceptor', () => {
 		errorSpy.mockRestore();
 	});
 
+	it('пропускает операции типа Query без логирования', async () => {
+		const logSpy = vi
+			.spyOn(Logger.prototype, 'log')
+			.mockImplementation(() => {});
+		const context = createMockContext('Query', 'getPostById');
+		const handler = {
+			handle: () => of({ id: 'post-1' }),
+		};
+
+		const result$ = interceptor.intercept(context, handler as any);
+
+		await new Promise<void>((resolve) => {
+			result$.subscribe({
+				complete: () => {
+					expect(logSpy).not.toHaveBeenCalled();
+					resolve();
+				},
+			});
+		});
+
+		logSpy.mockRestore();
+	});
+
 	it('не логирует вложенные поля или контексты без info', async () => {
 		const logSpy = vi
 			.spyOn(Logger.prototype, 'log')

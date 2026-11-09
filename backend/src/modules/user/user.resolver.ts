@@ -31,6 +31,9 @@ export class UserResolver {
 
 	@ResolveField(() => [PostModel], { name: 'posts' })
 	public async posts(@Parent() user: UserModel) {
+		if (user.postsCount === 0) {
+			return [];
+		}
 		if (user.posts && user.posts.length > 0) {
 			return user.posts;
 		}
@@ -39,6 +42,9 @@ export class UserResolver {
 
 	@ResolveField(() => [BlogModel], { name: 'blogs' })
 	public async blogs(@Parent() user: UserModel) {
+		if (user.blogsCount === 0) {
+			return [];
+		}
 		if (user.blogs && user.blogs.length > 0) {
 			return user.blogs;
 		}
