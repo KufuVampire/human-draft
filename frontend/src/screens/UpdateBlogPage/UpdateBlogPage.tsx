@@ -15,7 +15,7 @@ import {
 	useGetAllFreePostsForPinQuery,
 	useUpdateBlogMutation,
 } from '@/graphql/generated/output';
-import { useBlog, useDebounce } from '@/hooks';
+import { useBlog, useBlobUrl, useDebounce } from '@/hooks';
 import { TypeUpdateBlogSchema, createBlogSchema } from '@/schemas';
 import { Button, Dropdown, FormField, Section, TagsPicker } from '@/shared';
 import { cn, isNotFoundError } from '@/utils';
@@ -45,6 +45,7 @@ export const UpdateBlogPage = () => {
 	}
 	const [tags, setTags] = useState<string[]>([]);
 	const [poster, setPoster] = useState<File | null>(null);
+	const posterBlobUrl = useBlobUrl(poster);
 	const [posterUrl, setPosterUrl] = useState<string | null | undefined>(null);
 	const [postIds, setPostIds] = useState<string[]>([]);
 	const [isDropdownOpen, setDropdownOpen] = useState(false);
@@ -176,9 +177,9 @@ export const UpdateBlogPage = () => {
 	return (
 		<div className='flex flex-col gap-y-6 w-full'>
 			<Section className='bg-placeholder transition-colors flex flex-col gap-y-6 md:py-0 py-0 rounded-xl w-full relative min-h-60 md:min-h-87.5 overflow-hidden group'>
-				{poster && !posterUrl && (
+				{posterBlobUrl && !posterUrl && (
 					<Image
-						src={URL.createObjectURL(poster)}
+						src={posterBlobUrl}
 						alt={t('blogPage.blogPoster')}
 						sizes='100%'
 						fill

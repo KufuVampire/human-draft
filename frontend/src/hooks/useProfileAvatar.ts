@@ -1,5 +1,7 @@
+'use client';
+
 import { useTranslations } from 'next-intl';
-import { ChangeEvent } from 'react';
+import { ChangeEvent, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 
 import {
@@ -14,7 +16,7 @@ import {
 import { getCroppedImg } from '@/utils';
 
 export const useProfileAvatar = () => {
-	const { updateProfile } = useProfile();
+	const { profile, updateProfile } = useProfile();
 	const { setCb, setOpen, setType } = useConfirmationDeletionModal();
 	const {
 		isCropperOpen,
@@ -31,27 +33,57 @@ export const useProfileAvatar = () => {
 
 	const t = useTranslations('profilePage.notifications');
 
+	const cropperUrlRef = useRef<string | null>(null);
+	const previewUrlRef = useRef<string | null>(null);
+	const prevAvatarRef = useRef<string | null | undefined>(profile?.avatarUrl);
+
 	const [changeAvatar, { loading: isAvatarChanging }] =
 		useChangeProfileAvatarMutation({
-			onCompleted() {
+			onCompleted(data) {
+				if (previewUrlRef.current) {
+					URL.revokeObjectURL(previewUrlRef.current);
+					previewUrlRef.current = null;
+				}
+				if (data?.changeProfileAvatar?.avatarUrl) {
+					updateProfile({ avatarUrl: data.changeProfileAvatar.avatarUrl });
+				}
 				toast.success(t('changeAvatarSuccess'));
 			},
 			onError(err) {
 				console.error(err, 'changeAvatar');
+				updateProfile({ avatarUrl: prevAvatarRef.current });
+				if (previewUrlRef.current) {
+					URL.revokeObjectURL(previewUrlRef.current);
+					previewUrlRef.current = null;
+				}
+				toast.error(t('changeAvatarError'));
 			},
 		});
+
 	const [removeAvatar, { loading: isAvatarRemoving }] =
 		useRemoveProfileAvatarMutation({
 			onCompleted() {
+				if (previewUrlRef.current) {
+					URL.revokeObjectURL(previewUrlRef.current);
+					previewUrlRef.current = null;
+				}
+				updateProfile({ avatarUrl: null });
 				toast.success(t('removeAvatarSuccess'));
 			},
 			onError(err) {
 				console.error(err, 'removeAvatar');
+				updateProfile({ avatarUrl: prevAvatarRef.current });
+				toast.error(t('removeAvatarError'));
 			},
 		});
 
 	const handleLoadAvatar = (avatar: File) => {
+		prevAvatarRef.current = profile?.avatarUrl;
+		if (previewUrlRef.current) {
+			URL.revokeObjectURL(previewUrlRef.current);
+		}
 		const avatarUrlFromFile = URL.createObjectURL(avatar);
+		previewUrlRef.current = avatarUrlFromFile;
 		updateProfile({ avatarUrl: avatarUrlFromFile });
 
 		changeAvatar({
@@ -62,6 +94,7 @@ export const useProfileAvatar = () => {
 	};
 
 	const handleRemoveAvatar = () => {
+		prevAvatarRef.current = profile?.avatarUrl;
 		setType('avatar');
 		setOpen(true);
 		setCb(() => {
@@ -71,13 +104,26 @@ export const useProfileAvatar = () => {
 		});
 	};
 
+	const handleCloseCropperModal = () => {
+		if (cropperUrlRef.current) {
+			URL.revokeObjectURL(cropperUrlRef.current);
+			cropperUrlRef.current = null;
+		}
+		setCloseCropper();
+	};
+
 	const handleChangeAvatar = (e: ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		if (!file) return;
+
+		if (cropperUrlRef.current) {
+			URL.revokeObjectURL(cropperUrlRef.current);
+		}
 		const imageUrl = URL.createObjectURL(file);
+		cropperUrlRef.current = imageUrl;
 
 		setOpenCropper(imageUrl);
-		e.target.value = ''
+		e.target.value = '';
 	};
 
 	const handleSaveCroppedAvatar = async () => {
@@ -90,8 +136,21 @@ export const useProfileAvatar = () => {
 		});
 
 		handleLoadAvatar(file);
-		setCloseCropper();
+		handleCloseCropperModal();
 	};
+
+	useEffect(() => {
+		return () => {
+			if (cropperUrlRef.current) {
+				URL.revokeObjectURL(cropperUrlRef.current);
+				cropperUrlRef.current = null;
+			}
+			if (previewUrlRef.current) {
+				URL.revokeObjectURL(previewUrlRef.current);
+				previewUrlRef.current = null;
+			}
+		};
+	}, []);
 
 	return {
 		removeAvatar,
@@ -107,7 +166,7 @@ export const useProfileAvatar = () => {
 		avatarImage,
 		isCropperOpen,
 		setCroppedAreaPixels,
-		setCloseCropper,
+		setCloseCropper: handleCloseCropperModal,
 		handleChangeAvatar,
 		handleSaveCroppedAvatar,
 	};

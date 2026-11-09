@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { Dispatch, SetStateAction } from 'react';
+import { toast } from 'sonner';
 
 import { Button } from '../Button/Button';
 
@@ -17,9 +18,17 @@ interface Props {
 
 export const SubscribeButton = ({ toId, setSubscribe, className }: Props) => {
 	const t = useTranslations('btns');
-	const [subscribeMutation] = useSubscribeMutation();
-	const { profile, addSubscription } = useProfile();
+	const { profile, addSubscription, removeSubscription } = useProfile();
 	const { setOpen } = useNeedAuthModal();
+
+	const [subscribeMutation] = useSubscribeMutation({
+		onError(err) {
+			console.error(err);
+			removeSubscription(toId);
+			setSubscribe(false);
+			toast.error(t('subscribeError'));
+		},
+	});
 
 	const handleClick = () => {
 		if (!profile) {
