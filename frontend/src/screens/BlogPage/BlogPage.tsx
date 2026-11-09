@@ -137,18 +137,28 @@ export const BlogPage = memo(({ initialData }: Props = {}) => {
 		useChangeBlogPosterMutation({
 			onCompleted() {
 				if (posterFile) {
-					setPosterUrl(URL.createObjectURL(posterFile));
+					setPosterUrl((prev) => {
+						if (prev && prev.startsWith('blob:')) {
+							URL.revokeObjectURL(prev);
+						}
+						return URL.createObjectURL(posterFile);
+					});
 					toast.success(t('blogPage.poster.updated'));
 				}
 			},
 			onError(err) {
 				console.error(err);
+				toast.error(t('blogPage.poster.updateError'));
 			},
 		});
 	const [deletePoster, { loading: isPosterDeleting }] =
 		useDeleteBlogPosterMutation({
 			onCompleted() {
 				toast.success(t('blogPage.poster.deleted'));
+			},
+			onError(err) {
+				console.error(err);
+				toast.error(t('blogPage.poster.deleteError'));
 			},
 		});
 
@@ -283,7 +293,12 @@ export const BlogPage = memo(({ initialData }: Props = {}) => {
 	const handleDeletePoster = () => {
 		setType('poster');
 		setCb(() => {
-			setPosterUrl(null);
+			setPosterUrl((prev) => {
+				if (prev && prev.startsWith('blob:')) {
+					URL.revokeObjectURL(prev);
+				}
+				return null;
+			});
 			deletePoster({
 				variables: {
 					blogId,
@@ -293,6 +308,14 @@ export const BlogPage = memo(({ initialData }: Props = {}) => {
 		});
 		setModalOpen(true);
 	};
+
+	useEffect(() => {
+		return () => {
+			if (posterUrl && posterUrl.startsWith('blob:')) {
+				URL.revokeObjectURL(posterUrl);
+			}
+		};
+	}, [posterUrl]);
 
 	const isOwner = profile?.username === blog.author.username;
 

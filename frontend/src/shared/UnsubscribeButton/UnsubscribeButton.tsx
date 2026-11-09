@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { Dispatch, SetStateAction } from 'react';
+import { toast } from 'sonner';
 
 import { Button } from '../Button/Button';
 
@@ -17,8 +18,16 @@ interface Props {
 
 export const UnsubscribeButton = ({ toId, setSubscribe, className }: Props) => {
 	const t = useTranslations('btns');
-	const [unsubscribeMutation] = useUnsubscribeMutation();
-	const { removeSubscription } = useProfile();
+	const { addSubscription, removeSubscription } = useProfile();
+
+	const [unsubscribeMutation] = useUnsubscribeMutation({
+		onError(err) {
+			console.error(err);
+			addSubscription(toId);
+			setSubscribe(true);
+			toast.error(t('unsubscribeError'));
+		},
+	});
 
 	const handleClick = () => {
 		unsubscribeMutation({

@@ -21,43 +21,69 @@ type PostsAndBlogs =
 	| GetAllBlogsQuery['getAllBlogsPagination']['data'][number];
 
 export const usePostsAndBlogs = (params: Params) => {
-	const { posts, isPostsLoading } = usePosts(params);
-	const { blogs, isBlogsLoading } = useBlogs(params);
+	const {
+		posts,
+		isPostsLoading,
+		totalPages: postsTotalPages = 0,
+	} = usePosts(params);
+	const {
+		blogs,
+		isBlogsLoading,
+		totalPages: blogsTotalPages = 0,
+	} = useBlogs(params);
+
 	const [allItems, setAllItems] = useState<PostsAndBlogs[]>([]);
-	const [hasMore, setHasMore] = useState(true);
+	const isLoading = isPostsLoading || isBlogsLoading;
 
-	const currentPageItems = useMemo(() => {
-		return [...posts, ...blogs];
-	}, [posts, blogs]);
+	const { onlySubscriptions, onlyPosts, onlyBlogs } = params.filters;
 
+	// Reset when filters change or page resets to 1
 	useEffect(() => {
 		if (params.page === 1) {
 			setAllItems([]);
-			setHasMore(true);
 		}
-	}, [
-		params.page,
-		params.filters.onlySubscriptions,
-		params.filters.onlyPosts,
-		params.filters.onlyBlogs,
-	]);
+	}, [params.page, onlySubscriptions, onlyPosts, onlyBlogs]);
 
 	useEffect(() => {
-		if (!currentPageItems.length) {
-			setHasMore(false);
-			return;
+		if (isLoading) return;
+
+		const currentPageItems = [...posts, ...blogs];
+
+		if (params.page === 1) {
+			setAllItems(currentPageItems);
+		} else if (currentPageItems.length > 0) {
+			setAllItems((prev) => {
+				const map = new Map<string, PostsAndBlogs>();
+				[...prev, ...currentPageItems].forEach((item) => {
+					map.set(item.id, item);
+				});
+				return Array.from(map.values());
+			});
+		}
+	}, [posts, blogs, isLoading, params.page]);
+
+	const hasMore = useMemo(() => {
+		if (isLoading) return true;
+
+		if (onlyPosts && !onlyBlogs) {
+			return params.page < (postsTotalPages ?? 0);
+		}
+		if (onlyBlogs && !onlyPosts) {
+			return params.page < (blogsTotalPages ?? 0);
 		}
 
-		setAllItems((prev) => {
-			const map = new Map<string, PostsAndBlogs>();
-
-			[...prev, ...currentPageItems].forEach((item) => {
-				map.set(item.id, item);
-			});
-
-			return Array.from(map.values());
-		});
-	}, [currentPageItems.length]);
+		return (
+			params.page < (postsTotalPages ?? 0) ||
+			params.page < (blogsTotalPages ?? 0)
+		);
+	}, [
+		isLoading,
+		onlyPosts,
+		onlyBlogs,
+		params.page,
+		postsTotalPages,
+		blogsTotalPages,
+	]);
 
 	const postsAndBlogs = useMemo(() => {
 		return [...allItems].sort(
@@ -71,6 +97,6 @@ export const usePostsAndBlogs = (params: Params) => {
 		blogs,
 		postsAndBlogs,
 		hasMore,
-		isLoading: isPostsLoading || isBlogsLoading,
+		isLoading,
 	};
 };

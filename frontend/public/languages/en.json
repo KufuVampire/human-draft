@@ -23,6 +23,8 @@
 		"removeAvatar": "Remove avatar",
 		"subscribe": "Subscribe",
 		"unsubscribe": "Unsubscribe",
+		"subscribeError": "Failed to subscribe",
+		"unsubscribeError": "Failed to unsubscribe",
 		"signIn": "Sign in",
 		"signUp": "Sign up",
 		"saveChanges": "Save changes",
@@ -150,9 +152,13 @@
 		"editProfile": "Edit profile",
 		"notifications": {
 			"changePosterSuccess": "Poster successfully changed",
+			"changePosterError": "Failed to change poster, please try again",
 			"removePosterSuccess": "Poster successfully deleted",
+			"removePosterError": "Failed to delete poster, please try again",
 			"changeAvatarSuccess": "Avatar successfully changed",
-			"removeAvatarSuccess": "Avatar successfully deleted"
+			"changeAvatarError": "Failed to change avatar, please try again",
+			"removeAvatarSuccess": "Avatar successfully deleted",
+			"removeAvatarError": "Failed to delete avatar, please try again"
 		}
 	},
 	"settingsPage": {
@@ -195,7 +201,9 @@
 		"blogUpdatedSuccess": "Blog successfully updated",
 		"poster": {
 			"deleted": "Poster successfully deleted",
-			"updated": "Poster successfully updated"
+			"updated": "Poster successfully updated",
+			"deleteError": "Failed to delete poster",
+			"updateError": "Failed to update poster"
 		},
 		"pinPosts": {
 			"pin": "Pin posts",

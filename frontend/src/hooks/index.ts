@@ -1,4 +1,5 @@
 export { useActiveLink } from './useActiveLink';
+export { useBlobUrl } from './useBlobUrl';
 export { useBlog } from './useBlog';
 export { useBlogs } from './useBlogs';
 export { useClickOutside } from './useClickOutside';

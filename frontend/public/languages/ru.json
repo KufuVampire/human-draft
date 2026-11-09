@@ -23,6 +23,8 @@
 		"removeAvatar": "Удалить аватарку",
 		"subscribe": "Подписаться",
 		"unsubscribe": "Отписаться",
+		"subscribeError": "Не удалось оформить подписку",
+		"unsubscribeError": "Не удалось отменить подписку",
 		"signIn": "Войти",
 		"signUp": "Зарегистрироваться",
 		"saveChanges": "Сохранить изменения",
@@ -149,10 +151,14 @@
 		},
 		"editProfile": "Редактировать профиль",
 		"notifications": {
-			"changePosterSuccess": "Обложка успешна изменена",
+			"changePosterSuccess": "Обложка успешно изменена",
+			"changePosterError": "Не удалось изменить обложку, попробуйте ещё раз",
 			"removePosterSuccess": "Обложка успешно удалена",
+			"removePosterError": "Не удалось удалить обложку, попробуйте ещё раз",
 			"changeAvatarSuccess": "Аватар успешно изменен",
-			"removeAvatarSuccess": "Аватар успешно удален"
+			"changeAvatarError": "Не удалось изменить аватар, попробуйте ещё раз",
+			"removeAvatarSuccess": "Аватар успешно удален",
+			"removeAvatarError": "Не удалось удалить аватар, попробуйте ещё раз"
 		}
 	},
 	"settingsPage": {
@@ -195,7 +201,9 @@
 		"blogUpdatedSuccess": "Блог успешно обновлён",
 		"poster": {
 			"deleted": "Постер успешно удален",
-			"updated": "Постер успешно обновлён"
+			"updated": "Постер успешно обновлён",
+			"deleteError": "Не удалось удалить постер",
+			"updateError": "Не удалось обновить постер"
 		},
 		"pinPosts": {
 			"pin": "Закрепить посты",
