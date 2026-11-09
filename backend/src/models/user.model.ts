@@ -1,4 +1,10 @@
-import { Field, GraphQLISODateTime, ID, ObjectType } from '@nestjs/graphql';
+import {
+	Field,
+	GraphQLISODateTime,
+	ID,
+	Int,
+	ObjectType,
+} from '@nestjs/graphql';
 
 import { BlogModel } from './blog.model';
 import { CommentModel } from './comment.model';
@@ -35,6 +41,18 @@ export class UserModel {
 
 	@Field(() => [String])
 	subscribers: string[];
+
+	@Field(() => Int, { nullable: true })
+	postsCount?: number;
+
+	@Field(() => Int, { nullable: true })
+	blogsCount?: number;
+
+	@Field(() => Int, { nullable: true })
+	subscribersCount?: number;
+
+	@Field(() => Int, { nullable: true })
+	subscriptionsCount?: number;
 
 	@Field(() => [BlogModel])
 	blogs: BlogModel[];

@@ -1,10 +1,11 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createClient, RedisClientType } from 'redis';
 
 @Injectable()
 export class RedisService implements OnModuleInit {
 	public client: RedisClientType;
+	private readonly logger = new Logger(RedisService.name);
 
 	constructor(readonly configService: ConfigService) {
 		this.client = createClient({
@@ -13,11 +14,11 @@ export class RedisService implements OnModuleInit {
 				port: configService.getOrThrow<number>('REDIS_PORT'),
 			},
 			username: configService.getOrThrow('REDIS_USER'),
-			password: configService.getOrThrow('REDIS_PASSWORD')
+			password: configService.getOrThrow('REDIS_PASSWORD'),
 		});
 
-		this.client.on('connect', () => console.log('✅ Redis подключен'));
-		this.client.on('error', (err) => console.error('❌ Redis ошибка:', err));
+		this.client.on('connect', () => this.logger.log('Redis connected'));
+		this.client.on('error', (err) => this.logger.error('Redis error:', err));
 	}
 
 	async onModuleInit() {
