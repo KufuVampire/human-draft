@@ -127,7 +127,9 @@ type Query {
   getBlogById(blogId: String!): BlogModel!
   getFreePostsForPin(searchStr: String): [PostModel!]!
   getPostById(postId: String!): PostModel!
+  getUserBlogsPagination(searchParams: SearchParamsInput = {page: 1, perPage: 10}, username: String!): BlogPagination!
   getUserByUsername(username: String!): UserModel!
+  getUserPostsPagination(searchParams: SearchParamsInput = {page: 1, perPage: 10}, username: String!): PostPagination!
   userProfile: UserModel!
 }
 
@@ -194,6 +196,7 @@ type UploadImageModel {
 type UserModel {
   avatarUrl: String
   blogs: [BlogModel!]!
+  blogsCount: Int
   comments: [CommentModel!]
   createdAt: DateTime!
   description: String
@@ -201,8 +204,11 @@ type UserModel {
   id: ID!
   posterUrl: String
   posts: [PostModel!]!
+  postsCount: Int
   subscribers: [String!]!
+  subscribersCount: Int
   subscriptions: [String!]!
+  subscriptionsCount: Int
   updatedAt: DateTime!
   username: String!
 }
