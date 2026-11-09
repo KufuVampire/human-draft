@@ -28,7 +28,7 @@ import {
 	usePinPostMutation,
 	useUnPinPostMutation,
 } from '@/graphql/generated/output';
-import { useBlog, useDebounce, useProfile } from '@/hooks';
+import { useBlog, useBlobUrl, useDebounce, useProfile } from '@/hooks';
 import { TypeSearchSchema } from '@/schemas';
 import {
 	BlogPageSkeleton,
@@ -58,6 +58,7 @@ export const BlogPage = memo(({ initialData }: Props = {}) => {
 		initialData?.posts ?? []
 	);
 	const [posterFile, setPosterFile] = useState<File | null>(null);
+	const posterBlobUrl = useBlobUrl(posterFile);
 	const [posterUrl, setPosterUrl] = useState<string | null>(
 		initialData?.posterUrl ?? null
 	);
@@ -94,14 +95,6 @@ export const BlogPage = memo(({ initialData }: Props = {}) => {
 			setPosterUrl(data.getBlogById.posterUrl);
 		}
 	}, [data]);
-
-	useEffect(() => {
-		return () => {
-			if (posterUrl && posterUrl.startsWith('blob:')) {
-				URL.revokeObjectURL(posterUrl);
-			}
-		};
-	}, [posterUrl]);
 
 	const postsSearchStr = useDebounce(watch('search') || '');
 
@@ -144,18 +137,11 @@ export const BlogPage = memo(({ initialData }: Props = {}) => {
 	const [updatePoster, { loading: isPosterUpdating }] =
 		useChangeBlogPosterMutation({
 			onCompleted() {
-				if (posterFile) {
-					setPosterUrl((prev) => {
-						if (prev && prev.startsWith('blob:')) {
-							URL.revokeObjectURL(prev);
-						}
-						return URL.createObjectURL(posterFile);
-					});
-					toast.success(t('blogPage.poster.updated'));
-				}
+				toast.success(t('blogPage.poster.updated'));
 			},
 			onError(err) {
 				console.error(err);
+				setPosterFile(null);
 				toast.error(t('blogPage.poster.updateError'));
 			},
 		});
@@ -301,12 +287,8 @@ export const BlogPage = memo(({ initialData }: Props = {}) => {
 	const handleDeletePoster = () => {
 		setType('poster');
 		setCb(() => {
-			setPosterUrl((prev) => {
-				if (prev && prev.startsWith('blob:')) {
-					URL.revokeObjectURL(prev);
-				}
-				return null;
-			});
+			setPosterFile(null);
+			setPosterUrl(null);
 			deletePoster({
 				variables: {
 					blogId,
@@ -318,15 +300,16 @@ export const BlogPage = memo(({ initialData }: Props = {}) => {
 	};
 
 	const isOwner = profile?.username === blog.author.username;
+	const currentPosterUrl = posterBlobUrl || posterUrl;
 
 	return (
 		<div className='flex flex-col gap-y-6 w-full'>
 			<Section
 				className='py-0 md:py-0 relative overflow-hidden rounded-xl bg-placeholder before:absolute before:inset-0 before:bg-[rgba(0,0,0,0.4)] before:z-0 bg-no-repeat bg-size-[100%_330px]'
 				style={
-					posterUrl
+					currentPosterUrl
 						? {
-								backgroundImage: `url(${posterUrl})`,
+								backgroundImage: `url(${currentPosterUrl})`,
 							}
 						: undefined
 				}>
@@ -356,7 +339,7 @@ export const BlogPage = memo(({ initialData }: Props = {}) => {
 									disabled={isPosterDeleting || isPosterUpdating}
 								/>
 							</label>
-							{posterUrl && (
+							{currentPosterUrl && (
 								<Button
 									variant='light'
 									className='p-2 rounded-lg'

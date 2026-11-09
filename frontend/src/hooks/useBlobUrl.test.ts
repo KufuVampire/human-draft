@@ -18,13 +18,13 @@ describe('useBlobUrl', () => {
 		vi.clearAllMocks();
 	});
 
-	it('returns null when no file is passed', () => {
+	it('возвращает null, если файл не передан', () => {
 		const { result } = renderHook(() => useBlobUrl(null));
 		expect(result.current).toBeNull();
 		expect(URL.createObjectURL).not.toHaveBeenCalled();
 	});
 
-	it('creates and returns blob URL when file is provided', () => {
+	it('создает и возвращает blob URL при передаче файла', () => {
 		const file = new File(['content'], 'test.png', { type: 'image/png' });
 		const { result } = renderHook(() => useBlobUrl(file));
 
@@ -32,7 +32,7 @@ describe('useBlobUrl', () => {
 		expect(result.current).toBe('blob:mock-url-7');
 	});
 
-	it('revokes previous URL when file changes', () => {
+	it('отзывает предыдущий URL при изменении файла', () => {
 		const file1 = new File(['file1'], 'file1.png', { type: 'image/png' });
 		const file2 = new File(['file22'], 'file2.png', { type: 'image/png' });
 
@@ -48,7 +48,7 @@ describe('useBlobUrl', () => {
 		expect(URL.createObjectURL).toHaveBeenCalledWith(file2);
 	});
 
-	it('revokes URL on unmount', () => {
+	it('отзывает URL при размонтировании компонента', () => {
 		const file = new File(['content'], 'test.png', { type: 'image/png' });
 		const { unmount } = renderHook(() => useBlobUrl(file));
 

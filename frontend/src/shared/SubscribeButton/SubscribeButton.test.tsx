@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react';
+import { toast } from 'sonner';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { SubscribeButton } from './SubscribeButton';
@@ -9,6 +10,7 @@ const mockSetSubscribe = vi.fn();
 const mockSetOpenNeedAuth = vi.fn();
 let mockProfile: { id: string } | null = { id: 'user-1' };
 let mockSubscribeMutation: any = vi.fn();
+let shouldFailMutation = false;
 
 vi.mock('next-intl', () => ({
 	useTranslations: () => (key: string) => key,
@@ -31,7 +33,7 @@ vi.mock('@/store', () => ({
 vi.mock('@/graphql/generated/output', () => ({
 	useSubscribeMutation: (options?: any) => {
 		mockSubscribeMutation = vi.fn((vars) => {
-			if (options?.onTriggerError) {
+			if (shouldFailMutation && options?.onError) {
 				options.onError(new Error('Mutation failed'));
 			}
 		});
@@ -50,11 +52,14 @@ describe('SubscribeButton', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
 		mockProfile = { id: 'user-1' };
+		shouldFailMutation = false;
 	});
 
-	it('prompts need auth modal when user is not logged in', () => {
+	it('открывает модалку авторизации, если пользователь не авторизован', () => {
 		mockProfile = null;
-		render(<SubscribeButton toId='target-user' setSubscribe={mockSetSubscribe} />);
+		render(
+			<SubscribeButton toId='target-user' setSubscribe={mockSetSubscribe} />
+		);
 
 		fireEvent.click(screen.getByText('subscribe'));
 
@@ -63,8 +68,10 @@ describe('SubscribeButton', () => {
 		expect(mockSetSubscribe).not.toHaveBeenCalled();
 	});
 
-	it('performs optimistic subscription when clicked by logged in user', () => {
-		render(<SubscribeButton toId='target-user' setSubscribe={mockSetSubscribe} />);
+	it('выполняет оптимистичную подписку при клике авторизованного пользователя', () => {
+		render(
+			<SubscribeButton toId='target-user' setSubscribe={mockSetSubscribe} />
+		);
 
 		fireEvent.click(screen.getByText('subscribe'));
 
@@ -73,5 +80,21 @@ describe('SubscribeButton', () => {
 		});
 		expect(mockAddSubscription).toHaveBeenCalledWith('target-user');
 		expect(mockSetSubscribe).toHaveBeenCalledWith(true);
+	});
+
+	it('откатывает подписку, сбрасывает состояние и показывает toast.error при сбое мутации', () => {
+		shouldFailMutation = true;
+		render(
+			<SubscribeButton toId='target-user' setSubscribe={mockSetSubscribe} />
+		);
+
+		fireEvent.click(screen.getByText('subscribe'));
+
+		expect(mockSubscribeMutation).toHaveBeenCalledWith({
+			variables: { toId: 'target-user' },
+		});
+		expect(mockRemoveSubscription).toHaveBeenCalledWith('target-user');
+		expect(mockSetSubscribe).toHaveBeenCalledWith(false);
+		expect(toast.error).toHaveBeenCalledWith('subscribeError');
 	});
 });

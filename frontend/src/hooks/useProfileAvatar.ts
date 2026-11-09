@@ -39,7 +39,14 @@ export const useProfileAvatar = () => {
 
 	const [changeAvatar, { loading: isAvatarChanging }] =
 		useChangeProfileAvatarMutation({
-			onCompleted() {
+			onCompleted(data) {
+				if (previewUrlRef.current) {
+					URL.revokeObjectURL(previewUrlRef.current);
+					previewUrlRef.current = null;
+				}
+				if (data?.changeProfileAvatar?.avatarUrl) {
+					updateProfile({ avatarUrl: data.changeProfileAvatar.avatarUrl });
+				}
 				toast.success(t('changeAvatarSuccess'));
 			},
 			onError(err) {
@@ -56,6 +63,11 @@ export const useProfileAvatar = () => {
 	const [removeAvatar, { loading: isAvatarRemoving }] =
 		useRemoveProfileAvatarMutation({
 			onCompleted() {
+				if (previewUrlRef.current) {
+					URL.revokeObjectURL(previewUrlRef.current);
+					previewUrlRef.current = null;
+				}
+				updateProfile({ avatarUrl: null });
 				toast.success(t('removeAvatarSuccess'));
 			},
 			onError(err) {

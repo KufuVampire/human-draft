@@ -96,7 +96,7 @@ describe('UsersPage', () => {
 		};
 	});
 
-	it('renders user cards with absolute links /:username (not relative)', () => {
+	it('рендерит карточки пользователей с абсолютными ссылками /:username (не относительными)', () => {
 		render(<UsersPage />);
 
 		const aliceLink = screen.getByRole('link', { name: /alice/i });
@@ -106,7 +106,7 @@ describe('UsersPage', () => {
 		expect(bobLink).toHaveAttribute('href', '/bob');
 	});
 
-	it('shows loading skeletons when initial page is loading', () => {
+	it('отображает скелетоны загрузки при начальной загрузке страницы', () => {
 		mockLoading = true;
 		mockQueryData = null;
 

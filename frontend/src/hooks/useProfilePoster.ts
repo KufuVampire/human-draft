@@ -21,6 +21,11 @@ export const useProfilePoster = () => {
 	const [removePosterMutation, { loading: removePosterLoading }] =
 		useRemoveProfilePosterMutation({
 			onCompleted() {
+				if (previewUrlRef.current) {
+					URL.revokeObjectURL(previewUrlRef.current);
+					previewUrlRef.current = null;
+				}
+				updateProfile({ posterUrl: null });
 				toast.success(t('removePosterSuccess'));
 			},
 			onError(err) {
@@ -32,7 +37,14 @@ export const useProfilePoster = () => {
 
 	const [changePosterMutation, { loading: changePosterLoading }] =
 		useChangeProfilePosterMutation({
-			onCompleted() {
+			onCompleted(data) {
+				if (previewUrlRef.current) {
+					URL.revokeObjectURL(previewUrlRef.current);
+					previewUrlRef.current = null;
+				}
+				if (data?.changeProfilePoster?.posterUrl) {
+					updateProfile({ posterUrl: data.changeProfilePoster.posterUrl });
+				}
 				toast.success(t('changePosterSuccess'));
 			},
 			onError(err) {

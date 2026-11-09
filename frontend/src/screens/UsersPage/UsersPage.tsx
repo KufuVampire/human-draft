@@ -58,10 +58,9 @@ export const UsersPage = () => {
 		},
 	});
 
-	// Reset page and list when filters or search change
+	// Reset page when filters or search change
 	useEffect(() => {
 		setPage(SEARCH_PARAMS.PAGE);
-		setAllUsers([]);
 	}, [debouncedSearchValue, onlySubscriptionsValue]);
 
 	// Accumulate users as pages are fetched
@@ -132,40 +131,39 @@ export const UsersPage = () => {
 			</div>
 
 			{filteredUsers.length > 0 && (
-				<div className='flex flex-col gap-y-4 w-full'>
-					<ul
-						className='grid grid-cols-1 lg:grid-cols-2 w-full gap-y-4 md:gap-6 bg-[var(--background-color-card)] px-5 py-4 rounded-xl transition-colors'
-						onClickCapture={handleClick}>
-						{filteredUsers.map(({ id, username, description, avatarUrl }) => (
-							<li
-								key={id}
-								className='w-full border border-primary rounded-xl hover:shadow-primary transition-shadow'>
-								<CustomLink
-									href={routesConfig.profileUsername(username)}
-									className='flex w-full p-2 gap-x-4 text-left hover:text-[var(--text-color-main)] focus-visible:text-[var(--text-color-main)]'>
-									<UserAvatar
-										username={username}
-										avatarUrl={avatarUrl}
-										location='users-page'
+				<ul
+					className='grid grid-cols-1 lg:grid-cols-2 w-full gap-y-4 md:gap-6 bg-[var(--background-color-card)] px-5 py-4 rounded-xl transition-colors'
+					onClickCapture={handleClick}>
+					{filteredUsers.map(({ id, username, description, avatarUrl }) => (
+						<li
+							key={id}
+							className='w-full border border-primary rounded-xl hover:shadow-primary transition-shadow'>
+							<CustomLink
+								href={routesConfig.profileUsername(username)}
+								className='flex w-full p-2 gap-x-4 text-left hover:text-[var(--text-color-main)] focus-visible:text-[var(--text-color-main)]'>
+								<UserAvatar
+									username={username}
+									avatarUrl={avatarUrl}
+									location='users-page'
+								/>
+								<div className='flex flex-col gap-y-2 w-full min-w-0'>
+									<h2 className='font-title font-bold text-xl leading-[110%]'>
+										{username}
+									</h2>
+									<p className='leading-6 truncate w-full'>{description}</p>
+									<SubscribeUnsubscribeButtons
+										toId={id}
+										className='self-start py-1 px-2 rounded-sm leading-[110%] tracking-[5%] uppercase'
+										isSubscribed={subscriptions.includes(id)}
 									/>
-									<div className='flex flex-col gap-y-2 w-full min-w-0'>
-										<h2 className='font-title font-bold text-xl leading-[110%]'>
-											{username}
-										</h2>
-										<p className='leading-6 truncate w-full'>{description}</p>
-										<SubscribeUnsubscribeButtons
-											toId={id}
-											className='self-start py-1 px-2 rounded-sm leading-[110%] tracking-[5%] uppercase'
-											isSubscribed={subscriptions.includes(id)}
-										/>
-									</div>
-								</CustomLink>
-							</li>
-						))}
-					</ul>
-					<div ref={lastElementRef} />
-				</div>
+								</div>
+							</CustomLink>
+						</li>
+					))}
+				</ul>
 			)}
+
+			{hasMore && <div ref={lastElementRef} className='h-4 w-full' />}
 
 			{loading && page === 1 && (
 				<ul className='grid grid-cols-1 lg:grid-cols-2 w-full gap-y-4 md:gap-6 bg-[var(--background-color-card)] px-5 py-4 rounded-xl transition-colors'>
