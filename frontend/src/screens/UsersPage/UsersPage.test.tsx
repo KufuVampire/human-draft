@@ -33,10 +33,14 @@ vi.mock('next-intl', () => ({
 
 vi.mock('@/hooks', () => ({
 	useDebounce: (v: string) => v,
-	useProfile: () => ({
-		subscriptions: [],
-	}),
 	useInfiniteScroll: vi.fn(() => vi.fn()),
+}));
+
+vi.mock('@/store', () => ({
+	useSubscriptions: (selector?: (s: unknown) => unknown) => {
+		const state = { subscriptions: [] };
+		return selector ? selector(state) : state;
+	},
 }));
 
 vi.mock('@/modules', () => ({

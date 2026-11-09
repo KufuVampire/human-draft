@@ -8,7 +8,7 @@ import { Button } from '../Button/Button';
 
 import { useSubscribeMutation } from '@/graphql/generated/output';
 import { useProfile } from '@/hooks';
-import { useNeedAuthModal } from '@/store';
+import { useModalStore } from '@/store';
 
 interface Props {
 	toId: string;
@@ -19,7 +19,7 @@ interface Props {
 export const SubscribeButton = ({ toId, setSubscribe, className }: Props) => {
 	const t = useTranslations('btns');
 	const { profile, addSubscription, removeSubscription } = useProfile();
-	const { setOpen } = useNeedAuthModal();
+	const openModal = useModalStore((s) => s.openModal);
 
 	const [subscribeMutation] = useSubscribeMutation({
 		onError(err) {
@@ -32,7 +32,7 @@ export const SubscribeButton = ({ toId, setSubscribe, className }: Props) => {
 
 	const handleClick = () => {
 		if (!profile) {
-			setOpen(true);
+			openModal('needAuth');
 			return;
 		}
 		subscribeMutation({

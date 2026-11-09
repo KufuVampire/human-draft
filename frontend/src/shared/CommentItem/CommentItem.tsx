@@ -19,7 +19,7 @@ import {
 	FormField,
 	UserBadgeWithCreatedAt,
 } from '@/shared';
-import { useComments, useConfirmationDeletionModal, useProfile } from '@/store';
+import { useComments, useModalStore, useProfileStore } from '@/store';
 import { cn } from '@/utils';
 
 interface Props {
@@ -31,8 +31,8 @@ const buttonStyles =
 	'px-2 py-1.5 leading-[110%] tracking-[5%] uppercase rounded-sm';
 
 export const CommentItem = ({ comment, className }: Props) => {
-	const { profile } = useProfile();
-	const { setCb, setOpen, setType } = useConfirmationDeletionModal();
+	const profile = useProfileStore((s) => s.profile);
+	const openModal = useModalStore((s) => s.openModal);
 	const [isReply, setReply] = useState(false);
 	const [isEditMode, setEditMode] = useState(false);
 	const [isShowReplies, setShowReplies] = useState(false);
@@ -82,17 +82,17 @@ export const CommentItem = ({ comment, className }: Props) => {
 	});
 
 	const handleDeleteComment = (commentId: string) => {
-		setType('comment');
-		setCb(() => {
-			deleteComm(commentId);
-			deleteComment({
-				variables: {
-					commentId,
-				},
-			});
-			setOpen(false);
+		openModal('confirmationDeletion', {
+			type: 'comment',
+			cb: () => {
+				deleteComm(commentId);
+				deleteComment({
+					variables: {
+						commentId,
+					},
+				});
+			},
 		});
-		setOpen(true);
 	};
 
 	const handleToggleEditMode = () => {

@@ -7,7 +7,7 @@ import { SubscribeButton } from './SubscribeButton';
 const mockAddSubscription = vi.fn();
 const mockRemoveSubscription = vi.fn();
 const mockSetSubscribe = vi.fn();
-const mockSetOpenNeedAuth = vi.fn();
+const mockOpenModal = vi.fn();
 let mockProfile: { id: string } | null = { id: 'user-1' };
 let mockSubscribeMutation: any = vi.fn();
 let shouldFailMutation = false;
@@ -25,9 +25,12 @@ vi.mock('@/hooks', () => ({
 }));
 
 vi.mock('@/store', () => ({
-	useNeedAuthModal: () => ({
-		setOpen: mockSetOpenNeedAuth,
-	}),
+	useModalStore: (selector?: (s: unknown) => unknown) => {
+		const state = {
+			openModal: mockOpenModal,
+		};
+		return selector ? selector(state) : state;
+	},
 }));
 
 vi.mock('@/graphql/generated/output', () => ({
@@ -63,7 +66,7 @@ describe('SubscribeButton', () => {
 
 		fireEvent.click(screen.getByText('subscribe'));
 
-		expect(mockSetOpenNeedAuth).toHaveBeenCalledWith(true);
+		expect(mockOpenModal).toHaveBeenCalledWith('needAuth');
 		expect(mockAddSubscription).not.toHaveBeenCalled();
 		expect(mockSetSubscribe).not.toHaveBeenCalled();
 	});

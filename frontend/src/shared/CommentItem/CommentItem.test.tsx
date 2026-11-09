@@ -10,9 +10,7 @@ const mockUpdateComment = vi.fn();
 const mockDeleteComment = vi.fn();
 const mockDeleteCommentStore = vi.fn();
 const mockUpdateCommentStore = vi.fn();
-const mockSetCb = vi.fn();
-const mockSetOpen = vi.fn();
-const mockSetType = vi.fn();
+const mockOpenModal = vi.fn();
 const mockToastError = vi.fn();
 let mockCurrentUsername: string | undefined = 'alice';
 let mockUpdateShouldFail = false;
@@ -73,24 +71,33 @@ vi.mock('@/hooks', () => ({
 	useCreateAt: () => '26 окт в 12:00',
 }));
 
-vi.mock('@/store', () => ({
-	useProfile: () => ({
+vi.mock('@/store', () => {
+	const getProfileState = () => ({
 		profile: mockCurrentUsername
 			? { id: 'user-1', username: mockCurrentUsername, avatarUrl: null }
 			: null,
 		isAuth: !!mockCurrentUsername,
-	}),
-	useComments: () => ({
-		deleteComment: mockDeleteCommentStore,
-		updateComment: mockUpdateCommentStore,
-		addComment: vi.fn(),
-	}),
-	useConfirmationDeletionModal: () => ({
-		setCb: (cb: () => void) => mockSetCb(cb),
-		setOpen: mockSetOpen,
-		setType: mockSetType,
-	}),
-}));
+	});
+
+	return {
+		useProfile: (selector?: (s: unknown) => unknown) =>
+			selector ? selector(getProfileState()) : getProfileState(),
+		useProfileStore: (selector?: (s: unknown) => unknown) =>
+			selector ? selector(getProfileState()) : getProfileState(),
+		useComments: () => ({
+			deleteComment: mockDeleteCommentStore,
+			updateComment: mockUpdateCommentStore,
+			addComment: vi.fn(),
+		}),
+		useModalStore: (selector?: (s: unknown) => unknown) => {
+			const state = {
+				openModal: mockOpenModal,
+				closeModal: vi.fn(),
+			};
+			return selector ? selector(state) : state;
+		},
+	};
+});
 
 vi.mock('@/graphql/generated/output', async (importOriginal) => {
 	const actual = await importOriginal<typeof import('@/graphql/generated/output')>();
@@ -361,13 +368,18 @@ describe('CommentItem (colocated unit tests)', () => {
 		const deleteBtn = screen.getByTitle('postPage.comments.deleteComment');
 		await user.click(deleteBtn);
 
-		expect(mockSetType).toHaveBeenCalledWith('comment');
-		expect(mockSetOpen).toHaveBeenCalledWith(true);
-		expect(mockSetCb).toHaveBeenCalled();
+		expect(mockOpenModal).toHaveBeenCalledWith(
+			'confirmationDeletion',
+			expect.objectContaining({
+				type: 'comment',
+				cb: expect.any(Function),
+			})
+		);
 
 		// Симулируем подтверждение в модалке (вызов сохраненного cb)
-		const savedCallback = mockSetCb.mock.calls[0][0] as () => void;
-		savedCallback();
+		const modalCall = mockOpenModal.mock.calls[0];
+		const modalData = modalCall[1] as { cb: () => void };
+		modalData.cb();
 
 		expect(mockDeleteCommentStore).toHaveBeenCalledWith('comment-1');
 		expect(mockDeleteComment).toHaveBeenCalledWith({
@@ -375,6 +387,5 @@ describe('CommentItem (colocated unit tests)', () => {
 				commentId: 'comment-1',
 			},
 		});
-		expect(mockSetOpen).toHaveBeenCalledWith(false);
 	});
 });

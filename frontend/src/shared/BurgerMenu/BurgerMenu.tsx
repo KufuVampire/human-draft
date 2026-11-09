@@ -13,7 +13,7 @@ import { ComponentType, useMemo, useState } from 'react';
 
 import { Burger } from './Burger/Burger';
 import { routesConfig } from '@/config';
-import { useActiveLink, useProfile, useResolvedHref } from '@/hooks';
+import { useActiveLink, useResolvedHref } from '@/hooks';
 import {
 	CustomLink,
 	Dropdown,
@@ -21,6 +21,7 @@ import {
 	LogoutButton,
 	UserBadge,
 } from '@/shared';
+import { useProfileStore } from '@/store';
 import { cn } from '@/utils';
 
 interface Props {
@@ -86,7 +87,8 @@ const burgerDropdownItems: BurgerDropdownItem[] = [
 export const BurgerMenu = ({ className }: Props) => {
 	const t = useTranslations();
 	const [isOpen, setOpen] = useState(false);
-	const { isAuth, profile } = useProfile();
+	const isAuth = useProfileStore((s) => s.isAuth);
+	const profile = useProfileStore((s) => s.profile);
 	const isActiveLink = useActiveLink();
 	const resolveHref = useResolvedHref();
 

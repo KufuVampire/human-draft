@@ -10,7 +10,7 @@ import { toast } from 'sonner';
 
 import { routesConfig } from '@/config';
 import { useUpdateProfileMutation } from '@/graphql/generated/output';
-import { useProfile } from '@/hooks';
+import { useProfileAvatar } from '@/hooks';
 import { TypeUpdateProfileSchema, updateProfileSchema } from '@/schemas';
 import {
 	Button,
@@ -19,7 +19,7 @@ import {
 	SettingsPageSkeleton,
 	UserAvatar,
 } from '@/shared';
-import { useConfirmationChangesModal } from '@/store';
+import { useModalStore, useProfileStore } from '@/store';
 import { IField } from '@/types';
 
 const fieldItems: IField<TypeUpdateProfileSchema>[] = [
@@ -56,13 +56,11 @@ export const SettingsPage = () => {
 	const t = useTranslations();
 	const router = useRouter();
 	const { username } = useParams();
-	const {
-		profile,
-		isLoading,
-		updateProfile,
-		handleChangeAvatar,
-		isAvatarChanging,
-	} = useProfile();
+	const profile = useProfileStore((s) => s.profile);
+	const isLoading = useProfileStore((s) => s.isLoading);
+	const updateProfile = useProfileStore((s) => s.updateProfile);
+	const { handleChangeAvatar, isAvatarChanging } = useProfileAvatar();
+	const openModal = useModalStore((s) => s.openModal);
 	const formId = useId();
 	const {
 		register,
@@ -78,7 +76,6 @@ export const SettingsPage = () => {
 			description: '',
 		},
 	});
-	const { setCb, setOpen } = useConfirmationChangesModal();
 	const [updateProfileMutation] = useUpdateProfileMutation({
 		onCompleted() {
 			toast.success(t('settingsPage.notifications.updateSuccess'));
@@ -113,17 +110,17 @@ export const SettingsPage = () => {
 	}
 
 	const onSubmit: SubmitHandler<TypeUpdateProfileSchema> = (data) => {
-		setCb(() => {
-			updateProfileMutation({
-				variables: {
-					data,
-				},
-			});
-			setOpen(false);
-			updateProfile(data);
-			router.replace(`/${data.username}/${routesConfig.settings}`);
+		openModal('confirmationChanges', {
+			cb: () => {
+				updateProfileMutation({
+					variables: {
+						data,
+					},
+				});
+				updateProfile(data);
+				router.replace(`/${data.username}/${routesConfig.settings}`);
+			},
 		});
-		setOpen(true);
 	};
 
 	return (

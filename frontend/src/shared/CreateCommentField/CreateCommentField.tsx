@@ -11,9 +11,8 @@ import { FormField } from '../FormField/FormField';
 import { UserBadge } from '../UserBadge/UserBadge';
 
 import { useCreateCommentMutation } from '@/graphql/generated/output';
-import { useProfile } from '@/hooks';
 import { TypeCreateCommentSchema } from '@/schemas';
-import { useComments } from '@/store';
+import { useComments, useProfileStore } from '@/store';
 import { cn } from '@/utils';
 
 const buttonStyles =
@@ -32,7 +31,8 @@ export const CreateCommentField = ({
 }: Props) => {
 	const { postId } = useParams<{ postId: string }>();
 	const t = useTranslations();
-	const { profile, isAuth } = useProfile();
+	const isAuth = useProfileStore((s) => s.isAuth);
+	const profile = useProfileStore((s) => s.profile);
 	const { addComment } = useComments();
 
 	const {

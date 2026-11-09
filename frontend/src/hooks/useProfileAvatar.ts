@@ -8,28 +8,12 @@ import {
 	useChangeProfileAvatarMutation,
 	useRemoveProfileAvatarMutation,
 } from '@/graphql/generated/output';
-import {
-	useConfirmationDeletionModal,
-	useCropperModal,
-	useProfile,
-} from '@/store';
-import { getCroppedImg } from '@/utils';
+import { useModalStore, useProfileStore } from '@/store';
 
 export const useProfileAvatar = () => {
-	const { profile, updateProfile } = useProfile();
-	const { setCb, setOpen, setType } = useConfirmationDeletionModal();
-	const {
-		isCropperOpen,
-		avatarImage,
-		zoom,
-		crop,
-		croppedAreaPixels,
-		setZoom,
-		setCrop,
-		setOpenCropper,
-		setCloseCropper,
-		setCroppedAreaPixels,
-	} = useCropperModal();
+	const profile = useProfileStore((s) => s.profile);
+	const updateProfile = useProfileStore((s) => s.updateProfile);
+	const openModal = useModalStore((s) => s.openModal);
 
 	const t = useTranslations('profilePage.notifications');
 
@@ -95,21 +79,13 @@ export const useProfileAvatar = () => {
 
 	const handleRemoveAvatar = () => {
 		prevAvatarRef.current = profile?.avatarUrl;
-		setType('avatar');
-		setOpen(true);
-		setCb(() => {
-			removeAvatar();
-			updateProfile({ avatarUrl: null });
-			setOpen(false);
+		openModal('confirmationDeletion', {
+			type: 'avatar',
+			cb: () => {
+				removeAvatar();
+				updateProfile({ avatarUrl: null });
+			},
 		});
-	};
-
-	const handleCloseCropperModal = () => {
-		if (cropperUrlRef.current) {
-			URL.revokeObjectURL(cropperUrlRef.current);
-			cropperUrlRef.current = null;
-		}
-		setCloseCropper();
 	};
 
 	const handleChangeAvatar = (e: ChangeEvent<HTMLInputElement>) => {
@@ -122,21 +98,17 @@ export const useProfileAvatar = () => {
 		const imageUrl = URL.createObjectURL(file);
 		cropperUrlRef.current = imageUrl;
 
-		setOpenCropper(imageUrl);
-		e.target.value = '';
-	};
-
-	const handleSaveCroppedAvatar = async () => {
-		if (!avatarImage || !croppedAreaPixels) return;
-
-		const croppedBlob = await getCroppedImg(avatarImage, croppedAreaPixels);
-
-		const file = new File([croppedBlob], 'avatar.png', {
-			type: 'image/png',
+		openModal('cropper', {
+			image: imageUrl,
+			onCropComplete: handleLoadAvatar,
+			onClose: () => {
+				if (cropperUrlRef.current) {
+					URL.revokeObjectURL(cropperUrlRef.current);
+					cropperUrlRef.current = null;
+				}
+			},
 		});
-
-		handleLoadAvatar(file);
-		handleCloseCropperModal();
+		e.target.value = '';
 	};
 
 	useEffect(() => {
@@ -159,15 +131,6 @@ export const useProfileAvatar = () => {
 		isAvatarChanging,
 		handleLoadAvatar,
 		handleRemoveAvatar,
-		zoom,
-		setZoom,
-		crop,
-		setCrop,
-		avatarImage,
-		isCropperOpen,
-		setCroppedAreaPixels,
-		setCloseCropper: handleCloseCropperModal,
 		handleChangeAvatar,
-		handleSaveCroppedAvatar,
 	};
 };

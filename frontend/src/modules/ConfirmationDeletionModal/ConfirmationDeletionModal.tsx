@@ -5,7 +5,7 @@ import { useCallback, useRef } from 'react';
 
 import { useClickOutside } from '@/hooks';
 import { Button, Modal } from '@/shared';
-import { useConfirmationDeletionModal } from '@/store';
+import { ConfirmationDeletionData, useModalStore } from '@/store';
 import { cn } from '@/utils';
 
 interface Props {
@@ -15,15 +15,28 @@ interface Props {
 const buttonStyles = 'p-2 md:p-3 w-full tracking-[5%] uppercase rounded-lg';
 
 export const ConfirmationDeletionModal = ({ className }: Props) => {
-	const { isOpen, setOpen, cb, type } = useConfirmationDeletionModal();
+	const activeModal = useModalStore((s) => s.activeModal);
+	const modalData = useModalStore(
+		(s) => s.modalData as ConfirmationDeletionData | null
+	);
+	const closeModal = useModalStore((s) => s.closeModal);
 	const t = useTranslations();
 	const modalRef = useRef<HTMLDivElement>(null);
 
+	const isOpen = activeModal === 'confirmationDeletion';
+
 	const handleClose = useCallback(() => {
-		setOpen(false);
-	}, [setOpen]);
+		closeModal();
+	}, [closeModal]);
 
 	useClickOutside(modalRef, handleClose);
+
+	const type = modalData?.type ?? 'post';
+
+	const handleConfirm = () => {
+		modalData?.cb();
+		closeModal();
+	};
 
 	return (
 		<Modal
@@ -47,7 +60,7 @@ export const ConfirmationDeletionModal = ({ className }: Props) => {
 					</Button>
 					<Button
 						className={buttonStyles}
-						onClick={cb}>
+						onClick={handleConfirm}>
 						{t('btns.remove')}
 					</Button>
 				</div>

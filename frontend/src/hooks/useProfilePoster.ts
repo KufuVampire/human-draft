@@ -8,11 +8,12 @@ import {
 	useChangeProfilePosterMutation,
 	useRemoveProfilePosterMutation,
 } from '@/graphql/generated/output';
-import { useConfirmationDeletionModal, useProfile } from '@/store';
+import { useModalStore, useProfileStore } from '@/store';
 
 export const useProfilePoster = () => {
-	const { setCb, setType, setOpen } = useConfirmationDeletionModal();
-	const { profile, updateProfile } = useProfile();
+	const profile = useProfileStore((s) => s.profile);
+	const updateProfile = useProfileStore((s) => s.updateProfile);
+	const openModal = useModalStore((s) => s.openModal);
 	const t = useTranslations('profilePage.notifications');
 
 	const previewUrlRef = useRef<string | null>(null);
@@ -81,12 +82,12 @@ export const useProfilePoster = () => {
 
 	const handleRemovePoster = () => {
 		prevPosterRef.current = profile?.posterUrl;
-		setType('poster');
-		setOpen(true);
-		setCb(() => {
-			removePosterMutation();
-			updateProfile({ posterUrl: null });
-			setOpen(false);
+		openModal('confirmationDeletion', {
+			type: 'poster',
+			cb: () => {
+				removePosterMutation();
+				updateProfile({ posterUrl: null });
+			},
 		});
 	};
 

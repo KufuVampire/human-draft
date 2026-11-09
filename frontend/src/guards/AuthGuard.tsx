@@ -4,10 +4,11 @@ import { useRouter } from 'next/navigation';
 import { PropsWithChildren, useEffect } from 'react';
 
 import { routesConfig } from '@/config';
-import { useProfile } from '@/hooks';
+import { useProfileStore } from '@/store';
 
 export const AuthGuard = ({ children }: PropsWithChildren) => {
-	const { isAuth, isLoading } = useProfile();
+	const isAuth = useProfileStore((s) => s.isAuth);
+	const isLoading = useProfileStore((s) => s.isLoading);
 	const router = useRouter();
 
 	useEffect(() => {

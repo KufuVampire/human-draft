@@ -3,12 +3,12 @@
 import { usePathname } from 'next/navigation';
 import { useMemo } from 'react';
 
-import { useProfile } from './useProfile';
 import { routesConfig } from '@/config';
+import { useProfileStore } from '@/store';
 
 export const useNavigationLink = (href: string) => {
 	const pathname = usePathname();
-	const { profile } = useProfile();
+	const profile = useProfileStore((s) => s.profile);
 
 	const finalHref = useMemo(() => {
 		if (!profile?.username) return href;

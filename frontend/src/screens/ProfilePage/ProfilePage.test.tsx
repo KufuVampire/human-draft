@@ -45,12 +45,16 @@ vi.mock('@/hooks', () => ({
 	useProfile: () => ({
 		profile: mockProfileUsername ? { username: mockProfileUsername } : null,
 		subscriptions: [],
+	}),
+	useProfilePoster: () => ({
 		changePosterLoading: false,
 		removePosterLoading: false,
-		isAvatarChanging: false,
-		isAvatarRemoving: false,
 		handleLoadPoster: vi.fn(),
 		handleRemovePoster: vi.fn(),
+	}),
+	useProfileAvatar: () => ({
+		isAvatarChanging: false,
+		isAvatarRemoving: false,
 		handleRemoveAvatar: vi.fn(),
 		handleChangeAvatar: vi.fn(),
 	}),

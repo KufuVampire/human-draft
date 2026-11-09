@@ -160,10 +160,7 @@ frontend/
 │   │
 │   ├── store/                  # Клиентские хранилища состояния (Zustand)
 │   │   ├── useComments.ts      # Состояние редактирования/ответов комментариев
-│   │   ├── useConfirmationChangesModal.ts # Управление подтверждением изменений
-│   │   ├── useConfirmationDeletionModal.ts# Управление модалкой удаления
-│   │   ├── useCropperModal.ts  # Состояние модалки кадрирования аватара/обложки
-│   │   ├── useNeedAuthModal.ts # Состояние модалки «Требуется авторизация»
+│   │   ├── useModalStore.ts    # Единый стор модалок (confirmation, needAuth, cropper)
 │   │   ├── useProfile.ts       # Текущий авторизованный пользователь
 │   │   ├── useSubscriptions.ts # Список подписок пользователя
 │   │   └── index.ts

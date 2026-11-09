@@ -1,33 +1,74 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { useRef } from 'react';
-import Cropper from 'react-easy-crop';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import Cropper, { Area, Point } from 'react-easy-crop';
 
-import { useClickOutside, useProfileAvatar } from '@/hooks';
+import { useClickOutside } from '@/hooks';
 import { Button, Modal } from '@/shared';
+import { CropperData, useModalStore } from '@/store';
+import { getCroppedImg } from '@/utils';
 
 export const CropperModal = () => {
 	const t = useTranslations();
-	const {
-		isCropperOpen,
-		avatarImage,
-		zoom,
-		setZoom,
-		crop,
-		setCrop,
-		setCroppedAreaPixels,
-		setCloseCropper,
-		handleSaveCroppedAvatar,
-	} = useProfileAvatar();
+	const activeModal = useModalStore((s) => s.activeModal);
+	const modalData = useModalStore((s) => s.modalData as CropperData | null);
+	const closeModal = useModalStore((s) => s.closeModal);
+
+	const isOpen = activeModal === 'cropper';
+
+	const [zoom, setZoom] = useState(1);
+	const [crop, setCrop] = useState<Point>({ x: 0, y: 0 });
+	const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
+	const [isSaving, setIsSaving] = useState(false);
+
 	const cropperModalRef = useRef<HTMLDivElement>(null);
 
-	useClickOutside(cropperModalRef, setCloseCropper);
+	const handleClose = useCallback(() => {
+		modalData?.onClose?.();
+		closeModal();
+	}, [closeModal, modalData]);
+
+	useClickOutside(cropperModalRef, handleClose);
+
+	useEffect(() => {
+		if (isOpen) {
+			setZoom(1);
+			setCrop({ x: 0, y: 0 });
+			setCroppedAreaPixels(null);
+			setIsSaving(false);
+		}
+	}, [isOpen]);
+
+	const handleSave = async () => {
+		if (!modalData?.image || !croppedAreaPixels || isSaving) return;
+
+		setIsSaving(true);
+		try {
+			const croppedBlob = await getCroppedImg(
+				modalData.image,
+				croppedAreaPixels
+			);
+
+			const file = new File([croppedBlob], 'avatar.png', {
+				type: 'image/png',
+			});
+
+			modalData.onCropComplete?.(file);
+			handleClose();
+		} catch (error) {
+			console.error(error);
+		} finally {
+			setIsSaving(false);
+		}
+	};
+
+	const avatarImage = modalData?.image;
 
 	return (
 		<Modal
-			isOpen={isCropperOpen}
-			onClose={setCloseCropper}>
+			isOpen={isOpen}
+			onClose={handleClose}>
 			<div
 				ref={cropperModalRef}
 				className='flex flex-col bg-[var(--background-color-card)] px-3 md:px-5 py-6 max-w-112.5 w-full rounded-t-2xl sm:rounded-2xl max-h-[90vh] overflow-y-auto gap-y-6'>
@@ -53,12 +94,14 @@ export const CropperModal = () => {
 					<Button
 						variant='secondary'
 						className='py-3 uppercase tracking-[5%] leading-[110%] rounded-[0.625rem] w-full dark:text-secondary'
-						onClick={setCloseCropper}>
+						disabled={isSaving}
+						onClick={handleClose}>
 						{t('btns.cancel')}
 					</Button>
 					<Button
 						className='py-3 uppercase tracking-[5%] leading-[110%] rounded-[0.625rem] w-full'
-						onClick={handleSaveCroppedAvatar}>
+						disabled={isSaving}
+						onClick={handleSave}>
 						{t('btns.save')}
 					</Button>
 				</div>

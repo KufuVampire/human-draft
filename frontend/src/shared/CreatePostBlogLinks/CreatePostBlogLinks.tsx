@@ -6,7 +6,7 @@ import { CreatePostLink } from '../CreatePostLink/CreatePostLink';
 import { CustomLink } from '../CustomLink/CustomLink';
 
 import { routesConfig } from '@/config';
-import { useProfile } from '@/hooks';
+import { useProfileStore } from '@/store';
 import { cn } from '@/utils';
 
 const linkItems = [
@@ -19,7 +19,7 @@ const linkItems = [
 
 export const CreatePostBlogLinks = () => {
 	const t = useTranslations('btns');
-	const { isAuth } = useProfile();
+	const isAuth = useProfileStore((s) => s.isAuth);
 
 	if (!isAuth) return;
 

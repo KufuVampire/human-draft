@@ -7,7 +7,8 @@ import { CustomLink } from '../CustomLink/CustomLink';
 
 import { routesConfig } from '@/config';
 import { UNAVAILABLE_ROUTES_IF_NOT_AUTH } from '@/consts';
-import { useActiveLink, useProfile, useResolvedHref } from '@/hooks';
+import { useActiveLink, useResolvedHref } from '@/hooks';
+import { useProfileStore } from '@/store';
 import { cn } from '@/utils';
 
 type NavigationVariants = 'dashboard' | 'footer';
@@ -50,7 +51,7 @@ export const Navigation = ({
 	isExpanded = true,
 }: Props) => {
 	const t = useTranslations('navigation');
-	const { isAuth } = useProfile();
+	const isAuth = useProfileStore((s) => s.isAuth);
 	const isActiveLink = useActiveLink();
 	const resolveHref = useResolvedHref();
 

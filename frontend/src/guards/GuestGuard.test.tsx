@@ -13,11 +13,14 @@ vi.mock('next/navigation', () => ({
 	}),
 }));
 
-vi.mock('@/hooks', () => ({
-	useProfile: () => ({
-		isAuth: mockIsAuth,
-		isLoading: mockIsLoading,
-	}),
+vi.mock('@/store', () => ({
+	useProfileStore: (selector?: (s: unknown) => unknown) => {
+		const state = {
+			isAuth: mockIsAuth,
+			isLoading: mockIsLoading,
+		};
+		return selector ? selector(state) : state;
+	},
 }));
 
 describe('GuestGuard', () => {

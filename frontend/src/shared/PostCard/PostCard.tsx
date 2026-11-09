@@ -37,7 +37,7 @@ export const PostCard = ({
 	tags,
 	isBlogPage = false,
 }: Props) => {
-	const { profile } = useProfile();
+	const profile = useProfile((s) => s.profile);
 	const previewContent = useMemo(() => {
 		if (!content) return null;
 		let parsed: unknown = content;

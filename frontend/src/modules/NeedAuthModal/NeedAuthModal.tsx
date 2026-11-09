@@ -1,12 +1,12 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { useEffect, useRef } from 'react';
+import { useCallback, useRef } from 'react';
 
 import { routesConfig } from '@/config';
 import { useClickOutside } from '@/hooks';
 import { Button, CustomLink, Modal } from '@/shared';
-import { useNeedAuthModal } from '@/store';
+import { useModalStore } from '@/store';
 import { cn } from '@/utils';
 
 const buttonStyles = 'py-3 w-full tracking-[5%] uppercase rounded-lg';
@@ -14,17 +14,16 @@ const buttonStyles = 'py-3 w-full tracking-[5%] uppercase rounded-lg';
 export const NeedAuthModal = () => {
 	const t = useTranslations();
 	const modalRef = useRef<HTMLDivElement>(null);
-	const { isOpen, setOpen } = useNeedAuthModal();
+	const activeModal = useModalStore((s) => s.activeModal);
+	const closeModal = useModalStore((s) => s.closeModal);
 
-	const handleClose = () => {
-		setOpen(false);
-	};
+	const isOpen = activeModal === 'needAuth';
+
+	const handleClose = useCallback(() => {
+		closeModal();
+	}, [closeModal]);
 
 	useClickOutside(modalRef, handleClose);
-
-	useEffect(() => {
-		handleClose();
-	}, []);
 
 	return (
 		<Modal
@@ -46,7 +45,8 @@ export const NeedAuthModal = () => {
 					<CustomLink
 						variant='primary'
 						href={routesConfig.signin}
-						className={buttonStyles}>
+						className={buttonStyles}
+						onClick={handleClose}>
 						{t('btns.signIn')}
 					</CustomLink>
 				</div>
