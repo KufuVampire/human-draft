@@ -1,8 +1,15 @@
 'use client';
 
-import { Newspaper, Settings, User, Users } from 'lucide-react';
+import {
+	LogIn,
+	Newspaper,
+	Settings,
+	User,
+	UserPlus,
+	Users,
+} from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useMemo, useState } from 'react';
+import { ComponentType, useMemo, useState } from 'react';
 
 import { Burger } from './Burger/Burger';
 import { routesConfig } from '@/config';
@@ -20,12 +27,33 @@ interface Props {
 	className?: string;
 }
 
-const burgerDropdownItems = [
+interface BurgerDropdownItem {
+	needAuth?: boolean;
+	onlyGuest?: boolean;
+	href?: string;
+	translationKey?: string;
+	Icon?: ComponentType<{ className?: string }>;
+	Component?: ComponentType<{ className?: string }>;
+}
+
+const burgerDropdownItems: BurgerDropdownItem[] = [
 	{
 		needAuth: false,
 		href: routesConfig.home,
 		translationKey: 'navigation.feed',
 		Icon: Newspaper,
+	},
+	{
+		onlyGuest: true,
+		href: routesConfig.signin,
+		translationKey: 'btns.signIn',
+		Icon: LogIn,
+	},
+	{
+		onlyGuest: true,
+		href: routesConfig.signup,
+		translationKey: 'btns.signUp',
+		Icon: UserPlus,
 	},
 	{
 		needAuth: true,
@@ -64,35 +92,49 @@ export const BurgerMenu = ({ className }: Props) => {
 
 	const dropdownItems = useMemo(() => {
 		const items = burgerDropdownItems
-			.map(({ Icon, href, translationKey, Component, needAuth }, i) => {
-				if (needAuth && !isAuth) {
-					return null;
-				}
+			.map(
+				(
+					{ Icon, href, translationKey, Component, needAuth, onlyGuest },
+					i
+				) => {
+					if (needAuth && !isAuth) {
+						return null;
+					}
 
-				if (Component) {
+					if (onlyGuest && isAuth) {
+						return null;
+					}
+
+					if (Component) {
+						return (
+							<Component
+								key={i}
+								className='text-secondary'
+							/>
+						);
+					}
+
+					if (!href || !Icon || !translationKey) {
+						return null;
+					}
+
+					const currentHref = resolveHref(href);
+
 					return (
-						<Component
-							key={i}
-							className='text-secondary'
-						/>
+						<CustomLink
+							key={href}
+							href={currentHref}
+							onClick={() => setOpen(false)}
+							className={cn(
+								'p-2 hover:bg-main-hover w-full flex gap-x-1 justify-normal text-secondary',
+								isActiveLink(currentHref) && 'text-primary'
+							)}>
+							<Icon />
+							{t(translationKey)}
+						</CustomLink>
 					);
 				}
-
-				const currentHref = resolveHref(href);
-
-				return (
-					<CustomLink
-						key={href}
-						href={currentHref}
-						className={cn(
-							'p-2 hover:bg-main-hover w-full flex gap-x-1 justify-normal text-secondary',
-							isActiveLink(currentHref) && 'text-primary'
-						)}>
-						<Icon />
-						{t(translationKey)}
-					</CustomLink>
-				);
-			})
+			)
 			.filter(Boolean);
 
 		if (profile) {

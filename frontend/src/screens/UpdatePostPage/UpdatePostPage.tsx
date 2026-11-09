@@ -52,6 +52,7 @@ export const UpdatePostPage = () => {
 		register,
 		formState: { isValid },
 		reset,
+		watch,
 	} = useForm<TypeUpdatePostSchema>();
 	const [tags, setTags] = useState<string[]>([]);
 	const { loading, get } = useEditor(
@@ -151,7 +152,7 @@ export const UpdatePostPage = () => {
 			<Container className='md:px-22 selection:bg-[#ede0d4] dark:selection:bg-primary'>
 				<form
 					onSubmit={handleSubmit(onSubmit)}
-					className='w-full flex flex-col gap-y-6'>
+					className='w-full flex flex-col gap-y-6 pb-20 md:pb-0'>
 					<FormField
 						text={t('createPostPage.title')}
 						className='w-full outline-0 border-0 [&:not(:placeholder-shown)]:shadow-none px-0'
@@ -170,6 +171,19 @@ export const UpdatePostPage = () => {
 						className='rounded-xl py-4 w-full md:font-bold uppercase md:text-xl md:leading-[120%] leading-[110%] md:tracking-[10%] tracking-[5%]'>
 						{t('postPage.editPost')}
 					</Button>
+
+					<div className='fixed bottom-0 left-0 right-0 z-30 p-3 bg-[var(--background-color-card)]/90 backdrop-blur-md border-t border-[var(--border-color-primary)] md:hidden flex items-center justify-between gap-x-3'>
+						<span className='text-sm text-secondary truncate font-medium'>
+							{watch('title') || t('createPostPage.title')}
+						</span>
+						<Button
+							type='submit'
+							isLoading={loading || isUpdating}
+							variant={isValid ? 'primary' : 'disabled'}
+							className='rounded-lg py-2.5 px-5 font-bold uppercase text-sm shrink-0'>
+							{t('postPage.editPost')}
+						</Button>
+					</div>
 				</form>
 			</Container>
 		</Section>

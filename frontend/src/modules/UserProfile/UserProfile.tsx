@@ -98,14 +98,14 @@ export const UserProfile = () => {
 			{isLoading && (
 				<Button
 					isLoading={isLoading}
-					className='rounded-[0.625rem] py-3 px-[3.906rem] font-bold text-xl text-secondary max-w-50 w-full text-center leading-6 hidden md:block'
+					className='rounded-[0.625rem] py-1.5 md:py-3 px-3 md:px-[3.906rem] font-bold text-sm md:text-xl text-secondary max-w-50 w-auto md:w-full text-center leading-6 shrink-0'
 				/>
 			)}
 			{!isAuth && !isLoading && (
 				<CustomLink
 					variant='primary'
 					href={routesConfig.signin}
-					className='rounded-[0.625rem] py-3 px-[3.906rem] font-bold text-xl text-secondary max-w-50 w-full text-center leading-6 hidden md:block'>
+					className='rounded-[0.625rem] py-1.5 md:py-3 px-3 md:px-[3.906rem] font-bold text-sm md:text-xl text-secondary max-w-50 w-auto md:w-full text-center leading-6 shrink-0 whitespace-nowrap'>
 					{t('btns.signIn')}
 				</CustomLink>
 			)}

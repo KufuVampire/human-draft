@@ -14,6 +14,7 @@ interface Props extends Omit<AnchorProps, keyof LinkProps> {
 	text?: string;
 	variant?: LinkAndButtonVariants;
 	isLoading?: boolean;
+	onClick?: LinkProps['onClick'];
 }
 
 const styles: LinkAndButtonVariantType = {

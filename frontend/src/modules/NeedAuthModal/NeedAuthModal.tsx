@@ -27,10 +27,12 @@ export const NeedAuthModal = () => {
 	}, []);
 
 	return (
-		<Modal isOpen={isOpen}>
+		<Modal
+			isOpen={isOpen}
+			onClose={handleClose}>
 			<div
 				ref={modalRef}
-				className='bg-[var(--background-color-card)] px-3 md:px-5 py-6 rounded-lg flex flex-col gap-y-[1.875rem] md:gap-y-12'>
+				className='bg-[var(--background-color-card)] px-4 md:px-5 py-5 md:py-6 rounded-t-2xl sm:rounded-xl w-full sm:w-auto max-h-[90vh] overflow-y-auto flex flex-col gap-y-[1.875rem] md:gap-y-12'>
 				<h2 className='font-title text-[1.75rem] md:text-4xl font-bold leading-[110%]'>
 					{t('modals.needAuth')}
 				</h2>
