@@ -1,6 +1,6 @@
 'use client';
 
-import { PropsWithChildren, useEffect, useState } from 'react';
+import { PropsWithChildren, useEffect, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
 
 import { cn } from '@/utils';
@@ -11,17 +11,19 @@ interface Props {
 	className?: string;
 }
 
+const emptySubscribe = () => () => {};
+
 export const Modal = ({
 	children,
 	isOpen,
 	onClose,
 	className,
 }: PropsWithChildren<Props>) => {
-	const [mounted, setMounted] = useState(false);
-
-	useEffect(() => {
-		setMounted(true);
-	}, []);
+	const mounted = useSyncExternalStore(
+		emptySubscribe,
+		() => true,
+		() => false,
+	);
 
 	useEffect(() => {
 		if (isOpen) {

@@ -37,7 +37,7 @@ export const DropdownList = memo(
 			<ul
 				{...props}
 				className={cn(
-					'absolute z-dropdown flex flex-col min-w-max max-w-[calc(100vw-2rem)] max-h-72 overflow-y-auto rounded-xl bg-[var(--background-color-card)] scale-0 transition-all opacity-0 duration-200 shadow-primary',
+					'absolute z-dropdown flex flex-col w-max max-w-[calc(100vw-2rem)] max-h-72 overflow-y-auto rounded-xl bg-[var(--background-color-card)] scale-0 transition-all opacity-0 duration-200 shadow-primary',
 					directionPositionMap[displayDirection],
 					{
 						['scale-100 opacity-100']: isOpen,
