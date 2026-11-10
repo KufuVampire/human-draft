@@ -11,6 +11,14 @@ const config: StorybookConfig = {
 	async viteFinal(config) {
 		return {
 			...config,
+			define: {
+				...config.define,
+				'process.env': {},
+			},
+			optimizeDeps: {
+				...config.optimizeDeps,
+				exclude: [...(config.optimizeDeps?.exclude || []), 'next/link'],
+			},
 			resolve: {
 				...config.resolve,
 				alias: {

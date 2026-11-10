@@ -1,10 +1,17 @@
 import { ComponentPropsWithoutRef, forwardRef } from 'react';
 
-type MockLinkProps = ComponentPropsWithoutRef<'a'> & {
+export type LinkProps = ComponentPropsWithoutRef<'a'> & {
 	href: string | object;
+	external?: boolean;
+	as?: string;
+	replace?: boolean;
+	scroll?: boolean;
+	shallow?: boolean;
+	passHref?: boolean;
+	prefetch?: boolean;
 };
 
-const MockNextLink = forwardRef<HTMLAnchorElement, MockLinkProps>(
+const MockNextLink = forwardRef<HTMLAnchorElement, LinkProps>(
 	({ href, children, ...props }, ref) => (
 		<a
 			ref={ref}
@@ -18,3 +25,4 @@ const MockNextLink = forwardRef<HTMLAnchorElement, MockLinkProps>(
 MockNextLink.displayName = 'MockNextLink';
 
 export default MockNextLink;
+export { MockNextLink as Link };
