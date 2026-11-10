@@ -8,6 +8,7 @@ import {
 import { AwsStorageService } from '../aws-storage/aws-storage.service';
 import { PrismaService } from '../prisma/prisma.service';
 
+import { MediaStatus } from '@/prisma/generated/enums';
 import { PostWhereInput } from '@/prisma/generated/models';
 import { PAGINATION_PAGE, PAGINATION_PER_PAGE } from '@/src/consts';
 import {
@@ -17,13 +18,7 @@ import {
 	UpdatePostInput,
 } from '@/src/inputs';
 import { UserModel } from '@/src/models';
-import { sanitizeTags } from '@/src/utils';
-
-interface ContentNode {
-	type?: string;
-	attrs?: { src?: string };
-	content?: ContentNode[];
-}
+import { extractMediaKeysFromContent, sanitizeTags } from '@/src/utils';
 
 @Injectable()
 export class PostService {
@@ -36,7 +31,7 @@ export class PostService {
 		const { content, title, tags } = input;
 		const sanitizedTags = sanitizeTags(tags);
 
-		return this.prismaService.post.create({
+		const post = await this.prismaService.post.create({
 			data: {
 				title,
 				content,
@@ -61,6 +56,22 @@ export class PostService {
 				}),
 			},
 		});
+
+		const mediaKeys = extractMediaKeysFromContent(content, this.storage);
+		if (mediaKeys.length > 0) {
+			await this.prismaService.mediaAttachment.updateMany({
+				where: {
+					key: { in: mediaKeys },
+					authorId,
+				},
+				data: {
+					postId: post.id,
+					status: MediaStatus.ATTACHED,
+				},
+			});
+		}
+
+		return post;
 	}
 
 	async update(authorId: string, postId: string, input: UpdatePostInput) {
@@ -100,6 +111,55 @@ export class PostService {
 			},
 		});
 
+		if (content !== undefined) {
+			const currentAttachments =
+				await this.prismaService.mediaAttachment.findMany({
+					where: { postId },
+					select: { id: true, key: true },
+				});
+
+			const newKeys = new Set(
+				extractMediaKeysFromContent(content, this.storage)
+			);
+
+			const removedAttachments = currentAttachments.filter(
+				(attachment) => !newKeys.has(attachment.key)
+			);
+
+			if (removedAttachments.length > 0) {
+				await this.storage.removeMany(
+					removedAttachments.map((attachment) => attachment.key)
+				);
+				await this.prismaService.mediaAttachment.deleteMany({
+					where: {
+						id: {
+							in: removedAttachments.map((attachment) => attachment.id),
+						},
+					},
+				});
+			}
+
+			const currentKeySet = new Set(
+				currentAttachments.map((attachment) => attachment.key)
+			);
+			const newlyAddedKeys = Array.from(newKeys).filter(
+				(key) => !currentKeySet.has(key)
+			);
+
+			if (newlyAddedKeys.length > 0) {
+				await this.prismaService.mediaAttachment.updateMany({
+					where: {
+						key: { in: newlyAddedKeys },
+						authorId,
+					},
+					data: {
+						postId,
+						status: MediaStatus.ATTACHED,
+					},
+				});
+			}
+		}
+
 		return true;
 	}
 
@@ -118,24 +178,13 @@ export class PostService {
 			throw new ForbiddenException('You are not the author of this post');
 		}
 
-		const removeImages = async (nodes: ContentNode[]) => {
-			for (const node of nodes) {
-				if (node.type === 'image' && node.attrs?.src) {
-					await this.storage.remove(node.attrs.src);
-				}
-				if (Array.isArray(node.content)) {
-					await removeImages(node.content);
-				}
-			}
-		};
+		const attachments = await this.prismaService.mediaAttachment.findMany({
+			where: { postId },
+			select: { key: true },
+		});
 
-		if (post.content && typeof post.content === 'object') {
-			const json = post.content as Record<string, unknown>;
-			if (Array.isArray(json.content)) {
-				await removeImages(json.content as ContentNode[]);
-			} else if (Array.isArray(post.content)) {
-				await removeImages(post.content as ContentNode[]);
-			}
+		if (attachments.length > 0) {
+			await this.storage.removeMany(attachments.map((a) => a.key));
 		}
 
 		await this.prismaService.post.delete({

@@ -16,6 +16,7 @@ model Post {
 
   comments Comment[]
   tags     Tag[]
+  mediaAttachments MediaAttachment[]
 
   @@index([authorId])
   @@index([blogId])
