@@ -9,23 +9,10 @@ import {
 } from 'react';
 
 import { SelectList } from './SelectList';
+import type { SelectOption, SelectProps } from './types';
 import { cn } from '@/utils';
 
-export interface SelectOption {
-	value: string;
-	label: string;
-	disabled?: boolean;
-}
-
-export interface SelectProps {
-	options: SelectOption[];
-	value?: string;
-	placeholder?: string;
-	disabled?: boolean;
-	error?: boolean | string;
-	className?: string;
-	onChange?: (value: string) => void;
-}
+export type { SelectOption, SelectProps };
 
 export const Select = forwardRef<HTMLButtonElement, SelectProps>(
 	(

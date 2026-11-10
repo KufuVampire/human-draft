@@ -1,14 +1,5 @@
-import { SelectOption } from './Select';
+import type { SelectListProps } from './types';
 import { cn } from '@/utils';
-
-export interface SelectListProps {
-	id: string;
-	options: SelectOption[];
-	value?: string;
-	highlightedIndex: number;
-	onSelect: (val: string) => void;
-	onHighlight: (idx: number) => void;
-}
 
 export const SelectList = ({
 	id,
