@@ -3,16 +3,17 @@
 import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Cropper, { Area, Point } from 'react-easy-crop';
+import { toast } from 'sonner';
 
 import { useClickOutside } from '@/hooks';
 import { Button, Modal } from '@/shared';
-import { CropperData, useModalStore } from '@/store';
+import { useModalData, useModalStore } from '@/store';
 import { getCroppedImg } from '@/utils';
 
 export const CropperModal = () => {
 	const t = useTranslations();
 	const activeModal = useModalStore((s) => s.activeModal);
-	const modalData = useModalStore((s) => s.modalData as CropperData | null);
+	const modalData = useModalData('cropper');
 	const closeModal = useModalStore((s) => s.closeModal);
 
 	const isOpen = activeModal === 'cropper';
@@ -58,6 +59,7 @@ export const CropperModal = () => {
 			handleClose();
 		} catch (error) {
 			console.error(error);
+			toast.error(t('profilePage.notifications.changeAvatarError'));
 		} finally {
 			setIsSaving(false);
 		}

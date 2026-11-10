@@ -1,7 +1,7 @@
-import { act } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { useModalStore } from './useModalStore';
+import { useModalData, useModalStore } from './useModalStore';
 
 describe('useModalStore', () => {
 	beforeEach(() => {
@@ -116,5 +116,26 @@ describe('useModalStore', () => {
 			type: 'comment',
 			cb: mockCb,
 		});
+	});
+
+	it('useModalData возвращает данные только для запрошенного типа модалки', () => {
+		const mockCb = vi.fn();
+		act(() => {
+			useModalStore.getState().openModal('confirmationDeletion', {
+				type: 'post',
+				cb: mockCb,
+			});
+		});
+
+		const { result: deletionData } = renderHook(() =>
+			useModalData('confirmationDeletion')
+		);
+		const { result: cropperData } = renderHook(() => useModalData('cropper'));
+
+		expect(deletionData.current).toEqual({
+			type: 'post',
+			cb: mockCb,
+		});
+		expect(cropperData.current).toBeNull();
 	});
 });

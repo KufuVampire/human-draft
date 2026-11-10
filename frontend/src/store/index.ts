@@ -1,6 +1,7 @@
 export { useComments } from './useComments';
 export {
 	useModalStore,
+	useModalData,
 	type ConfirmationChangesData,
 	type ConfirmationDeletionData,
 	type CropperData,

@@ -5,7 +5,7 @@ import { useCallback, useRef } from 'react';
 
 import { useClickOutside } from '@/hooks';
 import { Button, Modal } from '@/shared';
-import { ConfirmationDeletionData, useModalStore } from '@/store';
+import { useModalData, useModalStore } from '@/store';
 import { cn } from '@/utils';
 
 interface Props {
@@ -16,9 +16,7 @@ const buttonStyles = 'p-2 md:p-3 w-full tracking-[5%] uppercase rounded-lg';
 
 export const ConfirmationDeletionModal = ({ className }: Props) => {
 	const activeModal = useModalStore((s) => s.activeModal);
-	const modalData = useModalStore(
-		(s) => s.modalData as ConfirmationDeletionData | null
-	);
+	const modalData = useModalData('confirmationDeletion');
 	const closeModal = useModalStore((s) => s.closeModal);
 	const t = useTranslations();
 	const modalRef = useRef<HTMLDivElement>(null);

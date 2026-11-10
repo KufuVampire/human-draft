@@ -49,3 +49,10 @@ export const useModalStore = create<ModalState>((set) => ({
 		set({ activeModal: type, modalData: args[0] ?? null }),
 	closeModal: () => set({ activeModal: null, modalData: null }),
 }));
+
+export const useModalData = <T extends ModalType>(
+	type: T
+): ModalDataMap[T] | null =>
+	useModalStore((s) =>
+		s.activeModal === type ? (s.modalData as ModalDataMap[T]) : null
+	);
