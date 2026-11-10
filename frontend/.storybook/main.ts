@@ -16,6 +16,7 @@ const config: StorybookConfig = {
 				alias: {
 					...config.resolve?.alias,
 					'@': path.resolve(__dirname, '../src'),
+					'next/link': path.resolve(__dirname, 'mockNextLink.tsx'),
 				},
 			},
 		};

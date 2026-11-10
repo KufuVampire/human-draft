@@ -12,7 +12,7 @@ export const buttonVariants = cva(
 				primary:
 					'bg-primary text-secondary hover:bg-primary-hover focus-visible:ring-primary shadow-primary',
 				secondary:
-					'bg-transparent text-foreground border border-border-subtle hover:bg-surface-tag focus-visible:ring-primary',
+					'bg-surface-card text-foreground border border-border-subtle shadow-primary hover:bg-surface-tag focus-visible:ring-primary',
 				ghost: 'bg-transparent text-foreground hover:bg-surface-tag focus-visible:ring-primary',
 				danger: 'bg-error text-secondary hover:opacity-90 focus-visible:ring-error',
 				outline:
