@@ -8,10 +8,9 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 
 import { BlogPinnedPostsDropdown } from './components/BlogPinnedPostsDropdown';
 import { BlogPosterUpload } from './components/BlogPosterUpload';
-import { useFreePostsForPin } from './hooks/useFreePostsForPin';
 import { routesConfig } from '@/config';
 import { useCreateBlogMutation } from '@/graphql/generated/output';
-import { useBlobUrl } from '@/hooks';
+import { useBlobUrl, useFreePostsForPin } from '@/hooks';
 import { TypeCreateBlogSchema, createBlogSchema } from '@/schemas';
 import { Button, FormField, Section, TagsPicker } from '@/shared';
 
@@ -37,13 +36,10 @@ export const CreateBlogPage = () => {
 		},
 	});
 
-	const { postIds, dropdownItems, searchField, handleClick } =
-		useFreePostsForPin({
-			register,
-			watch,
-			isDropdownOpen,
-			placeholder: t('blogPage.pinPosts.searchFieldPlaceholder'),
-		});
+	const { postIds, posts, handleClick } = useFreePostsForPin({
+		watch,
+		isDropdownOpen,
+	});
 
 	const [createBlog, { loading: isCreating }] = useCreateBlogMutation({
 		onCompleted(data) {
@@ -117,10 +113,10 @@ export const CreateBlogPage = () => {
 						/>
 					</div>
 					<BlogPinnedPostsDropdown
-						items={[searchField, ...dropdownItems]}
+						posts={posts}
 						isOpen={isDropdownOpen}
 						setOpen={setDropdownOpen}
-						buttonText={t('blogPage.pinPosts.pin')}
+						register={register}
 						onClick={handleClick}
 					/>
 					<Button

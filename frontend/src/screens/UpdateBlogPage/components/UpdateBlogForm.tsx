@@ -1,16 +1,21 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import type { Dispatch, ReactNode, SetStateAction } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
 import type {
-	FieldErrors,
 	UseFormHandleSubmit,
 	UseFormRegister,
 	UseFormSetFocus,
 } from 'react-hook-form';
 
-import { Button, Dropdown, FormField, Section, TagsPicker } from '@/shared';
+import { BlogPinnedPostsDropdown } from '../../CreateBlogPage/components/BlogPinnedPostsDropdown';
 import type { TypeUpdateBlogSchema } from '@/schemas';
+import { Button, FormField, Section, TagsPicker } from '@/shared';
+
+interface PostItem {
+	id: string;
+	title: string;
+}
 
 interface Props {
 	register: UseFormRegister<TypeUpdateBlogSchema>;
@@ -19,8 +24,7 @@ interface Props {
 	onSubmit: (data: TypeUpdateBlogSchema) => void;
 	tags: string[];
 	setTags: Dispatch<SetStateAction<string[]>>;
-	searchField: ReactNode;
-	dropdownItems: ReactNode[];
+	posts: PostItem[];
 	isDropdownOpen: boolean;
 	setDropdownOpen: Dispatch<SetStateAction<boolean>>;
 	onDropdownClick: (e: React.MouseEvent<HTMLUListElement>) => void;
@@ -36,8 +40,7 @@ export const UpdateBlogForm = ({
 	onSubmit,
 	tags,
 	setTags,
-	searchField,
-	dropdownItems,
+	posts,
 	isDropdownOpen,
 	setDropdownOpen,
 	onDropdownClick,
@@ -78,20 +81,13 @@ export const UpdateBlogForm = ({
 						placeholder={t('blogPage.fields.description')}
 					/>
 				</div>
-				<Dropdown
-					items={[searchField, ...dropdownItems]}
+				<BlogPinnedPostsDropdown
+					posts={posts}
 					isOpen={isDropdownOpen}
 					setOpen={setDropdownOpen}
-					listClassName='w-full top-[calc(100%+0.5rem)] overflow-hidden py-3 px-2.5 shadow-secondary'
-					onClick={onDropdownClick}>
-					<Button
-						variant='secondary'
-						className='py-2 px-5 rounded-lg justify-between'
-						onClick={() => setDropdownOpen((prev) => !prev)}
-						type='button'>
-						{t('blogPage.pinPosts.pin')}
-					</Button>
-				</Dropdown>
+					register={register}
+					onClick={onDropdownClick}
+				/>
 				<Button
 					disabled={!isValid || isUpdating || !isDirty}
 					variant={isValid ? 'primary' : 'disabled'}

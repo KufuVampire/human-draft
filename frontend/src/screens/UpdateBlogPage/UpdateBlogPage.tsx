@@ -9,13 +9,12 @@ import { toast } from 'sonner';
 
 import { UpdateBlogForm } from './components/UpdateBlogForm';
 import { UpdateBlogPosterUpload } from './components/UpdateBlogPosterUpload';
-import { useFreePostsForPin } from './hooks/useFreePostsForPin';
 import { routesConfig } from '@/config';
 import {
 	GetAllFreePostsForPinDocument,
 	useUpdateBlogMutation,
 } from '@/graphql/generated/output';
-import { useBlog, useBlobUrl } from '@/hooks';
+import { useBlog, useBlobUrl, useFreePostsForPin } from '@/hooks';
 import { TypeUpdateBlogSchema, createBlogSchema } from '@/schemas';
 import { isNotFoundError } from '@/utils';
 
@@ -64,13 +63,10 @@ export const UpdateBlogPage = () => {
 		},
 	});
 
-	const { postIds, dropdownItems, searchField, handleClick } =
-		useFreePostsForPin({
-			register,
-			watch,
-			isDropdownOpen,
-			placeholder: t('blogPage.pinPosts.searchFieldPlaceholder'),
-		});
+	const { postIds, posts, handleClick } = useFreePostsForPin({
+		watch,
+		isDropdownOpen,
+	});
 
 	const [updateBlog, { loading: isUpdating }] = useUpdateBlogMutation({
 		refetchQueries: [{ query: GetAllFreePostsForPinDocument }],
@@ -137,8 +133,7 @@ export const UpdateBlogPage = () => {
 				onSubmit={onSubmit}
 				tags={tags}
 				setTags={setTags}
-				searchField={searchField}
-				dropdownItems={dropdownItems}
+				posts={posts}
 				isDropdownOpen={isDropdownOpen}
 				setDropdownOpen={setDropdownOpen}
 				onDropdownClick={handleClick}
