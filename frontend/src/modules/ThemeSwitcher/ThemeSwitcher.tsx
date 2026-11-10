@@ -31,7 +31,7 @@ export const ThemeSwitcher = () => {
 			aria-label={t(`theme.${theme}`) || t('theme.light')}
 			title={t(`theme.${theme}`) || t('theme.light')}
 			className={cn(
-				'flex items-center cursor-pointer relative bg-text py-1 px-1 md:px-1.5 rounded-full md:gap-x-2 transition-colors duration-500',
+				'flex items-center cursor-pointer relative bg-foreground py-1 px-1 md:px-1.5 rounded-full md:gap-x-2 transition-colors duration-500',
 				{
 					['bg-secondary']: !isChecked,
 				}

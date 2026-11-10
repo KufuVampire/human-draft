@@ -99,7 +99,7 @@ export const SettingsPage = () => {
 
 	if (!isLoading && username !== profile?.username) {
 		return (
-			<Section className='bg-[var(--background-color-card)] transition-colors w-full px-2 py-6 md:px-6 rounded-xl flex items-center justify-center'>
+			<Section className='bg-surface-card transition-colors w-full px-2 py-6 md:px-6 rounded-xl flex items-center justify-center'>
 				<h1 className='font-title font-bold'>{t('settingsPage.notMyAcc')}</h1>
 			</Section>
 		);
@@ -124,12 +124,12 @@ export const SettingsPage = () => {
 	};
 
 	return (
-		<Section className='bg-[var(--background-color-card)] transition-colors w-full px-2 py-6 md:px-6 rounded-xl flex flex-col md:gap-y-12 gap-y-6'>
-			<h1 className='font-title font-bold text-[1.75rem] md:text-5xl leading-[110%] text-center md:text-left'>
+		<Section className='bg-surface-card transition-colors w-full px-2 py-6 md:px-6 rounded-xl flex flex-col md:gap-y-12 gap-y-6'>
+			<h1 className='font-title font-bold text-[1.75rem] md:text-5xl leading-heading-tight text-center md:text-left'>
 				{t('settingsPage.metadata.title')}
 			</h1>
 			<div className='flex flex-col md:flex-row gap-6 items-center'>
-				<label className='relative size-42.5 md:border border-primary rounded-full bg-[var(--background-color-card)] transition-colors cursor-pointer md:self-start shrink-0'>
+				<label className='relative size-42.5 md:border border-primary rounded-full bg-surface-card transition-colors cursor-pointer md:self-start shrink-0'>
 					<input
 						type='file'
 						className='hidden'
@@ -156,7 +156,7 @@ export const SettingsPage = () => {
 								text={t(text)}
 								type={type}
 								placeholder={t(placeholder)}
-								wrapperClassNames='font-bold text-xl leading-[110%] font-title'
+								wrapperClassNames='font-bold text-xl leading-heading-tight font-title'
 								className='rounded-xl px-4 py-3 text-[1rem] leading-6 font-normal'
 								{...register(registerName, registerOptions)}
 							/>
@@ -168,7 +168,7 @@ export const SettingsPage = () => {
 				form={formId}
 				type='submit'
 				variant={isValid && isDirty ? 'primary' : 'disabled'}
-				className='py-4 rounded-[0.625rem] md:text-xl md:font-bold leading-[120%] uppercase tracking-[5%] md:tracking-[10%]'>
+				className='py-4 rounded-card md:text-xl md:font-bold leading-heading uppercase tracking-wider md:tracking-widest'>
 				{t('btns.saveChanges')}
 			</Button>
 		</Section>

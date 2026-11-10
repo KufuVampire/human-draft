@@ -18,7 +18,7 @@ export const Dashboard = () => {
 	return (
 		<aside
 			className={cn(
-				'sticky py-3.5 pb-0 md:top-26 bg-[var(--background-color-card)] shadow-primary rounded-xl md:flex flex-col hidden gap-y-5.5 h-min w-full max-w-42.5 shrink-0 transition-all z-10',
+				'sticky py-3.5 pb-0 md:top-26 bg-surface-card shadow-primary rounded-xl md:flex flex-col hidden gap-y-5.5 h-min w-full max-w-42.5 shrink-0 transition-all z-10',
 				!isExpanded && 'max-w-13.5'
 			)}>
 			<Button

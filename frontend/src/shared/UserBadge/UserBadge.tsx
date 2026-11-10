@@ -62,7 +62,7 @@ export const UserBadge = ({
 			</div>
 			{username && (
 				<span
-					className={cn('text-lg hover:text-primary-hovers', {
+					className={cn('text-lg hover:text-accent-hover', {
 						['text-secondary']: location === 'burger-menu',
 						['hidden']: location === 'comment-field',
 					})}>

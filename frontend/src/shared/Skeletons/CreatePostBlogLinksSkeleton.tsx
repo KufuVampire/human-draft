@@ -8,7 +8,7 @@ export const CreatePostBlogLinksSkeleton = () => {
 			{arr.map((_, index) => (
 				<Skeleton
 					key={index}
-					className='w-full py-7 rounded-[0.625rem]'
+					className='w-full py-7 rounded-card'
 				/>
 			))}
 		</div>

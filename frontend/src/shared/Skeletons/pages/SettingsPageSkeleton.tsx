@@ -5,10 +5,10 @@ const arr = new Array(3).fill(0);
 
 export const SettingsPageSkeleton = () => {
 	return (
-		<div className='bg-[var(--background-color-card)] transition-colors w-full px-2 py-6 md:px-6 rounded-xl flex flex-col md:gap-y-12 gap-y-6'>
+		<div className='bg-surface-card transition-colors w-full px-2 py-6 md:px-6 rounded-xl flex flex-col md:gap-y-12 gap-y-6'>
 			<Skeleton className='w-full lg:w-[54%] h-13 rounded-xl' />
 			<div className='flex flex-col md:flex-row gap-6 items-center'>
-				<div className='size-42.5 rounded-full bg-[var(--background-color-card)] transition-colors md:self-start shrink-0'>
+				<div className='size-42.5 rounded-full bg-surface-card transition-colors md:self-start shrink-0'>
 					<UserAvatarSkeleton location='settings-page' />
 				</div>
 				<ul className='flex flex-col gap-y-5 w-full'>
@@ -22,7 +22,7 @@ export const SettingsPageSkeleton = () => {
 					))}
 				</ul>
 			</div>
-			<Skeleton className='py-4 rounded-[0.625rem] h-14' />
+			<Skeleton className='py-4 rounded-card h-14' />
 		</div>
 	);
 };

@@ -164,8 +164,8 @@ describe('CommentItem (colocated unit tests)', () => {
 
 		const textElement = screen.getByText('Первоначальный текст комментария');
 		expect(textElement).toBeInTheDocument();
-		expect(textElement).toHaveClass('leading-[150%]');
-		expect(textElement).toHaveClass('tracking-[2%]');
+		expect(textElement).toHaveClass('leading-body');
+		expect(textElement).toHaveClass('tracking-snug');
 	});
 
 	it('скрывает кнопки редактирования и удаления для чужого комментария', async () => {

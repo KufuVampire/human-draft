@@ -60,13 +60,13 @@ export const PostCard = ({
 	const isOwner = profile?.username === author.username;
 
 	return (
-		<li className='bg-[var(--background-color-card)] transition-all rounded-xl py-5 px-4 hover:shadow-primary border-t-16 border-primary self-start min-w-85 w-full break-inside-avoid not-last:mb-6 relative w-full'>
-			<div className='flex flex-col gap-y-5 transition-colors hover:text-[var(--text-color-main)]'>
+		<li className='bg-surface-card transition-all rounded-xl py-5 px-4 hover:shadow-primary border-t-16 border-primary self-start min-w-85 w-full break-inside-avoid not-last:mb-6 relative w-full'>
+			<div className='flex flex-col gap-y-5 transition-colors hover:text-foreground'>
 				<div className='flex flex-col gap-y-3'>
 					<h2>
 						<CustomLink
 							href={routesConfig.postById(id)}
-							className='font-bold text-[1.75rem] md:text-4xl leading-[110%] font-title text-left wrap-break-word text-wrap hyphens-manual justify-start'>
+							className='font-bold text-[1.75rem] md:text-4xl leading-heading-tight font-title text-left wrap-break-word text-wrap hyphens-manual justify-start'>
 							{title}
 						</CustomLink>
 					</h2>

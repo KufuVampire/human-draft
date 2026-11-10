@@ -66,7 +66,7 @@ export const UserBadgeWithCreatedAt = ({
 			)}
 			<time
 				dateTime={datetime}
-				className='font-light text-sm leading-[150%] text-placeholder'>
+				className='font-light text-sm leading-body text-placeholder'>
 				{datetime}
 			</time>
 		</div>

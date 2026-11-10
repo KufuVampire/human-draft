@@ -15,7 +15,7 @@ interface Props extends HTMLProps<HTMLInputElement> {
 }
 
 const iconStyles =
-	'absolute stroke-[var(--stroke-form-icon)] cursor-pointer hover:stroke-primary-hover transition-colors -translate-1/2 top-1/2 right-0';
+	'absolute stroke-foreground cursor-pointer hover:stroke-primary-hover transition-colors -translate-1/2 top-1/2 right-0';
 
 export const FormField = forwardRef<HTMLInputElement, PropsWithChildren<Props>>(
 	(
@@ -43,13 +43,13 @@ export const FormField = forwardRef<HTMLInputElement, PropsWithChildren<Props>>(
 				className={cn(
 					'flex flex-col gap-y-2 cursor-pointer transition-colors',
 					(type === 'checkbox' || type === 'radio') &&
-						'hover:text-primary flex-row-reverse items-center justify-end gap-x-2 p-2',
+						'hover:text-accent flex-row-reverse items-center justify-end gap-x-2 p-2',
 					wrapperClassNames
 				)}>
 				{text && (
 					<span
 						className={cn(
-							'text-xl font-title font-bold leading-[110%]',
+							'text-xl font-title font-bold leading-heading-tight',
 							(type === 'checkbox' || type === 'radio') &&
 								'font-normal font-text',
 							labelTextClassName

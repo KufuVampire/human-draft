@@ -59,7 +59,7 @@ export const ProfilePage = ({ username, initialData }: Props) => {
 		const inputs = [
 			<label
 				key={'edit-avatar'}
-				className='text-secondary px-3 rounded-lg leading-6 backdrop-blur-disabled hover:text-primary-hover focus-visible:text-primary-hover cursor-pointer transition-colors w-full text-left'>
+				className='text-secondary px-3 rounded-lg leading-6 backdrop-blur-disabled hover:text-accent-hover focus-visible:text-accent-hover cursor-pointer transition-colors w-full text-left'>
 				{t('btns.editAvatar')}
 				<input
 					type='file'
@@ -75,7 +75,7 @@ export const ProfilePage = ({ username, initialData }: Props) => {
 			</label>,
 			<label
 				key={'edit-poster'}
-				className='text-secondary px-3 rounded-lg leading-6 backdrop-blur-disabled hover:text-primary-hover focus-visible:text-primary-hover cursor-pointer transition-colors w-full text-left'>
+				className='text-secondary px-3 rounded-lg leading-6 backdrop-blur-disabled hover:text-accent-hover focus-visible:text-accent-hover cursor-pointer transition-colors w-full text-left'>
 				{t('btns.editPoster')}
 				<input
 					type='file'
@@ -218,7 +218,7 @@ export const ProfilePage = ({ username, initialData }: Props) => {
 
 	return (
 		<div className='flex flex-col w-full gap-y-6'>
-			<Section className='flex flex-col w-full py-0 md:py-0 bg-[var(--background-color-card)] rounded-xl overflow-hidden transition-colors'>
+			<Section className='flex flex-col w-full py-0 md:py-0 bg-surface-card rounded-xl overflow-hidden transition-colors'>
 				<ProfilePoster
 					isOwner={isOwner}
 					user={{ posterUrl: user.posterUrl }}>
@@ -259,7 +259,7 @@ export const ProfilePage = ({ username, initialData }: Props) => {
 							/>
 						)}
 						<div className='flex flex-col gap-y-2 items-center lg:items-stretch'>
-							<h1 className='font-title font-bold text-4xl leading-[110%] text-center lg:text-left'>
+							<h1 className='font-title font-bold text-4xl leading-heading-tight text-center lg:text-left'>
 								{user.username}
 							</h1>
 							{user.description && (

@@ -142,7 +142,7 @@ export const PostPage = ({ initialData }: Props = {}) => {
 					type='radio'
 					data-blog={id}
 					text={title}
-					wrapperClassNames='w-full justify-end bg-[var(--background-color-card)]'
+					wrapperClassNames='w-full justify-end bg-surface-card'
 					name='pin-blog'
 					defaultChecked={id === pinnedBlogId}
 				/>
@@ -246,7 +246,7 @@ export const PostPage = ({ initialData }: Props = {}) => {
 	}
 
 	return (
-		<div className='flex flex-col gap-y-8 bg-[var(--background-color-card)] rounded-xl transition-colors px-2 py-6 md:px-6 w-full'>
+		<div className='flex flex-col gap-y-8 bg-surface-card rounded-xl transition-colors px-2 py-6 md:px-6 w-full'>
 			<article className='flex flex-col gap-y-6 w-full'>
 				<div className='flex flex-col md:flex-row gap-y-2 md:items-center justify-between'>
 					{author && (
@@ -271,7 +271,7 @@ export const PostPage = ({ initialData }: Props = {}) => {
 								displayDirection='top'>
 								<Button
 									variant='secondary'
-									className='bg-[var(--background-color-card)] px-5 py-2 flex gap-x-5 rounded-lg w-full'
+									className='bg-surface-card px-5 py-2 flex gap-x-5 rounded-lg w-full'
 									onClick={() => setDropdownOpen((prev) => !prev)}>
 									<span className='w-full inline-block text-left'>
 										{t('postPage.pinBlog.pin')}
@@ -287,7 +287,7 @@ export const PostPage = ({ initialData }: Props = {}) => {
 
 							<Button
 								variant='secondary'
-								className='dark:text-secondary py-1.75 px-3 font-title font-bold leading-[150%] rounded-lg md:w-auto w-full max-w-32.5'
+								className='dark:text-secondary py-1.75 px-3 font-title font-bold leading-body rounded-lg md:w-auto w-full max-w-32.5'
 								onClick={handleDeletePost}>
 								{t('btns.remove')}
 							</Button>
@@ -295,14 +295,14 @@ export const PostPage = ({ initialData }: Props = {}) => {
 							<CustomLink
 								variant='primary'
 								href={routesConfig.postUpdate(postId)}
-								className='py-2 px-3 font-title font-bold leading-[150%] rounded-lg text-nowrap'>
+								className='py-2 px-3 font-title font-bold leading-body rounded-lg text-nowrap'>
 								{t('postPage.editPost')}
 							</CustomLink>
 						</div>
 					)}
 				</div>
 				{title && (
-					<h1 className='font-title font-bold leading-[110%] text-4xl md:text-5xl mb-6'>
+					<h1 className='font-title font-bold leading-heading-tight text-4xl md:text-5xl mb-6'>
 						{title}
 					</h1>
 				)}

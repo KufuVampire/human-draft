@@ -15,7 +15,7 @@ const arr = new Array(6).fill(0);
 export const ProfilePageSkeleton = ({ isOwner }: Props) => {
 	return (
 		<div className='flex flex-col w-full gap-y-6'>
-			<div className='flex flex-col w-full py-0 md:py-0 bg-[var(--background-color-card)] rounded-xl overflow-hidden transition-colors'>
+			<div className='flex flex-col w-full py-0 md:py-0 bg-surface-card rounded-xl overflow-hidden transition-colors'>
 				<PosterSkeleton />
 				<div className='flex lg:flex-row flex-col items-center gap-y-2 lg:items-stretch justify-between px-6 pb-6 md:py-3 min-h-[7.188rem]'>
 					<div className='flex lg:flex-row flex-col items-center lg:items-stretch gap-x-3 gap-y-2'>

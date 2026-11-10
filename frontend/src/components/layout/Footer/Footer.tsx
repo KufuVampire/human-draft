@@ -37,7 +37,7 @@ export const Footer = () => {
 							<div className='flex gap-x-3'>
 								<a
 									href='mailto:dmitrykertsman@mail.ru'
-									className='text-secondary md:leading-6 leading-[1.125rem] text-xs font-light hover:text-primary-hover transition-colors'>
+									className='text-secondary md:leading-6 leading-subtext text-xs font-light hover:text-accent-hover transition-colors'>
 									{t('fields.email')}: dmitrykertsman@mail.ru
 								</a>
 							</div>
@@ -51,7 +51,7 @@ export const Footer = () => {
 					<Logo />
 				</div>
 				<div className='flex justify-between items-center pt-8 w-full flex-col md:flex-row gap-y-2'>
-					<div className='text-secondary font-light text-xs leading-[1.125rem]'>
+					<div className='text-secondary font-light text-xs leading-subtext'>
 						© {new Date().getFullYear()} HUMAN DRAFT
 					</div>
 					<nav>
@@ -59,7 +59,7 @@ export const Footer = () => {
 							{additionalNavigationItems.map(({ href, translationKey }) => (
 								<li
 									key={href}
-									className='text-secondary md:pr-2 md:last:border-0 md:border-r md:border-secondary font-light text-xs leading-[1.125rem]'>
+									className='text-secondary md:pr-2 md:last:border-0 md:border-r md:border-secondary font-light text-xs leading-subtext'>
 									<CustomLink href={href}>{t(translationKey)}</CustomLink>
 								</li>
 							))}
