@@ -1,3 +1,4 @@
+import type React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -26,7 +27,11 @@ vi.mock('@/store', () => ({
 }));
 
 vi.mock('../../Button/Button', () => ({
-	Button: ({ children, onClick, ...props }: any) => (
+	Button: ({
+		children,
+		onClick,
+		...props
+	}: React.ButtonHTMLAttributes<HTMLButtonElement>) => (
 		<button
 			onClick={onClick}
 			{...props}>
@@ -36,7 +41,12 @@ vi.mock('../../Button/Button', () => ({
 }));
 
 vi.mock('../CustomLink/CustomLink', () => ({
-	CustomLink: ({ children, href, onClick, ...props }: any) => (
+	CustomLink: ({
+		children,
+		href,
+		onClick,
+		...props
+	}: React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
 		<a
 			href={href}
 			onClick={onClick}
@@ -47,7 +57,15 @@ vi.mock('../CustomLink/CustomLink', () => ({
 }));
 
 vi.mock('../Dropdown/Dropdown', () => ({
-	Dropdown: ({ children, items, isOpen }: any) => (
+	Dropdown: ({
+		children,
+		items,
+		isOpen,
+	}: {
+		children?: React.ReactNode;
+		items?: React.ReactNode;
+		isOpen?: boolean;
+	}) => (
 		<div>
 			{children}
 			<div data-testid='dropdown-container' data-is-open={isOpen}>
@@ -66,7 +84,9 @@ vi.mock('../LogoutButton/LogoutButton', () => ({
 }));
 
 vi.mock('../UserBadge/UserBadge', () => ({
-	UserBadge: ({ username }: any) => <div>Badge: {username}</div>,
+	UserBadge: ({ username }: { username: string }) => (
+		<div>Badge: {username}</div>
+	),
 }));
 
 describe('BurgerMenu (мобильное меню навигации)', () => {

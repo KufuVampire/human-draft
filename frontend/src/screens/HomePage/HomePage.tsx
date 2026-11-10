@@ -1,11 +1,12 @@
 'use client';
 
-import { Search, SlidersHorizontal } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
-import { routesConfig } from '@/config';
+import { HomePageFiltersDropdown } from './components/HomePageFiltersDropdown';
+import { renderSearchItems } from './components/HomePageSearchItems';
 import { SEARCH_PARAMS } from '@/consts';
 import {
 	useDebounce,
@@ -15,46 +16,16 @@ import {
 } from '@/hooks';
 import { TypeHomePageSearchSchema } from '@/schemas';
 import {
-	Button,
 	CreatePostBlogLinks,
-	CustomLink,
 	Dropdown,
 	FormField,
 	PostsAndBlogsList,
 	Section,
-	TagsList,
-	UserBadgeWithCreatedAt,
 } from '@/shared';
 import { useProfileStore } from '@/store';
 import { cn } from '@/utils';
 
-interface IFilter {
-	key: keyof TypeHomePageSearchSchema;
-	translationKey: string;
-	needAuth: boolean;
-}
-
-const filters: IFilter[] = [
-	{
-		key: 'onlyPosts',
-		translationKey: 'filters.posts',
-		needAuth: false,
-	},
-	{
-		key: 'onlyBlogs',
-		translationKey: 'filters.blogs',
-		needAuth: false,
-	},
-	{
-		key: 'onlySubscriptions',
-		translationKey: 'filters.subscriptions',
-		needAuth: true,
-	},
-];
-
 const perPage = SEARCH_PARAMS.PER_PAGE;
-
-const searchedItemStyles = 'items-start px-5 py-3 flex-col gap-y-2 group';
 
 export const HomePage = () => {
 	const t = useTranslations();
@@ -69,7 +40,6 @@ export const HomePage = () => {
 		},
 		mode: 'onChange',
 	});
-	const [isFiltersOpen, setFiltersOpen] = useState(false);
 	const [isDropdownSearchOpen, setDropdownSearchOpen] = useState(false);
 	const [isSearchOpenOnMobile, setSearchOpenOnMobile] = useState(false);
 
@@ -111,76 +81,15 @@ export const HomePage = () => {
 		isLoading,
 	});
 
-	const filterItems = useMemo(() => {
-		return filters.map(({ key, needAuth, translationKey }) => {
-			if (needAuth && !isAuth) return;
-
-			if (needAuth && isAuth) {
-				return (
-					<FormField
-						key={key}
-						text={t(translationKey)}
-						type='checkbox'
-						{...register(key)}
-					/>
-				);
-			}
-
-			return (
-				<FormField
-					key={key}
-					text={t(translationKey)}
-					type='checkbox'
-					{...register(key)}
-				/>
-			);
-		});
-	}, [isAuth, register, t]);
-	const dropdownSearchItems = useMemo(() => {
-		return searchedItems.map((o) => {
-			if (o.__typename === 'BlogModel') {
-				return (
-					<CustomLink
-						key={o.id}
-						href={routesConfig.blogById(o.id)}
-						className={searchedItemStyles}>
-						<h2 className='font-title text-left text-xl leading-body'>
-							{o.title}
-						</h2>
-						<UserBadgeWithCreatedAt
-							author={o.author}
-							createdAt={o.createdAt}
-							type='not-link'
-						/>
-						<TagsList tags={o.tags} />
-					</CustomLink>
-				);
-			}
-
-			if (o.__typename === 'PostModel') {
-				return (
-					<CustomLink
-						key={o.id}
-						href={routesConfig.postById(o.id)}
-						className={searchedItemStyles}>
-						<h2 className='font-title text-left text-xl leading-body'>
-							{o.title}
-						</h2>
-						<UserBadgeWithCreatedAt
-							author={o.author}
-							createdAt={o.createdAt}
-							type='not-link'
-						/>
-						<TagsList tags={o.tags} />
-					</CustomLink>
-				);
-			}
-		});
-	}, [searchedItems]);
+	const dropdownSearchItems = useMemo(
+		() => renderSearchItems(searchedItems),
+		[searchedItems]
+	);
 
 	useEffect(() => {
 		setPage(SEARCH_PARAMS.PAGE);
 	}, [search, onlySubscriptions, onlyBlogs, onlyPosts]);
+
 	useEffect(() => {
 		if (search.length >= 3 && dropdownSearchItems.length > 0) {
 			setDropdownSearchOpen(true);
@@ -227,18 +136,10 @@ export const HomePage = () => {
 						<Search />
 					</FormField>
 				</Dropdown>
-				<Dropdown
-					isOpen={isFiltersOpen}
-					setOpen={setFiltersOpen}
-					items={filterItems} listClassName='w-full'>
-					<Button
-						variant='clear'
-						className='flex gap-x-5 items-center bg-surface-card px-5 py-4 rounded-card text-xl leading-heading-tight shadow'
-						onClick={() => setFiltersOpen((prev) => !prev)}>
-						<SlidersHorizontal />
-						{t('homePage.filters')}
-					</Button>
-				</Dropdown>
+				<HomePageFiltersDropdown
+					isAuth={isAuth}
+					register={register}
+				/>
 			</Section>
 			<Section className='w-full md:py-0 flex flex-col gap-y-6'>
 				{isAuth && <CreatePostBlogLinks />}

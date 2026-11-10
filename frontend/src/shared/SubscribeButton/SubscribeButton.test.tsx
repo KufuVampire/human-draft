@@ -9,8 +9,14 @@ const mockRemoveSubscription = vi.fn();
 const mockSetSubscribe = vi.fn();
 const mockOpenModal = vi.fn();
 let mockProfile: { id: string } | null = { id: 'user-1' };
-let mockSubscribeMutation: any = vi.fn();
+type MockMutationFn = (_vars?: unknown) => void;
+let mockSubscribeMutation: MockMutationFn = vi.fn();
 let shouldFailMutation = false;
+
+interface MutationOptions {
+	onError?: (error: Error) => void;
+	onCompleted?: () => void;
+}
 
 vi.mock('next-intl', () => ({
 	useTranslations: () => (key: string) => key,
@@ -34,8 +40,8 @@ vi.mock('@/store', () => ({
 }));
 
 vi.mock('@/graphql/generated/output', () => ({
-	useSubscribeMutation: (options?: any) => {
-		mockSubscribeMutation = vi.fn((vars) => {
+	useSubscribeMutation: (options?: MutationOptions) => {
+		mockSubscribeMutation = vi.fn((_vars?: unknown) => {
 			if (shouldFailMutation && options?.onError) {
 				options.onError(new Error('Mutation failed'));
 			}

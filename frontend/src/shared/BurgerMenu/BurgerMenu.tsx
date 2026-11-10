@@ -1,23 +1,13 @@
 'use client';
 
-import {
-	LogIn,
-	Newspaper,
-	Settings,
-	User,
-	UserPlus,
-	Users,
-} from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { ComponentType, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { Burger } from './Burger/Burger';
-import { routesConfig } from '@/config';
+import { burgerDropdownItems } from './burgerMenuItems';
 import { useActiveLink, useResolvedHref } from '@/hooks';
 import { CustomLink } from '../CustomLink/CustomLink';
 import { Dropdown } from '../Dropdown/Dropdown';
-import { LanguageSwitcher } from '../LanguageSwitcher/LanguageSwitcher';
-import { LogoutButton } from '../LogoutButton/LogoutButton';
 import { UserBadge } from '../UserBadge/UserBadge';
 import { useProfileStore } from '@/store';
 import { cn } from '@/utils';
@@ -25,62 +15,6 @@ import { cn } from '@/utils';
 interface Props {
 	className?: string;
 }
-
-interface BurgerDropdownItem {
-	needAuth?: boolean;
-	onlyGuest?: boolean;
-	href?: string;
-	translationKey?: string;
-	Icon?: ComponentType<{ className?: string }>;
-	Component?: ComponentType<{ className?: string }>;
-}
-
-const burgerDropdownItems: BurgerDropdownItem[] = [
-	{
-		needAuth: false,
-		href: routesConfig.home,
-		translationKey: 'navigation.feed',
-		Icon: Newspaper,
-	},
-	{
-		onlyGuest: true,
-		href: routesConfig.signin,
-		translationKey: 'btns.signIn',
-		Icon: LogIn,
-	},
-	{
-		onlyGuest: true,
-		href: routesConfig.signup,
-		translationKey: 'btns.signUp',
-		Icon: UserPlus,
-	},
-	{
-		needAuth: true,
-		href: routesConfig.profile,
-		translationKey: 'navigation.profile',
-		Icon: User,
-	},
-	{
-		needAuth: false,
-		href: routesConfig.users,
-		translationKey: 'navigation.users',
-		Icon: Users,
-	},
-	{
-		needAuth: true,
-		href: routesConfig.settings,
-		translationKey: 'navigation.settingsShort',
-		Icon: Settings,
-	},
-	{
-		needAuth: true,
-		Component: LogoutButton,
-	},
-	{
-		needAuth: false,
-		Component: LanguageSwitcher,
-	},
-];
 
 export const BurgerMenu = ({ className }: Props) => {
 	const t = useTranslations();

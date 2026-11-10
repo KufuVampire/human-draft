@@ -3,12 +3,31 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { usePostsAndBlogs } from './usePostsAndBlogs';
 
-let mockPostsState: any = {
+interface MockItem {
+	id: string;
+	title: string;
+	createdAt: string;
+	[key: string]: unknown;
+}
+
+interface MockPostsState {
+	posts: MockItem[];
+	isPostsLoading: boolean;
+	totalPages: number;
+}
+
+interface MockBlogsState {
+	blogs: MockItem[];
+	isBlogsLoading: boolean;
+	totalPages: number;
+}
+
+let mockPostsState: MockPostsState = {
 	posts: [],
 	isPostsLoading: false,
 	totalPages: 2,
 };
-let mockBlogsState: any = {
+let mockBlogsState: MockBlogsState = {
 	blogs: [],
 	isBlogsLoading: false,
 	totalPages: 2,

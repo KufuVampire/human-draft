@@ -1,59 +1,22 @@
 'use client';
 
-import { ChevronDown, Eye, Heart, MessageSquare, Search } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { notFound, useParams, useRouter } from 'next/navigation';
-import {
-	MouseEvent,
-	lazy,
-	useCallback,
-	useEffect,
-	useMemo,
-	useState,
-} from 'react';
-import { useForm } from 'react-hook-form';
+import { lazy, useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
+import { PostHeaderActions } from './components/PostHeaderActions';
+import { PostStatsBar } from './components/PostStatsBar';
 import { routesConfig } from '@/config';
 import {
 	GetPostByIdQuery,
 	useDeletePostMutation,
-	useGetBlogsForPinQuery,
 	useTogglePinBlogMutation,
 } from '@/graphql/generated/output';
-import { useDebounce, useLocalStorage, usePost } from '@/hooks';
-import { TypeSearchSchema } from '@/schemas';
-import {
-	Button,
-	CustomLink,
-	Dropdown,
-	FormField,
-	MilkdownContent,
-	TagsList,
-	UserBadgeWithCreatedAt,
-} from '@/shared';
-import {
-	useComments,
-	useModalStore,
-	useProfileStore,
-} from '@/store';
-import { cn, isNotFoundError } from '@/utils';
-
-const isLikeExpired = (date: number) => {
-	if (!date) return true;
-
-	const now = Date.now();
-	const diff = now - date;
-
-	return diff >= 24 * 60 * 60 * 1000;
-};
-
-interface ILikedAt {
-	postId: string;
-	date: number;
-	isLiked: boolean;
-	userId: string | null;
-}
+import { usePost } from '@/hooks';
+import { MilkdownContent, UserBadgeWithCreatedAt } from '@/shared';
+import { useModalStore, useProfileStore } from '@/store';
+import { isNotFoundError } from '@/utils';
 
 const CommentsLazy = lazy(() => import('@/modules/Comments/Comments'));
 
@@ -66,17 +29,9 @@ export const PostPage = ({ initialData }: Props = {}) => {
 	const router = useRouter();
 	const { postId } = useParams<{ postId: string }>();
 	const profile = useProfileStore((s) => s.profile);
-	const isAuth = useProfileStore((s) => s.isAuth);
 	const openModal = useModalStore((s) => s.openModal);
-	const [likedAt, setLikedAt] = useLocalStorage<ILikedAt[]>(`likedAt`, []);
-	const { getCommentsCount } = useComments();
-	const [isDropdownOpen, setDropdownOpen] = useState(false);
 	const [pinnedBlogId, setPinnedBlogId] = useState<string | null>(null);
-	const { register, watch } = useForm<TypeSearchSchema>({
-		defaultValues: {
-			search: '',
-		},
-	});
+
 	const {
 		isLoading,
 		error,
@@ -93,15 +48,13 @@ export const PostPage = ({ initialData }: Props = {}) => {
 
 	const isOwner = profile?.username === author?.username;
 
-	const { data } = useGetBlogsForPinQuery({
-		skip: !isDropdownOpen,
-	});
 	const [deletePost] = useDeletePostMutation({
 		onCompleted() {
 			toast.success(t('postPage.postDeletedSuccess'));
 			router.push(routesConfig.home);
 		},
 	});
+
 	const [togglePin] = useTogglePinBlogMutation({
 		onCompleted(data) {
 			if (data.pinPostToBlog.blog) {
@@ -116,48 +69,6 @@ export const PostPage = ({ initialData }: Props = {}) => {
 		}
 	}, [blog]);
 
-	const searchStr = useDebounce(watch('search'));
-
-	const drodownSearchField = useMemo(
-		() => (
-			<FormField
-				{...register('search')}
-				placeholder={t('blogPage.pinPosts.searchFieldPlaceholder')}
-				className='border-none [&:not(:placeholder-shown)]:shadow-none p-0 rounded-none'
-				wrapperClassNames='w-full border border-primary p-2 rounded-sm'
-				inputWrapperClassName='flex items-center justify-between flex-row-reverse'>
-				<Search />
-			</FormField>
-		),
-		[register, t]
-	);
-	const dropdownItems = useMemo(() => {
-		const blogs = data?.blogsForPin || [];
-		const normalizedSearchStr = searchStr.toLowerCase().trim();
-		return blogs
-			.filter((b) => b.title.toLowerCase().includes(normalizedSearchStr))
-			.map(({ id, title }) => (
-				<FormField
-					key={id}
-					type='radio'
-					data-blog={id}
-					text={title}
-					wrapperClassNames='w-full justify-end bg-surface-card'
-					name='pin-blog'
-					defaultChecked={id === pinnedBlogId}
-				/>
-			));
-	}, [data, pinnedBlogId, searchStr]);
-	const allDropdownItems = useMemo(
-		() => [drodownSearchField, ...dropdownItems],
-		[drodownSearchField, dropdownItems]
-	);
-
-	const likedAtObj = useMemo(
-		() => likedAt.find((el) => el.postId === postId),
-		[likedAt, postId]
-	);
-
 	const handleDeletePost = useCallback(() => {
 		openModal('confirmationDeletion', {
 			type: 'post',
@@ -171,47 +82,8 @@ export const PostPage = ({ initialData }: Props = {}) => {
 		});
 	}, [deletePost, openModal, postId]);
 
-	const handleLike = useCallback(() => {
-		if (!isAuth) {
-			openModal('needAuth');
-			return;
-		}
-
-		const currentLiked = likedAt.find((el) => el.postId === postId);
-
-		if (
-			currentLiked &&
-			currentLiked.isLiked &&
-			!isLikeExpired(currentLiked.date) &&
-			currentLiked.postId === postId &&
-			currentLiked.userId === profile?.id
-		) {
-			return;
-		}
-
-		setLikedAt((prev) => {
-			const filteredPrev = prev.filter((o) => o.postId !== postId);
-			return [
-				...filteredPrev,
-				{
-					postId,
-					date: Date.now(),
-					isLiked: true,
-					userId: profile ? profile.id : null,
-				},
-			];
-		});
-	}, [isAuth, likedAt, openModal, postId, profile, setLikedAt]);
-
 	const handleTogglePinBlog = useCallback(
-		(e: MouseEvent<HTMLUListElement>) => {
-			const target = e.target as HTMLElement;
-			const radio = target.closest('input');
-			if (!radio) return;
-
-			const blogId = radio.dataset.blog;
-			if (!blogId) return;
-
+		(blogId: string) => {
 			togglePin({
 				variables: {
 					blogId,
@@ -260,45 +132,12 @@ export const PostPage = ({ initialData }: Props = {}) => {
 						/>
 					)}
 					{isOwner && (
-						<div className='flex items-center gap-x-2'>
-							<Dropdown
-								isOpen={isDropdownOpen}
-								items={allDropdownItems}
-								setOpen={setDropdownOpen}
-								className='w-full'
-								listClassName='w-full top-[calc(100%+0.5rem)] overflow-hidden py-3 px-2.5 shadow-secondary'
-								onClick={handleTogglePinBlog}
-								displayDirection='top'>
-								<Button
-									variant='secondary'
-									className='bg-surface-card px-5 py-2 flex gap-x-5 rounded-lg w-full'
-									onClick={() => setDropdownOpen((prev) => !prev)}>
-									<span className='w-full inline-block text-left'>
-										{t('postPage.pinBlog.pin')}
-									</span>
-									<ChevronDown
-										className={cn(
-											'transition-transform shrink-0',
-											isDropdownOpen && 'rotate-180'
-										)}
-									/>
-								</Button>
-							</Dropdown>
-
-							<Button
-								variant='secondary'
-								className='dark:text-secondary py-1.75 px-3 font-title font-bold leading-body rounded-lg md:w-auto w-full max-w-32.5'
-								onClick={handleDeletePost}>
-								{t('btns.remove')}
-							</Button>
-
-							<CustomLink
-								variant='primary'
-								href={routesConfig.postUpdate(postId)}
-								className='py-2 px-3 font-title font-bold leading-body rounded-lg text-nowrap'>
-								{t('postPage.editPost')}
-							</CustomLink>
-						</div>
+						<PostHeaderActions
+							postId={postId}
+							pinnedBlogId={pinnedBlogId}
+							onTogglePinBlog={handleTogglePinBlog}
+							onDeletePost={handleDeletePost}
+						/>
 					)}
 				</div>
 				{title && (
@@ -310,44 +149,12 @@ export const PostPage = ({ initialData }: Props = {}) => {
 					content={content}
 					className='border-b border-primary pb-6'
 				/>
-				<div className='flex flex-col gap-y-6 md:flex-row justify-between'>
-					{tags && <TagsList tags={tags} />}
-					<ul className='flex gap-x-6'>
-						<li>
-							<Button
-								variant='clear'
-								className={cn(
-									'flex items-center gap-x-2',
-									likedAtObj?.isLiked && 'hover:text-foreground'
-								)}
-								disabled={
-									likedAtObj?.isLiked &&
-									!isLikeExpired(likedAtObj.date) &&
-									likedAtObj.userId === profile?.id &&
-									likedAtObj.postId === postId
-								}
-								onClick={handleLike}>
-								<Heart
-									className={cn(
-										likedAtObj?.isLiked &&
-											!isLikeExpired(likedAtObj.date) &&
-											likedAtObj.userId === profile?.id &&
-											'stroke-red-500 fill-red-500'
-									)}
-								/>
-								<span className='text-xs font-medium'>{likesCount}</span>
-							</Button>
-						</li>
-						<li className='flex items-center gap-x-2'>
-							<MessageSquare />
-							<span className='text-xs font-medium'>{getCommentsCount()}</span>
-						</li>
-						<li className='flex items-center gap-x-2'>
-							<Eye />
-							<span className='text-xs font-medium'>{viewsCount}</span>
-						</li>
-					</ul>
-				</div>
+				<PostStatsBar
+					postId={postId}
+					tags={tags}
+					likesCount={likesCount}
+					viewsCount={viewsCount}
+				/>
 			</article>
 			<CommentsLazy />
 		</div>

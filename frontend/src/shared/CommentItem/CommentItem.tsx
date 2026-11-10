@@ -1,21 +1,18 @@
 'use client';
 
-import { ChevronDown, Pencil, Reply, Trash, X } from 'lucide-react';
+import { ChevronDown, Reply } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useEffect, useState } from 'react';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { useState } from 'react';
 import { toast } from 'sonner';
 
 import {
 	CommentFieldsFragment,
 	useDeleteCommentMutation,
-	useUpdateCommentMutation,
 } from '@/graphql/generated/output';
-import { TypeUpdateCommentSchema } from '@/schemas';
 import { Button } from '../Button/Button';
 import { CreateCommentField } from '../CreateCommentField/CreateCommentField';
-import { FormField } from '../FormField/FormField';
-import { UserBadgeWithCreatedAt } from '../UserBadgeWithCreatedAt/UserBadgeWithCreatedAt';
+import { CommentItemEditForm } from './CommentItemEditForm';
+import { CommentItemHeader } from './CommentItemHeader';
 import { useComments, useModalStore, useProfileStore } from '@/store';
 import { cn } from '@/utils';
 
@@ -24,9 +21,6 @@ interface Props {
 	className?: string;
 }
 
-const buttonStyles =
-	'px-2 py-1.5 leading-heading-tight tracking-wider uppercase rounded-sm';
-
 export const CommentItem = ({ comment, className }: Props) => {
 	const profile = useProfileStore((s) => s.profile);
 	const openModal = useModalStore((s) => s.openModal);
@@ -34,7 +28,7 @@ export const CommentItem = ({ comment, className }: Props) => {
 	const [isEditMode, setEditMode] = useState(false);
 	const [isShowReplies, setShowReplies] = useState(false);
 	const t = useTranslations();
-	const { deleteComment: deleteComm, updateComment: updateComm } = useComments();
+	const { deleteComment: deleteComm } = useComments();
 
 	const {
 		author: { username, avatarUrl },
@@ -44,31 +38,6 @@ export const CommentItem = ({ comment, className }: Props) => {
 		text,
 		parentId,
 	} = comment;
-
-	const {
-		register,
-		formState: { isValid, isDirty },
-		handleSubmit,
-		reset,
-		setFocus,
-	} = useForm<TypeUpdateCommentSchema>({
-		mode: 'onChange',
-		defaultValues: {
-			text,
-		},
-	});
-
-	useEffect(() => {
-		if (isEditMode) {
-			setFocus('text');
-		}
-	}, [isEditMode, setFocus]);
-
-	const [updateComment, { loading: isUpdating }] = useUpdateCommentMutation({
-		onError(error) {
-			toast.error(error.message || t('comments.updateError'));
-		},
-	});
 
 	const isOwner = profile?.username === username;
 
@@ -92,32 +61,6 @@ export const CommentItem = ({ comment, className }: Props) => {
 		});
 	};
 
-	const handleToggleEditMode = () => {
-		if (isEditMode) {
-			reset({ text });
-		}
-		setEditMode((prev) => !prev);
-	};
-
-	const onSubmit: SubmitHandler<TypeUpdateCommentSchema> = ({
-		text: updatedText,
-	}) => {
-		const trimmedText = updatedText.trim();
-		if (!trimmedText) return;
-
-		updateComment({
-			variables: {
-				commentId: id,
-				text: trimmedText,
-			},
-			onCompleted() {
-				updateComm(id, trimmedText);
-				reset({ text: trimmedText });
-				setEditMode(false);
-			},
-		});
-	};
-
 	return (
 		<li
 			className={cn(
@@ -126,69 +69,25 @@ export const CommentItem = ({ comment, className }: Props) => {
 				isReply && replies && replies.length && 'after:h-[calc(100%-4rem)]',
 				className
 			)}>
-			<div
-				className={cn(
-					'flex items-center justify-between relative',
-					parentId &&
-						'after:content-[""] after:absolute after:top-4 after:-left-5 after:w-5 after:h-0.25 after:bg-placeholder'
-				)}>
-				<UserBadgeWithCreatedAt
-					author={{ username, avatarUrl }}
-					createdAt={createdAt}
-					location='comment-item'
-					className='z-10'
-				/>
-				{isOwner && (
-					<div className='flex items-center gap-x-2'>
-						<Button
-							variant='clear'
-							title={
-								isEditMode
-									? t('postPage.comments.exitEditMode')
-									: t('postPage.comments.enterEditMode')
-							}
-							onClick={handleToggleEditMode}>
-							{isEditMode ? (
-								<X className='size-4' />
-							) : (
-								<Pencil className='size-4' />
-							)}
-						</Button>
-						<Button
-							variant='clear'
-							title={t('postPage.comments.deleteComment')}
-							onClick={() => handleDeleteComment(id)}>
-							<Trash className='size-4' />
-						</Button>
-					</div>
-				)}
-			</div>
+			<CommentItemHeader
+				username={username}
+				avatarUrl={avatarUrl}
+				createdAt={createdAt}
+				parentId={parentId}
+				id={id}
+				isOwner={isOwner}
+				isEditMode={isEditMode}
+				onToggleEditMode={() => setEditMode((prev) => !prev)}
+				onDeleteComment={handleDeleteComment}
+			/>
 			<div className='flex flex-col gap-y-1 pl-9.5'>
 				{isEditMode ? (
-					<form
-						className={cn('flex flex-col gap-y-3', className)}
-						onSubmit={handleSubmit(onSubmit)}>
-						<div className='flex gap-x-2'>
-							<FormField
-								wrapperClassNames='w-full'
-								className='border-0 border-b rounded-none [&:not(:placeholder-shown)]:shadow-none px-0 pt-0'
-								{...register('text', {
-									required: true,
-									validate: (value) => !!value?.trim(),
-								})}
-								placeholder={t('fields.comment')}
-							/>
-						</div>
-						<div className='flex gap-x-2 justify-end'>
-							<Button
-								className={buttonStyles}
-								type='submit'
-								isLoading={isUpdating}
-								disabled={!isValid || !isDirty || isUpdating}>
-								{t('comments.updateComment')}
-							</Button>
-						</div>
-					</form>
+					<CommentItemEditForm
+						id={id}
+						initialText={text}
+						className={className}
+						onClose={() => setEditMode(false)}
+					/>
 				) : (
 					<p className='leading-body tracking-snug'>{text}</p>
 				)}

@@ -1,13 +1,14 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Camera } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useId } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
+import { SettingsAvatarUpload } from './components/SettingsAvatarUpload';
+import { settingsFieldItems } from './settingsFields';
 import { routesConfig } from '@/config';
 import { useUpdateProfileMutation } from '@/graphql/generated/output';
 import { useProfileAvatar } from '@/hooks';
@@ -17,40 +18,8 @@ import {
 	FormField,
 	Section,
 	SettingsPageSkeleton,
-	UserAvatar,
 } from '@/shared';
 import { useModalStore, useProfileStore } from '@/store';
-import { IField } from '@/types';
-
-const fieldItems: IField<TypeUpdateProfileSchema>[] = [
-	{
-		text: 'fields.username',
-		placeholder: 'fields.username',
-		type: 'text',
-		registerName: 'username',
-		registerOptions: {
-			minLength: 3,
-			maxLength: 16,
-			required: true,
-		},
-	},
-	{
-		text: 'fields.email',
-		placeholder: 'fields.email',
-		type: 'email',
-		registerName: 'email',
-		registerOptions: {
-			required: true,
-		},
-	},
-	{
-		text: 'fields.shortDescription',
-		placeholder: 'fields.shortDescription',
-		type: 'text',
-		registerName: 'description',
-		registerOptions: {},
-	},
-];
 
 export const SettingsPage = () => {
 	const t = useTranslations();
@@ -129,27 +98,17 @@ export const SettingsPage = () => {
 				{t('settingsPage.metadata.title')}
 			</h1>
 			<div className='flex flex-col md:flex-row gap-6 items-center'>
-				<label className='relative size-42.5 md:border border-primary rounded-full bg-surface-card transition-colors cursor-pointer md:self-start shrink-0'>
-					<input
-						type='file'
-						className='hidden'
-						onChange={handleChangeAvatar}
-						disabled={isAvatarChanging}
-					/>
-					<div className='md:border-2 border-secondary bg-[rgba(27,74,90,0.5)] md:bg-primary absolute inset-0 md:top-auto md:left-auto md:bottom-0 md:right-0 rounded-full overflow-hidden p-2 z-10 flex items-center justify-center md:block'>
-						<Camera className='size-14 md:size-8 stroke-secondary' />
-					</div>
-					<UserAvatar
-						avatarUrl={profile?.avatarUrl}
-						username={profile?.username}
-						location='settings-page'
-					/>
-				</label>
+				<SettingsAvatarUpload
+					avatarUrl={profile?.avatarUrl}
+					username={profile?.username}
+					onChangeAvatar={handleChangeAvatar}
+					isAvatarChanging={isAvatarChanging}
+				/>
 				<form
 					id={formId}
 					className='flex flex-col gap-y-5 w-full'
 					onSubmit={handleSubmit(onSubmit)}>
-					{fieldItems.map(
+					{settingsFieldItems.map(
 						({ text, placeholder, type, registerName, registerOptions }) => (
 							<FormField
 								key={text}

@@ -5,6 +5,7 @@ export { useBlogs } from './useBlogs';
 export { useClickOutside } from './useClickOutside';
 export { useCreateAt } from './useCreatedAt';
 export { useDebounce } from './useDebounce';
+export { useFreePostsForPin } from './useFreePostsForPin';
 export { useInfiniteScroll } from './useInfiniteScroll';
 export { useLocalStorage } from './useLocalStorage';
 export { usePost } from './usePost';
