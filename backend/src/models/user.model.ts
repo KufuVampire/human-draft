@@ -6,10 +6,6 @@ import {
 	ObjectType,
 } from '@nestjs/graphql';
 
-import { BlogModel } from './blog.model';
-import { CommentModel } from './comment.model';
-import { PostModel } from './post.model';
-
 @ObjectType()
 export class UserModel {
 	@Field(() => ID)
@@ -53,13 +49,4 @@ export class UserModel {
 
 	@Field(() => Int, { nullable: true })
 	subscriptionsCount?: number;
-
-	@Field(() => [BlogModel])
-	blogs: BlogModel[];
-
-	@Field(() => [PostModel])
-	posts: PostModel[];
-
-	@Field(() => [CommentModel], { nullable: true })
-	comments?: CommentModel[];
 }

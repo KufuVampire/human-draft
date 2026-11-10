@@ -13,6 +13,7 @@ import { SearchParamsInput } from '@/src/inputs';
 import {
 	BlogModel,
 	BlogPagination,
+	CommentModel,
 	PostModel,
 	PostPagination,
 	UserModel,
@@ -30,7 +31,9 @@ export class UserResolver {
 	}
 
 	@ResolveField(() => [PostModel], { name: 'posts' })
-	public async posts(@Parent() user: UserModel) {
+	public async posts(
+		@Parent() user: UserModel & { posts?: PostModel[] }
+	) {
 		if (user.postsCount === 0) {
 			return [];
 		}
@@ -41,7 +44,9 @@ export class UserResolver {
 	}
 
 	@ResolveField(() => [BlogModel], { name: 'blogs' })
-	public async blogs(@Parent() user: UserModel) {
+	public async blogs(
+		@Parent() user: UserModel & { blogs?: BlogModel[] }
+	) {
 		if (user.blogsCount === 0) {
 			return [];
 		}
@@ -49,6 +54,11 @@ export class UserResolver {
 			return user.blogs;
 		}
 		return this.userService.getUserBlogs(user.id);
+	}
+
+	@ResolveField(() => [CommentModel], { name: 'comments', nullable: true })
+	public comments() {
+		return [];
 	}
 
 	@Query(() => PostPagination, { name: 'getUserPostsPagination' })

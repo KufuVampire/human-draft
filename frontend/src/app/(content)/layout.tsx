@@ -7,7 +7,8 @@ import {
 	Dashboard,
 	NeedAuthModal,
 } from '@/modules';
-import { Container, Footer, Header, Main } from '@/shared';
+import { Footer, Header } from '@/components/layout';
+import { Container, Main } from '@/shared';
 
 export default function ContentLayout({
 	children,

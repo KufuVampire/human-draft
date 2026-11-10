@@ -1,13 +1,23 @@
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 
 import { TagService } from './tag.service';
 import { Auth, Authorized } from '@/src/decorators';
 import { UpdatePostOrBlogTagsInput } from '@/src/inputs';
-import { TagModel } from '@/src/models';
+import { BlogModel, PostModel, TagModel } from '@/src/models';
 
-@Resolver('Tag')
+@Resolver(() => TagModel)
 export class TagResolver {
 	constructor(private readonly tagService: TagService) {}
+
+	@ResolveField(() => [BlogModel], { name: 'blogs' })
+	blogs(@Parent() tag: TagModel & { blogs?: BlogModel[] }) {
+		return tag.blogs ?? [];
+	}
+
+	@ResolveField(() => [PostModel], { name: 'posts' })
+	posts(@Parent() tag: TagModel & { posts?: PostModel[] }) {
+		return tag.posts ?? [];
+	}
 
 	@Auth()
 	@Mutation(() => TagModel, { name: 'createTag' })

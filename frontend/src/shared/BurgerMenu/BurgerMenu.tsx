@@ -14,13 +14,11 @@ import { ComponentType, useMemo, useState } from 'react';
 import { Burger } from './Burger/Burger';
 import { routesConfig } from '@/config';
 import { useActiveLink, useResolvedHref } from '@/hooks';
-import {
-	CustomLink,
-	Dropdown,
-	LanguageSwitcher,
-	LogoutButton,
-	UserBadge,
-} from '@/shared';
+import { CustomLink } from '../CustomLink/CustomLink';
+import { Dropdown } from '../Dropdown/Dropdown';
+import { LanguageSwitcher } from '../LanguageSwitcher/LanguageSwitcher';
+import { LogoutButton } from '../LogoutButton/LogoutButton';
+import { UserBadge } from '../UserBadge/UserBadge';
 import { useProfileStore } from '@/store';
 import { cn } from '@/utils';
 

@@ -40,9 +40,12 @@ vi.mock('@/modules', () => ({
 	NeedAuthModal: () => null,
 }));
 
-vi.mock('@/shared', () => ({
+vi.mock('@/components/layout', () => ({
 	Header: () => <header data-testid='header'>Header</header>,
 	Footer: () => <footer data-testid='footer'>Footer</footer>,
+}));
+
+vi.mock('@/shared', () => ({
 	Main: ({ children }: { children: React.ReactNode }) => <main>{children}</main>,
 	Container: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 	CustomLink: ({

@@ -12,13 +12,10 @@ import {
 	useUpdateCommentMutation,
 } from '@/graphql/generated/output';
 import { TypeUpdateCommentSchema } from '@/schemas';
-import {
-	Button,
-	CommentsList,
-	CreateCommentField,
-	FormField,
-	UserBadgeWithCreatedAt,
-} from '@/shared';
+import { Button } from '../Button/Button';
+import { CreateCommentField } from '../CreateCommentField/CreateCommentField';
+import { FormField } from '../FormField/FormField';
+import { UserBadgeWithCreatedAt } from '../UserBadgeWithCreatedAt/UserBadgeWithCreatedAt';
 import { useComments, useModalStore, useProfileStore } from '@/store';
 import { cn } from '@/utils';
 
@@ -222,7 +219,14 @@ export const CommentItem = ({ comment, className }: Props) => {
 					/>
 				)}
 				{isShowReplies && replies && replies.length > 0 && (
-					<CommentsList data={replies as any} />
+					<ul className='flex flex-col gap-y-3'>
+						{replies.map((reply) => (
+							<CommentItem
+								key={reply.id}
+								comment={reply as CommentFieldsFragment}
+							/>
+						))}
+					</ul>
 				)}
 				{replies && replies.length > 0 && (
 					<Button

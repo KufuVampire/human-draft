@@ -10,7 +10,7 @@ import {
 } from 'react';
 
 import { useClickOutside } from '@/hooks';
-import { DropdownList } from '@/shared';
+import { DropdownList } from '../DropdownList/DropdownList';
 import { DisplayDropdownDirection } from '@/types';
 import { cn } from '@/utils';
 

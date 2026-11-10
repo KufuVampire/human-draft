@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction } from 'react';
 
-import { Button } from '@/shared';
+import { Button } from '../../Button/Button';
 import { cn } from '@/utils';
 
 interface Props {

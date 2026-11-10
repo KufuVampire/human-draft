@@ -1,6 +1,5 @@
 import { Field, GraphQLISODateTime, ID, ObjectType } from '@nestjs/graphql';
 
-import { PostModel } from './post.model';
 import { TagModel } from './tag.model';
 import { UserModel } from './user.model';
 
@@ -26,9 +25,6 @@ export class BlogModel {
 
 	@Field(() => UserModel)
 	author: UserModel;
-
-	@Field(() => [PostModel])
-	posts: PostModel[];
 
 	@Field(() => [TagModel])
 	tags: TagModel[];
