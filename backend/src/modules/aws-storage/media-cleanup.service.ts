@@ -46,18 +46,25 @@ export class MediaCleanupService {
 		const keys = staleAttachments.map((attachment) => attachment.key);
 		await this.storage.removeMany(keys);
 
-		const deleteResult = await this.prisma.mediaAttachment.deleteMany({
-			where: {
-				id: {
-					in: staleAttachments.map((attachment) => attachment.id),
+		const ids = staleAttachments.map((attachment) => attachment.id);
+		let totalDeleted = 0;
+		const chunkSize = 1000;
+		for (let i = 0; i < ids.length; i += chunkSize) {
+			const chunk = ids.slice(i, i + chunkSize);
+			const deleteResult = await this.prisma.mediaAttachment.deleteMany({
+				where: {
+					id: {
+						in: chunk,
+					},
 				},
-			},
-		});
+			});
+			totalDeleted += deleteResult.count;
+		}
 
 		this.logger.log(
-			`Successfully cleaned up ${deleteResult.count} stale pending media attachment(s) from S3 and database.`
+			`Successfully cleaned up ${totalDeleted} stale pending media attachment(s) from S3 and database.`
 		);
 
-		return { deletedCount: deleteResult.count };
+		return { deletedCount: totalDeleted };
 	}
 }

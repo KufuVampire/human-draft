@@ -63,6 +63,7 @@ export class PostService {
 				where: {
 					key: { in: mediaKeys },
 					authorId,
+					status: MediaStatus.PENDING,
 				},
 				data: {
 					postId: post.id,
@@ -151,6 +152,7 @@ export class PostService {
 					where: {
 						key: { in: newlyAddedKeys },
 						authorId,
+						status: MediaStatus.PENDING,
 					},
 					data: {
 						postId,

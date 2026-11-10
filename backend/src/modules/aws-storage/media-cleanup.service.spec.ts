@@ -104,4 +104,51 @@ describe('MediaCleanupService', () => {
 		expect(calledThreshold.getTime()).toBeGreaterThanOrEqual(beforeTime - 100);
 		expect(calledThreshold.getTime()).toBeLessThanOrEqual(Date.now());
 	});
+
+	it('батчит удаление записей из базы данных по 1000 штук при большом количестве устаревших вложений', async () => {
+		const totalItems = 1500;
+		const mockStaleAttachments = Array.from({ length: totalItems }, (_, i) => ({
+			id: `att-${i}`,
+			key: `posts/file-${i}.webp`,
+		}));
+
+		const mockFindMany = vi.fn().mockResolvedValue(mockStaleAttachments);
+		const mockDeleteMany = vi
+			.fn()
+			.mockResolvedValueOnce({ count: 1000 })
+			.mockResolvedValueOnce({ count: 500 });
+		const mockRemoveMany = vi.fn().mockResolvedValue(undefined);
+
+		const mockPrisma = {
+			mediaAttachment: {
+				findMany: mockFindMany,
+				deleteMany: mockDeleteMany,
+			},
+		} as unknown as PrismaService;
+
+		const mockStorage = {
+			removeMany: mockRemoveMany,
+		} as unknown as AwsStorageService;
+
+		const service = new MediaCleanupService(mockPrisma, mockStorage);
+
+		const result = await service.cleanupStalePendingMedia();
+
+		expect(result).toEqual({ deletedCount: 1500 });
+		expect(mockDeleteMany).toHaveBeenCalledTimes(2);
+		expect(mockDeleteMany).toHaveBeenNthCalledWith(1, {
+			where: {
+				id: {
+					in: mockStaleAttachments.slice(0, 1000).map((a) => a.id),
+				},
+			},
+		});
+		expect(mockDeleteMany).toHaveBeenNthCalledWith(2, {
+			where: {
+				id: {
+					in: mockStaleAttachments.slice(1000).map((a) => a.id),
+				},
+			},
+		});
+	});
 });

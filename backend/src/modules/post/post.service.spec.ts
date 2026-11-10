@@ -82,6 +82,7 @@ describe('PostService', () => {
 				where: {
 					key: { in: ['posts/img-1.webp'] },
 					authorId: 'author-1',
+					status: MediaStatus.PENDING,
 				},
 				data: {
 					postId: 'post-1',
@@ -239,6 +240,7 @@ describe('PostService', () => {
 				where: {
 					key: { in: ['posts/newly-added.webp'] },
 					authorId: 'author-1',
+					status: MediaStatus.PENDING,
 				},
 				data: {
 					postId: 'post-1',

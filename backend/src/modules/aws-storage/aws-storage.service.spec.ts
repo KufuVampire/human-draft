@@ -200,5 +200,24 @@ describe('AwsStorageService', () => {
 			expect(firstBatch).toHaveLength(1000);
 			expect(secondBatch).toHaveLength(500);
 		});
+
+		it('логирует предупреждение при наличии output.Errors в ответе S3', async () => {
+			const sendMock = vi.fn().mockResolvedValue({
+				Errors: [
+					{ Key: 'posts/err.webp', Code: 'AccessDenied', Message: 'Access Denied' },
+				],
+			});
+			vi.spyOn(service['client'], 'send').mockImplementation(sendMock);
+			const warnSpy = vi
+				.spyOn(service['logger'], 'warn')
+				.mockImplementation(() => {});
+
+			await service.removeMany(['posts/err.webp']);
+
+			expect(sendMock).toHaveBeenCalledTimes(1);
+			expect(warnSpy).toHaveBeenCalledWith(
+				expect.stringContaining('Failed to delete 1 objects from S3')
+			);
+		});
 	});
 });

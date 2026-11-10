@@ -7,7 +7,7 @@ import {
 	PutObjectCommandInput,
 	S3Client,
 } from '@aws-sdk/client-s3';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { FileUpload } from 'graphql-upload-ts';
 import sharp from 'sharp';
@@ -20,6 +20,7 @@ import { readStreamWithLimit, validateNoGif } from '@/src/utils';
 
 @Injectable()
 export class AwsStorageService {
+	private readonly logger = new Logger(AwsStorageService.name);
 	private readonly client: S3Client;
 	private readonly bucket: string;
 
@@ -144,7 +145,12 @@ export class AwsStorageService {
 				},
 			};
 
-			await this.client.send(new DeleteObjectsCommand(command));
+			const output = await this.client.send(new DeleteObjectsCommand(command));
+			if (output.Errors && output.Errors.length > 0) {
+				this.logger.warn(
+					`Failed to delete ${output.Errors.length} objects from S3: ${JSON.stringify(output.Errors)}`
+				);
+			}
 		}
 	}
 
