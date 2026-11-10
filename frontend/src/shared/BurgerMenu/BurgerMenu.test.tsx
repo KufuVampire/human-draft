@@ -25,7 +25,7 @@ vi.mock('@/store', () => ({
 	},
 }));
 
-vi.mock('@/shared', () => ({
+vi.mock('../../Button/Button', () => ({
 	Button: ({ children, onClick, ...props }: any) => (
 		<button
 			onClick={onClick}
@@ -33,6 +33,9 @@ vi.mock('@/shared', () => ({
 			{children}
 		</button>
 	),
+}));
+
+vi.mock('../CustomLink/CustomLink', () => ({
 	CustomLink: ({ children, href, onClick, ...props }: any) => (
 		<a
 			href={href}
@@ -41,6 +44,9 @@ vi.mock('@/shared', () => ({
 			{children}
 		</a>
 	),
+}));
+
+vi.mock('../Dropdown/Dropdown', () => ({
 	Dropdown: ({ children, items, isOpen }: any) => (
 		<div>
 			{children}
@@ -49,8 +55,17 @@ vi.mock('@/shared', () => ({
 			</div>
 		</div>
 	),
+}));
+
+vi.mock('../LanguageSwitcher/LanguageSwitcher', () => ({
 	LanguageSwitcher: () => <div data-testid='lang-switcher'>Lang</div>,
+}));
+
+vi.mock('../LogoutButton/LogoutButton', () => ({
 	LogoutButton: () => <button data-testid='logout-btn'>Logout</button>,
+}));
+
+vi.mock('../UserBadge/UserBadge', () => ({
 	UserBadge: ({ username }: any) => <div>Badge: {username}</div>,
 }));
 

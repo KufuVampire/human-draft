@@ -1,6 +1,6 @@
 import { ButtonHTMLAttributes, PropsWithChildren } from 'react';
 
-import { Loader } from '@/shared';
+import { Loader } from '../Loader/Loader';
 import { LinkAndButtonVariantType, LinkAndButtonVariants } from '@/types';
 import { cn } from '@/utils';
 

@@ -2,7 +2,7 @@
 
 import { cookies } from 'next/headers';
 
-import { COOKIE_NAME, type Locale, defaultLocale } from '@/libs';
+import { COOKIE_NAME, type Locale, defaultLocale } from './config';
 
 export async function getCurrentLocale(): Promise<Locale> {
 	const cookiesStore = await cookies();

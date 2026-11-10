@@ -1,4 +1,4 @@
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { FileUpload, GraphQLUpload } from 'graphql-upload-ts';
 
 import { BlogService } from './blog.service';
@@ -18,9 +18,14 @@ import {
 } from '@/src/models';
 import { FileValidationPipe } from '@/src/pipes/fileValidation.pipe';
 
-@Resolver('Blog')
+@Resolver(() => BlogModel)
 export class BlogResolver {
 	constructor(private readonly blogService: BlogService) {}
+
+	@ResolveField(() => [PostModel], { name: 'posts' })
+	posts(@Parent() blog: BlogModel & { posts?: PostModel[] }) {
+		return blog.posts ?? [];
+	}
 
 	@Auth()
 	@Mutation(() => BlogModel, { name: 'createBlog' })

@@ -1,5 +1,5 @@
 import { GetAllPostCommentsQuery } from '@/graphql/generated/output';
-import { CommentItem } from '@/shared';
+import { CommentItem } from '../CommentItem/CommentItem';
 
 interface Props {
 	data: GetAllPostCommentsQuery['getAllPostComments'];

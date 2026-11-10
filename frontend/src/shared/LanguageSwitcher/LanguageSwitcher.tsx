@@ -5,7 +5,9 @@ import { useLocale, useTranslations } from 'next-intl';
 import { MouseEvent, useCallback, useState } from 'react';
 
 import { Locale, locales, setLocale } from '@/libs';
-import { Button, Dropdown, FormField } from '@/shared';
+import { Button } from '../Button/Button';
+import { Dropdown } from '../Dropdown/Dropdown';
+import { FormField } from '../FormField/FormField';
 import { cn } from '@/utils';
 
 interface LanguageItem {
