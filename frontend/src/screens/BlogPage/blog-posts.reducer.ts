@@ -2,11 +2,13 @@ import { GetBlogByIdQuery } from '@/graphql/generated/output';
 
 type Post = GetBlogByIdQuery['getBlogById']['posts'][number];
 
-type Action =
+export type BlogPostsAction =
 	| { type: 'INIT'; payload: Post[] }
 	| { type: 'PIN'; payload: Post }
 	| { type: 'UNPIN'; payload: { postId: string } }
 	| { type: 'DELETE'; payload: { postId: string } };
+
+type Action = BlogPostsAction;
 
 const sortPosts = (posts: Post[]) =>
 	posts

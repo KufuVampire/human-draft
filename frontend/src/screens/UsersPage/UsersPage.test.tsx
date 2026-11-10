@@ -1,9 +1,27 @@
+import type React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { UsersPage } from './UsersPage';
 
-let mockQueryData: any = {
+interface UserMock {
+	id: string;
+	username: string;
+	description?: string | null;
+	avatarUrl?: string | null;
+}
+
+interface MockQueryData {
+	getAllUsersPagination?: {
+		data: UserMock[];
+		page: number;
+		perPage: number;
+		totalCount: number;
+		totalPages: number;
+	} | null;
+}
+
+let mockQueryData: MockQueryData | null = {
 	getAllUsersPagination: {
 		data: [
 			{
@@ -55,17 +73,33 @@ vi.mock('@/graphql/generated/output', () => ({
 }));
 
 vi.mock('@/shared', () => ({
-	Section: ({ children }: any) => <div>{children}</div>,
-	FormField: ({ children, wrapperClassNames: _w, inputWrapperClassName: _i, ...props }: any) => (
+	Section: ({ children }: React.PropsWithChildren) => <div>{children}</div>,
+	FormField: ({
+		children,
+		wrapperClassNames: _w,
+		inputWrapperClassName: _i,
+		...props
+	}: React.PropsWithChildren<
+		React.InputHTMLAttributes<HTMLInputElement> & {
+			wrapperClassNames?: string;
+			inputWrapperClassName?: string;
+		}
+	>) => (
 		<div>
 			<input {...props} />
 			{children}
 		</div>
 	),
-	UserAvatar: ({ username }: any) => <div>Avatar for {username}</div>,
+	UserAvatar: ({ username }: { username: string }) => (
+		<div>Avatar for {username}</div>
+	),
 	UserAvatarSkeleton: () => <div>AvatarSkeleton</div>,
 	Skeleton: () => <div>Skeleton</div>,
-	CustomLink: ({ children, href, ...props }: any) => (
+	CustomLink: ({
+		children,
+		href,
+		...props
+	}: React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
 		<a href={href} {...props}>
 			{children}
 		</a>

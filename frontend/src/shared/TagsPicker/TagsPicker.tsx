@@ -1,6 +1,5 @@
 'use client';
 
-import { X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import {
 	Dispatch,
@@ -15,7 +14,7 @@ import { useForm } from 'react-hook-form';
 
 import { Button } from '../Button/Button';
 import { Dropdown } from '../Dropdown/Dropdown';
-import { FormField } from '../FormField/FormField';
+import { TagsPickerSelectedList } from './TagsPickerSelectedList';
 
 import { useGetTagsBySearchStringQuery } from '@/graphql/generated/output';
 import { useDebounce } from '@/hooks';
@@ -75,11 +74,7 @@ export const TagsPicker = ({ tags, setTags, className }: Props) => {
 	}, [allTags, debounceSearch]);
 
 	useEffect(() => {
-		if (tags.length > 1) {
-			setFocus('search');
-		} else {
-			setFocus('search');
-		}
+		setFocus('search');
 	}, [setFocus, tags]);
 
 	const addTag = (tag: string) => {
@@ -158,38 +153,15 @@ export const TagsPicker = ({ tags, setTags, className }: Props) => {
 				</h2>
 				<div
 					role='tags-picker'
-					className='flex flex-row flex-wrap items-center border border-primary rounded cursor-text px-4 py-3 gap-2.5 rounded-xl'>
-					<ul
-						className='flex flex-wrap items-center gap-2.5'
-						onClick={handleRemoveTag}>
-						{[
-							...tags.map((tag) => (
-								<li key={tag}>
-									<Button
-										variant='clear'
-										type='button'
-										data-tag={tag}
-										className='flex items-center py-0.5 px-1 gap-x-0.5 text-foreground font-title text-xs leading-body bg-secondary dark:bg-placeholder dark:hover:bg-primary-hover hover:bg-primary hover:text-secondary transition-colors rounded-sm cursor-pointer'>
-										<span>{tag}</span>
-										<X className='size-4' />
-									</Button>
-								</li>
-							)),
-							<li key='tag-search-input'>
-								<FormField
-									{...register('search', {
-										min: 2,
-									})}
-									onFocus={handleOpenDropdownOnFocus}
-									onKeyDown={handleKeyDown}
-									wrapperClassNames='max-w-30'
-									inputWrapperClassName='w-auto'
-									className='border-none [&:not(:placeholder-shown)]:shadow-none px-0 py-0'
-									placeholder={t('createPostPage.tagPickerPlaceholder')}
-								/>
-							</li>,
-						]}
-					</ul>
+					className='flex flex-row flex-wrap items-center border border-primary cursor-text px-4 py-3 gap-2.5 rounded-xl'>
+					<TagsPickerSelectedList
+						tags={tags}
+						register={register}
+						placeholder={t('createPostPage.tagPickerPlaceholder')}
+						onRemoveTag={handleRemoveTag}
+						onOpenDropdownOnFocus={handleOpenDropdownOnFocus}
+						onKeyDown={handleKeyDown}
+					/>
 				</div>
 			</div>
 		</Dropdown>

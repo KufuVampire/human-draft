@@ -43,12 +43,12 @@ export const BlogCard = ({
 					alt={title}
 					width={460}
 					height={200}
-					className='size-full max-h-37.5 md:min-h-50 max-h-50'
+					className='size-full max-h-37.5 md:min-h-50 md:max-h-50'
 					loading='eager'
 				/>
 			)}
 			{!posterUrl && (
-				<div className='bg-placeholder size-full max-h-37.5 md:min-h-50 max-h-50' />
+				<div className='bg-placeholder size-full max-h-37.5 md:min-h-50 md:max-h-50' />
 			)}
 			<div className='flex flex-col gap-y-5 transition-colors hover:text-foreground py-5 px-4'>
 				<div className='flex flex-col gap-y-3'>

@@ -7,8 +7,14 @@ import { UnsubscribeButton } from './UnsubscribeButton';
 const mockAddSubscription = vi.fn();
 const mockRemoveSubscription = vi.fn();
 const mockSetSubscribe = vi.fn();
-let mockUnsubscribeMutation: any = vi.fn();
+type MockMutationFn = (_vars?: unknown) => void;
+let mockUnsubscribeMutation: MockMutationFn = vi.fn();
 let shouldFailMutation = false;
+
+interface MutationOptions {
+	onError?: (error: Error) => void;
+	onCompleted?: () => void;
+}
 
 vi.mock('next-intl', () => ({
 	useTranslations: () => (key: string) => key,
@@ -22,8 +28,8 @@ vi.mock('@/hooks', () => ({
 }));
 
 vi.mock('@/graphql/generated/output', () => ({
-	useUnsubscribeMutation: (options?: any) => {
-		mockUnsubscribeMutation = vi.fn((vars) => {
+	useUnsubscribeMutation: (options?: MutationOptions) => {
+		mockUnsubscribeMutation = vi.fn((_vars?: unknown) => {
 			if (shouldFailMutation && options?.onError) {
 				options.onError(new Error('Mutation failed'));
 			}
