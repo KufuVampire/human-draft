@@ -49,6 +49,8 @@ const eslintConfig = [
       ".next/**",
       "out/**",
       "build/**",
+      "storybook-static/**",
+      ".storybook/**",
       "next-env.d.ts",
       "src/graphql/generated/**",
     ],
