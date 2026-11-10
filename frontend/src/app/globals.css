@@ -74,6 +74,7 @@
 	--z-index-dropdown: 40;
 	--z-index-modal: 50;
 
+	--shadow-focus: var(--input-filled-shadow);
 	--shadow-filled-input: var(--input-filled-shadow);
 	--shadow-primary: var(--primary-shadow);
 	--shadow-secondary: var(--secondary-shadow);
