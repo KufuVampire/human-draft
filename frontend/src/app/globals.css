@@ -4,6 +4,18 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
+	/* semantic tokens: light */
+	--surface-base: #e5e5e5;
+	--surface-card: #ffffff;
+	--surface-tag: #e5e5e5;
+
+	--foreground: #151517;
+	--accent: var(--primary-color);
+	--accent-hover: var(--primary-color-hover);
+
+	--border-subtle: #e5e5e5;
+	--selection: #ede0d4;
+
 	/* light theme */
 	--main-bg-light-theme: #e5e5e5;
 	--card-bg-light-theme: #ffffff;
@@ -51,6 +63,29 @@
 }
 
 @theme inline {
+	--color-surface-base: var(--surface-base);
+	--color-surface-card: var(--surface-card);
+	--color-surface-tag: var(--surface-tag);
+
+	--color-foreground: var(--foreground);
+	--color-accent: var(--accent);
+	--color-accent-hover: var(--accent-hover);
+
+	--color-border-subtle: var(--border-subtle);
+	--color-border-field: var(--field-border-color);
+	--color-border-footer: var(--footer-border-bottom-color);
+
+	--color-selection: var(--selection);
+
+	--radius-card: 0.625rem;
+
+	--leading-heading-tight: 1.1;
+	--leading-heading: 1.2;
+	--leading-body: 1.5;
+	--leading-subtext: 1.125rem;
+	--leading-nav: 1.375rem;
+	--tracking-snug: 0.02em;
+
 	--background-color-main: var(--main-bg-light-theme);
 	--background-color-card: var(--card-bg-light-theme);
 	--background-color-tag: var(--tag-bg-light-theme);
@@ -105,6 +140,17 @@
 }
 
 .dark {
+	--surface-base: #171717;
+	--surface-card: #242424;
+	--surface-tag: rgba(229, 229, 229, 0.25);
+
+	--foreground: #ffffff;
+	--accent: var(--primary-color-hover);
+	--accent-hover: color-mix(in oklab, var(--accent) 80%, white);
+
+	--border-subtle: #7d7d7d;
+	--selection: var(--primary-color);
+
 	--background-color-main: var(--main-bg-dark-theme);
 	--background-color-card: var(--card-bg-dark-theme);
 	--background-color-tag: var(--tag-bg-dark-theme);
@@ -121,9 +167,7 @@ html {
 }
 
 body {
-	@apply font-text transition-colors;
-	color: var(--text-color-main);
-	background-color: var(--background-color-main);
+	@apply font-text bg-surface-base text-foreground transition-colors;
 }
 
 [data-milkdown-root='true'] {
@@ -171,7 +215,7 @@ body {
 	--crepe-color-inverse: #362f27; /* Inverse color for contrast */
 	--crepe-color-on-inverse: #fcefe2; /* Text color on inverse */
 	--crepe-color-inline-code: var(
-		--text-color-secondary
+		--color-secondary
 	); /* Inline code color */
 	--crepe-color-error: #ba1a1a; /* Error state color */
 
@@ -187,22 +231,22 @@ body {
 
 .dark .milkdown {
 	--crepe-color-background: var(
-		--background-color-card
+		--surface-card
 	); /* Main background color */
 	--crepe-color-surface: var(
-		--background-color-card
+		--surface-card
 	); /* Surface color for cards/panels */
 	--crepe-color-surface-low: var(
-		--background-color-card
+		--surface-card
 	); /* Lower surface color for depth */
 
 	/* Text Colors */
 	--crepe-color-on-background: var(
-		--text-color-main
+		--foreground
 	); /* Text color on background */
-	--crepe-color-on-surface: var(--text-color-main); /* Text color on surface */
+	--crepe-color-on-surface: var(--foreground); /* Text color on surface */
 	--crepe-color-on-surface-variant: var(
-		--text-color-main
+		--foreground
 	); /* Secondary text color */
 
 	/* Accent Colors */
