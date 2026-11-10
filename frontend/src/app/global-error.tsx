@@ -16,8 +16,8 @@ export default function GlobalError({ error, reset }: Props) {
 
 	return (
 		<html>
-			<body className='min-h-screen flex flex-col items-center justify-center p-4 bg-[var(--background-color)] text-[var(--color-primary)] antialiased font-sans'>
-				<div className='flex flex-col items-center justify-center max-w-lg text-center bg-[var(--background-color-card)] p-8 rounded-2xl'>
+			<body className='min-h-screen flex flex-col items-center justify-center p-4 bg-surface-base text-foreground antialiased font-sans'>
+				<div className='flex flex-col items-center justify-center max-w-lg text-center bg-surface-card p-8 rounded-2xl'>
 					<h1 className='flex justify-center items-center font-bold mb-4 text-7xl'>
 						<span>5</span>
 						<Image
@@ -45,12 +45,12 @@ export default function GlobalError({ error, reset }: Props) {
 						<button
 							type='button'
 							onClick={() => reset()}
-							className='px-5 py-2.5 rounded-xl font-bold text-sm bg-[var(--primary-color)] text-[var(--background-color)] hover:opacity-90 transition-opacity cursor-pointer'>
+							className='px-5 py-2.5 rounded-xl font-bold text-sm bg-primary text-secondary hover:opacity-90 transition-opacity cursor-pointer'>
 							Попробовать снова / Try again
 						</button>
 						<Link
 							href='/'
-							className='px-5 py-2.5 rounded-xl font-bold text-sm bg-[var(--background-color-body)] text-[var(--color-primary)] hover:opacity-80 transition-opacity'>
+							className='px-5 py-2.5 rounded-xl font-bold text-sm bg-surface-base text-accent hover:opacity-80 transition-opacity'>
 							На главную / Home
 						</Link>
 					</div>

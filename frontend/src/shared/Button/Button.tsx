@@ -14,13 +14,13 @@ const styles: LinkAndButtonVariantType = {
 	primary:
 		'bg-primary text-secondary hover:bg-primary-hover focus-visible:bg-primary-hover',
 	secondary:
-		'bg-transparent text-primary border border-primary hover:bg-primary-hover hover:border-primary-hover focus-visible:bg-primary-hover focus-visible:border-primary-hover hover:text-secondary focus-visible:text-primary dark:text-secondary',
+		'bg-transparent text-accent border border-primary hover:bg-primary-hover hover:border-primary-hover focus-visible:bg-primary-hover focus-visible:border-primary-hover hover:text-secondary focus-visible:text-accent dark:text-secondary',
 	disabled:
-		'bg-disabled hover:bg-disabled backdrop-blur-disabled text-[var(--text-color-main)]',
+		'bg-disabled hover:bg-disabled backdrop-blur-disabled text-foreground',
 	clear:
-		'outline-0 border-0 bg-transparent hover:text-primary-hover focus-visible:text-primary-hover disabled:pointer-events-none disabled:opacity-50',
+		'outline-0 border-0 bg-transparent hover:text-accent-hover focus-visible:text-accent-hover disabled:pointer-events-none disabled:opacity-50',
 	light:
-		'bg-disabled hover:bg-disabled backdrop-blur-disabled hover:text-primary-hover focus-visible:text-primary-hover text-[var(--text-color-main)] cursor-pointer',
+		'bg-disabled hover:bg-disabled backdrop-blur-disabled hover:text-accent-hover focus-visible:text-accent-hover text-foreground cursor-pointer',
 };
 
 export const Button = ({

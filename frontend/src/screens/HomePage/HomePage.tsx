@@ -144,7 +144,7 @@ export const HomePage = () => {
 						key={o.id}
 						href={routesConfig.blogById(o.id)}
 						className={searchedItemStyles}>
-						<h2 className='font-title text-left text-xl leading-[150%]'>
+						<h2 className='font-title text-left text-xl leading-body'>
 							{o.title}
 						</h2>
 						<UserBadgeWithCreatedAt
@@ -163,7 +163,7 @@ export const HomePage = () => {
 						key={o.id}
 						href={routesConfig.postById(o.id)}
 						className={searchedItemStyles}>
-						<h2 className='font-title text-left text-xl leading-[150%]'>
+						<h2 className='font-title text-left text-xl leading-body'>
 							{o.title}
 						</h2>
 						<UserBadgeWithCreatedAt
@@ -212,9 +212,9 @@ export const HomePage = () => {
 					itemClassName='border-b border-placeholder last:border-b-0'
 					items={dropdownSearchItems}>
 					<FormField
-						className='w-full p-0 border-none [&:not(:placeholder-shown)]:border-none [&:not(:placeholder-shown)]:shadow-none leading-[110%]'
-						wrapperClassNames='w-full shadow rounded-[0.625rem]'
-						inputWrapperClassName='bg-[var(--background-color-card)] transition-colors py-4 px-5 flex gap-x-2 md:gap-x-5 rounded-lg'
+						className='w-full p-0 border-none [&:not(:placeholder-shown)]:border-none [&:not(:placeholder-shown)]:shadow-none leading-heading-tight'
+						wrapperClassNames='w-full shadow rounded-card'
+						inputWrapperClassName='bg-surface-card transition-colors py-4 px-5 flex gap-x-2 md:gap-x-5 rounded-lg'
 						placeholder={t('fields.searchInput')}
 						{...register('search')}
 						onFocus={() => {
@@ -233,7 +233,7 @@ export const HomePage = () => {
 					items={filterItems} listClassName='w-full'>
 					<Button
 						variant='clear'
-						className='flex gap-x-5 items-center bg-[var(--background-color-card)] px-5 py-4 rounded-[0.625rem] text-xl leading-[110%] shadow'
+						className='flex gap-x-5 items-center bg-surface-card px-5 py-4 rounded-card text-xl leading-heading-tight shadow'
 						onClick={() => setFiltersOpen((prev) => !prev)}>
 						<SlidersHorizontal />
 						{t('homePage.filters')}

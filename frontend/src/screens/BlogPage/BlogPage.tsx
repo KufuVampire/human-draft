@@ -44,7 +44,7 @@ import {
 import { useModalStore, useProfileStore } from '@/store';
 import { cn, isNotFoundError } from '@/utils';
 
-const btnStyles = 'px-3 py-2 leading-[150%] font-bold rounded-lg';
+const btnStyles = 'px-3 py-2 leading-body font-bold rounded-lg';
 
 interface Props {
 	initialData?: GetBlogByIdQuery['getBlogById'];
@@ -169,7 +169,7 @@ export const BlogPage = memo(({ initialData }: Props = {}) => {
 					type='checkbox'
 					data-post={id}
 					text={title}
-					wrapperClassNames='w-full justify-end bg-[var(--background-color-card)]'
+					wrapperClassNames='w-full justify-end bg-surface-card'
 					defaultChecked={blogPosts.some((p) => p.id === id)}
 				/>
 			));
@@ -311,11 +311,11 @@ export const BlogPage = memo(({ initialData }: Props = {}) => {
 				}>
 				<div className='w-full p-3 pt-16 md:p-6 md:pt-10 z-10 relative min-h-82.5 flex flex-col justify-between'>
 					<div className='w-full flex flex-col gap-y-7.5 md:gap-y-12'>
-						<h1 className='font-title font-bold text-[1.75rem] md:text-5xl leading-[110%] w-full text-center text-secondary'>
+						<h1 className='font-title font-bold text-[1.75rem] md:text-5xl leading-heading-tight w-full text-center text-secondary'>
 							{blog.title}
 						</h1>
 						<div className='flex flex-col gap-y-4'>
-							<p className='leading-[150%] tracking-[2%] text-secondary'>
+							<p className='leading-body tracking-snug text-secondary'>
 								{blog.description}
 							</p>
 							<TagsList
@@ -326,7 +326,7 @@ export const BlogPage = memo(({ initialData }: Props = {}) => {
 					</div>
 					{isOwner && (
 						<div className='flex gap-x-2 self-end'>
-							<label className='text-secondary px-3 rounded-lg leading-6 backdrop-blur-disabled hover:text-primary-hover focus-visible:text-primary-hover cursor-pointer transition-colors text-left z-10 relative bg-disabled py-2'>
+							<label className='text-secondary px-3 rounded-lg leading-6 backdrop-blur-disabled hover:text-accent-hover focus-visible:text-accent-hover cursor-pointer transition-colors text-left z-10 relative bg-disabled py-2'>
 								{t('btns.editPoster')}
 								<input
 									type='file'
@@ -359,7 +359,7 @@ export const BlogPage = memo(({ initialData }: Props = {}) => {
 						displayDirection='top'>
 						<Button
 							variant='secondary'
-							className='bg-[var(--background-color-card)] px-5 py-2 flex gap-x-5 rounded-lg w-full'
+							className='bg-surface-card px-5 py-2 flex gap-x-5 rounded-lg w-full'
 							onClick={() => setOpen((prev) => !prev)}>
 							<span className='w-full inline-block text-left'>
 								{t('blogPage.pinPosts.pin')}

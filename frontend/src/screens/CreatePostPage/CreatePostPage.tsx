@@ -150,7 +150,7 @@ export const CreatePostPage = () => {
 					type='radio'
 					data-blog={id}
 					text={title}
-					wrapperClassNames='w-full justify-end bg-[var(--background-color-card)]'
+					wrapperClassNames='w-full justify-end bg-surface-card'
 					name='pin-blog'
 					defaultChecked={id === blogIdForPin}
 				/>
@@ -162,8 +162,8 @@ export const CreatePostPage = () => {
 	);
 
 	return (
-		<Section className='flex flex-col w-full bg-[var(--background-color-card)] rounded-xl transition-colors'>
-			<Container className='md:px-22 selection:bg-[#ede0d4] dark:selection:bg-primary'>
+		<Section className='flex flex-col w-full bg-surface-card rounded-xl transition-colors'>
+			<Container className='md:px-22 selection:bg-selection'>
 				<form
 					onSubmit={handleSubmit(onSubmit)}
 					className='w-full flex flex-col gap-y-6 pb-20 md:pb-0'>
@@ -186,7 +186,7 @@ export const CreatePostPage = () => {
 							displayDirection='top'>
 							<Button
 								variant='secondary'
-								className='bg-[var(--background-color-card)] px-5 py-2 flex gap-x-5 rounded-lg w-full'
+								className='bg-surface-card px-5 py-2 flex gap-x-5 rounded-lg w-full'
 								onClick={() => setOpen((prev) => !prev)}
 								type='button'>
 								<span className='w-full inline-block text-left'>
@@ -209,11 +209,11 @@ export const CreatePostPage = () => {
 						type='submit'
 						isLoading={isEditorLoading || isPostCreating}
 						variant={isValid ? 'primary' : 'disabled'}
-						className='rounded-xl py-4 w-full md:font-bold uppercase md:text-xl md:leading-[120%] leading-[110%] md:tracking-[10%] tracking-[5%]'>
+						className='rounded-xl py-4 w-full md:font-bold uppercase md:text-xl md:leading-heading leading-heading-tight md:tracking-widest tracking-wider'>
 						{t('btns.createPost')}
 					</Button>
 
-					<div className='fixed bottom-0 left-0 right-0 z-30 p-3 bg-[var(--background-color-card)]/90 backdrop-blur-md border-t border-[var(--border-color-primary)] md:hidden flex items-center justify-between gap-x-3'>
+					<div className='fixed bottom-0 left-0 right-0 z-30 p-3 bg-surface-card/90 backdrop-blur-md border-t border-accent md:hidden flex items-center justify-between gap-x-3'>
 						<span className='text-sm text-secondary truncate font-medium'>
 							{watch('title') || t('createPostPage.title')}
 						</span>

@@ -63,13 +63,13 @@ export const LanguageSwitcher = ({ className, isExpanded = true }: Props) => {
 			name='language'
 			type='radio'
 			data-locale={locale}
-			className='outline-0 bg-transparent hover:text-primary-hover focus-visible:text-primary-hover gap-x-1 flex justify-normal hover:stroke-primary-hover'
+			className='outline-0 bg-transparent hover:text-accent-hover focus-visible:text-accent-hover gap-x-1 flex justify-normal hover:stroke-accent-hover'
 			wrapperClassNames={cn(
-				'px-2 md:px-3.5 py-2.5 text-[var(--text-color-main)] gap-x-1',
-				currentLocale === locale && !isExpanded && 'text-primary'
+				'px-2 md:px-3.5 py-2.5 text-foreground gap-x-1',
+				currentLocale === locale && !isExpanded && 'text-accent'
 			)}
 			inputWrapperClassName={cn(!isExpanded && 'hidden')}
-			labelTextClassName='text-[1rem] md:text-xl leading-[1.375rem]'
+			labelTextClassName='text-[1rem] md:text-xl leading-nav'
 			checked={currentLocale === locale}
 			readOnly
 		/>
@@ -90,7 +90,7 @@ export const LanguageSwitcher = ({ className, isExpanded = true }: Props) => {
 			<Button
 				variant='clear'
 				className={cn(
-					'gap-x-1 w-full text-[1rem] md:text-xl leading-[1.375rem] hover:stroke-primary-hover justify-between p-2 md:p-2.5 md:px-3.5',
+					'gap-x-1 w-full text-[1rem] md:text-xl leading-nav hover:stroke-accent-hover justify-between p-2 md:p-2.5 md:px-3.5',
 					!isExpanded && 'justify-center'
 				)}
 				onClick={() => setOpen((prev) => !prev)}>

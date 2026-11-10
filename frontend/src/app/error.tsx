@@ -19,7 +19,7 @@ export default function ErrorPage({ error, reset }: Props) {
 	}, [error]);
 
 	return (
-		<div className='min-h-screen flex flex-col items-center justify-center p-4 bg-[var(--background-color-main)] text-[var(--text-color-main)]'>
+		<div className='min-h-screen flex flex-col items-center justify-center p-4 bg-surface-base text-foreground'>
 			<div className='flex flex-col items-center justify-center max-w-xl text-center py-4 my-auto'>
 				<h1 className='flex justify-center items-center font-title mb-2 select-none'>
 					<span className='text-6xl md:text-8xl lg:text-9xl font-bold leading-none'>

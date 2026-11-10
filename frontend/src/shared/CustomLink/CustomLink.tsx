@@ -21,10 +21,10 @@ const styles: LinkAndButtonVariantType = {
 	primary:
 		'bg-primary text-secondary hover:bg-primary-hover focus-visible:bg-primary-hover',
 	secondary:
-		'bg-transparent text-primary border border-primary hover:bg-primary-hover hover:border-primary-hover focus-visible:bg-primary-hover focus-visible:border-primary-hover hover:text-secondary focus-visible:text-primary',
+		'bg-transparent text-accent border border-primary hover:bg-primary-hover hover:border-primary-hover focus-visible:bg-primary-hover focus-visible:border-primary-hover hover:text-secondary focus-visible:text-accent',
 	disabled:
-		'bg-disabled hover:bg-disabled backdrop-blur-disabled text-[var(--text-color-main)] cursor-auto',
-	clear: 'hover:text-primary-hover focus-visible:text-primary-hover',
+		'bg-disabled hover:bg-disabled backdrop-blur-disabled text-foreground cursor-auto',
+	clear: 'hover:text-accent-hover focus-visible:text-accent-hover',
 	light: '',
 };
 

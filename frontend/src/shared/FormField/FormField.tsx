@@ -15,7 +15,7 @@ interface Props extends HTMLProps<HTMLInputElement> {
 }
 
 const iconStyles =
-	'absolute stroke-[var(--stroke-form-icon)] cursor-pointer hover:stroke-primary-hover transition-colors -translate-1/2 top-1/2 right-0';
+	'absolute stroke-foreground cursor-pointer hover:stroke-primary-hover transition-colors -translate-1/2 top-1/2 right-0';
 
 export const FormField = forwardRef<HTMLInputElement, PropsWithChildren<Props>>(
 	(
@@ -43,13 +43,13 @@ export const FormField = forwardRef<HTMLInputElement, PropsWithChildren<Props>>(
 				className={cn(
 					'flex flex-col gap-y-2 cursor-pointer transition-colors',
 					(type === 'checkbox' || type === 'radio') &&
-						'hover:text-primary flex-row-reverse items-center justify-end gap-x-2 p-2',
+						'hover:text-accent flex-row-reverse items-center justify-end gap-x-2 p-2',
 					wrapperClassNames
 				)}>
 				{text && (
 					<span
 						className={cn(
-							'text-xl font-title font-bold leading-[110%]',
+							'text-xl font-title font-bold leading-heading-tight',
 							(type === 'checkbox' || type === 'radio') &&
 								'font-normal font-text',
 							labelTextClassName
@@ -72,7 +72,7 @@ export const FormField = forwardRef<HTMLInputElement, PropsWithChildren<Props>>(
 						ref={ref}
 						type={inputType}
 						className={cn(
-							'p-2.5 outline-0 border border-field hover:border-primary focus:border-primary rounded-md w-full bg-transparent [&:not(:placeholder-shown)]:border-primary [&:not(:placeholder-shown)]:shadow-[0px_0px_6px_0px_var(--color-primary)]',
+							'p-2.5 outline-0 border border-field hover:border-primary focus:border-primary rounded-md w-full bg-transparent [&:not(:placeholder-shown)]:border-primary [&:not(:placeholder-shown)]:shadow-focus',
 							(type === 'checkbox' || type === 'radio') &&
 								'appearance-none absolute top-0 peer p-0 border-none [&:not(:placeholder-shown)]:border-none [&:not(:placeholder-shown)]:shadow-none',
 							props.className

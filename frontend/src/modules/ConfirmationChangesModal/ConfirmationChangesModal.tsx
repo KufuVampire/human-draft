@@ -12,7 +12,7 @@ interface Props {
 	className?: string;
 }
 
-const buttonStyles = 'py-3 w-full tracking-[5%] uppercase rounded-lg';
+const buttonStyles = 'py-3 w-full tracking-wider uppercase rounded-lg';
 
 export const ConfirmationChangesModal = ({ className }: Props) => {
 	const activeModal = useModalStore((s) => s.activeModal);
@@ -41,10 +41,10 @@ export const ConfirmationChangesModal = ({ className }: Props) => {
 			<div
 				ref={modalRef}
 				className={cn(
-					'bg-[var(--background-color-card)] px-4 md:px-5 py-5 md:py-6 rounded-t-2xl sm:rounded-xl w-full sm:w-auto max-h-[90vh] overflow-y-auto flex flex-col gap-y-[1.875rem] md:gap-y-12',
+					'bg-surface-card px-4 md:px-5 py-5 md:py-6 rounded-t-2xl sm:rounded-xl w-full sm:w-auto max-h-[90vh] overflow-y-auto flex flex-col gap-y-7.5 md:gap-y-12',
 					className
 				)}>
-				<h2 className='font-title text-[1.75rem] md:text-4xl font-bold leading-[110%]'>
+				<h2 className='font-title text-[1.75rem] md:text-4xl font-bold leading-heading-tight'>
 					{t('modals.saveChanges')}
 				</h2>
 				<div className='flex justify-between gap-x-12'>

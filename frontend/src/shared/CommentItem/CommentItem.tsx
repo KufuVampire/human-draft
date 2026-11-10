@@ -25,7 +25,7 @@ interface Props {
 }
 
 const buttonStyles =
-	'px-2 py-1.5 leading-[110%] tracking-[5%] uppercase rounded-sm';
+	'px-2 py-1.5 leading-heading-tight tracking-wider uppercase rounded-sm';
 
 export const CommentItem = ({ comment, className }: Props) => {
 	const profile = useProfileStore((s) => s.profile);
@@ -190,14 +190,14 @@ export const CommentItem = ({ comment, className }: Props) => {
 						</div>
 					</form>
 				) : (
-					<p className='leading-[150%] tracking-[2%]'>{text}</p>
+					<p className='leading-body tracking-snug'>{text}</p>
 				)}
 				{!isReply && (
 					<Button
 						variant='clear'
 						onClick={() => setReply(true)}
 						className={cn(
-							'flex items-center gap-x-1 font-bold text-xs leading-[150%] self-start relative',
+							'flex items-center gap-x-1 font-bold text-xs leading-body self-start relative',
 							replies &&
 								replies.length < 1 &&
 								'after:absolute after:-left-5.5 after:bottom-1/2 after:w-5 after:h-full after:border-l after:border-b after:border-placeholder after:rounded-bl-xl'
@@ -231,7 +231,7 @@ export const CommentItem = ({ comment, className }: Props) => {
 				{replies && replies.length > 0 && (
 					<Button
 						variant='clear'
-						className='relative self-start font-bold leading-[150%] flex items-center gap-x-1 after:absolute after:-left-5.5 after:bottom-[50%] after:w-5 after:h-10 after:border-l after:border-b after:border-placeholder after:rounded-bl-xl'
+						className='relative self-start font-bold leading-body flex items-center gap-x-1 after:absolute after:-left-5.5 after:bottom-[50%] after:w-5 after:h-10 after:border-l after:border-b after:border-placeholder after:rounded-bl-xl'
 						onClick={() => setShowReplies((prev) => !prev)}>
 						{isShowReplies
 							? t('comments.hideReplies')

@@ -37,7 +37,7 @@ export const BlogPageSkeleton = ({ isOwner = false }: Props) => {
 					</div>
 				</div>
 			)}
-			{isOwner && <Skeleton className='w-full h-14 rounded-[0.625rem]' />}
+			{isOwner && <Skeleton className='w-full h-14 rounded-card' />}
 			<ul className='grid grid-cols-1 md:grid-cols-2 gap-6'>
 				{arr.map((_, index) => (
 					<PostCardSkeleton

@@ -105,7 +105,7 @@ export const CreateBlogPage = () => {
 					type='checkbox'
 					data-post={id}
 					text={title}
-					wrapperClassNames='w-full justify-end bg-[var(--background-color-card)]'
+					wrapperClassNames='w-full justify-end bg-surface-card'
 				/>
 			));
 		}, [posts]) || [];
@@ -158,7 +158,7 @@ export const CreateBlogPage = () => {
 					/>
 				</label>
 			</Section>
-			<Section className='bg-[var(--background-color-card)] transition-colors flex flex-col gap-y-6 px-2 py-3 md:p-6 rounded-xl w-full'>
+			<Section className='bg-surface-card transition-colors flex flex-col gap-y-6 px-2 py-3 md:p-6 rounded-xl w-full'>
 				<form
 					className='flex flex-col gap-y-6'
 					onSubmit={handleSubmit(onSubmit)}>
@@ -179,7 +179,7 @@ export const CreateBlogPage = () => {
 					<div
 						className='flex flex-col gap-y-2'
 						onClick={() => setFocus('description')}>
-						<h2 className='font-bold text-xl leading-[110%] font-title cursor-pointer'>
+						<h2 className='font-bold text-xl leading-heading-tight font-title cursor-pointer'>
 							{t('blogPage.fields.description')}
 						</h2>
 						<textarea
@@ -212,7 +212,7 @@ export const CreateBlogPage = () => {
 						disabled={!isValid || isCreating}
 						variant={isValid ? 'primary' : 'disabled'}
 						type='submit'
-						className='py-4 w-full rounded-lg md:font-bold md:text-xl uppercase leading-[110%] md:leading-[120%] tracking-[5%] md:tracking-[10%]'>
+						className='py-4 w-full rounded-lg md:font-bold md:text-xl uppercase leading-heading-tight md:leading-heading tracking-wider md:tracking-widest'>
 						{t('btns.createBlog')}
 					</Button>
 				</form>

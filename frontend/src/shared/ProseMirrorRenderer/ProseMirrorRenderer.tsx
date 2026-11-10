@@ -82,7 +82,7 @@ function applyMarks(
 				return (
 					<code
 						key={key}
-						className='rounded bg-[var(--background-color-main)] px-1.5 py-0.5 font-mono text-sm'>
+						className='rounded bg-surface-base px-1.5 py-0.5 font-mono text-sm'>
 						{acc}
 					</code>
 				);
@@ -94,7 +94,7 @@ function applyMarks(
 						href={href}
 						target='_blank'
 						rel='noopener noreferrer'
-						className='text-primary underline hover:opacity-80 transition-opacity'>
+						className='text-accent underline hover:opacity-80 transition-opacity'>
 						{acc}
 					</a>
 				);
@@ -140,7 +140,7 @@ function renderNode(
 			return (
 				<p
 					key={key}
-					className='mb-4 leading-relaxed text-[var(--text-color-main)]'>
+					className='mb-4 leading-relaxed text-foreground'>
 					{renderChildren(node.content)}
 				</p>
 			);
@@ -153,7 +153,7 @@ function renderNode(
 					return (
 						<h1
 							key={key}
-							className='font-title font-bold leading-[110%] text-3xl md:text-4xl mb-4 mt-6 text-[var(--text-color-main)]'>
+							className='font-title font-bold leading-heading-tight text-3xl md:text-4xl mb-4 mt-6 text-foreground'>
 							{children}
 						</h1>
 					);
@@ -161,7 +161,7 @@ function renderNode(
 					return (
 						<h2
 							key={key}
-							className='font-title font-bold leading-[115%] text-2xl md:text-3xl mb-3 mt-5 text-[var(--text-color-main)]'>
+							className='font-title font-bold leading-heading-tight text-2xl md:text-3xl mb-3 mt-5 text-foreground'>
 							{children}
 						</h2>
 					);
@@ -169,7 +169,7 @@ function renderNode(
 					return (
 						<h3
 							key={key}
-							className='font-title font-bold leading-[120%] text-xl md:text-2xl mb-2 mt-4 text-[var(--text-color-main)]'>
+							className='font-title font-bold leading-heading text-xl md:text-2xl mb-2 mt-4 text-foreground'>
 							{children}
 						</h3>
 					);
@@ -177,7 +177,7 @@ function renderNode(
 					return (
 						<h4
 							key={key}
-							className='font-title font-bold text-lg md:text-xl mb-2 mt-3 text-[var(--text-color-main)]'>
+							className='font-title font-bold text-lg md:text-xl mb-2 mt-3 text-foreground'>
 							{children}
 						</h4>
 					);
@@ -185,7 +185,7 @@ function renderNode(
 					return (
 						<h5
 							key={key}
-							className='font-title font-bold text-base md:text-lg mb-1 mt-2 text-[var(--text-color-main)]'>
+							className='font-title font-bold text-base md:text-lg mb-1 mt-2 text-foreground'>
 							{children}
 						</h5>
 					);
@@ -194,7 +194,7 @@ function renderNode(
 					return (
 						<h6
 							key={key}
-							className='font-title font-bold text-sm md:text-base mb-1 mt-2 text-[var(--text-color-main)]'>
+							className='font-title font-bold text-sm md:text-base mb-1 mt-2 text-foreground'>
 							{children}
 						</h6>
 					);
@@ -205,7 +205,7 @@ function renderNode(
 			return (
 				<blockquote
 					key={key}
-					className='border-l-4 border-primary pl-4 italic my-4 text-[var(--text-color-main)]/90'>
+					className='border-l-4 border-primary pl-4 italic my-4 text-foreground/90'>
 					{renderChildren(node.content)}
 				</blockquote>
 			);
@@ -214,7 +214,7 @@ function renderNode(
 			return (
 				<ul
 					key={key}
-					className='list-disc pl-6 mb-4 space-y-1 text-[var(--text-color-main)]'>
+					className='list-disc pl-6 mb-4 space-y-1 text-foreground'>
 					{renderChildren(node.content)}
 				</ul>
 			);
@@ -223,7 +223,7 @@ function renderNode(
 			return (
 				<ol
 					key={key}
-					className='list-decimal pl-6 mb-4 space-y-1 text-[var(--text-color-main)]'>
+					className='list-decimal pl-6 mb-4 space-y-1 text-foreground'>
 					{renderChildren(node.content)}
 				</ol>
 			);
@@ -243,10 +243,10 @@ function renderNode(
 			return (
 				<pre
 					key={key}
-					className='overflow-auto rounded-sm bg-[var(--background-color-main)] whitespace-pre mb-2 transition-colors p-5'>
+					className='overflow-auto rounded-sm bg-surface-base whitespace-pre mb-2 transition-colors p-5'>
 					<code
 						className={cn(
-							'text-wrap text-[var(--text-color-main)]',
+							'text-wrap text-foreground',
 							language && `language-${language}`
 						)}>
 						{renderChildren(node.content)}
@@ -303,7 +303,7 @@ function renderNode(
 			return (
 				<hr
 					key={key}
-					className='my-6 border-[var(--border-color,rgba(0,0,0,0.1))]'
+					className='my-6 border-border-subtle'
 				/>
 			);
 
@@ -355,7 +355,7 @@ export const ProseMirrorRenderer: FC<ProseMirrorRendererProps> = memo(
 		if (rawText) {
 			return (
 				<div className={cn('prose-mirror-doc', className)}>
-					<p className='leading-relaxed text-[var(--text-color-main)]'>
+					<p className='leading-relaxed text-foreground'>
 						{rawText}
 					</p>
 				</div>

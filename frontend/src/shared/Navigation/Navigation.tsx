@@ -39,9 +39,9 @@ const listItem = [
 ];
 
 const styles: Record<NavigationVariants, string> = {
-	dashboard: 'text-[var(--text-color-main)] leading-[1.375rem] gap-x-1 px-3.5',
+	dashboard: 'text-foreground leading-nav gap-x-1 px-3.5',
 	footer:
-		'text-secondary font-bold uppercase tracking-widest md:leading-6 leading-[1.125rem] text-xs',
+		'text-secondary font-bold uppercase tracking-widest md:leading-6 leading-subtext text-xs',
 };
 
 export const Navigation = ({
@@ -79,7 +79,7 @@ export const Navigation = ({
 									!isExpanded && 'justify-center',
 									variant !== 'footer' && 'py-2.5',
 									styles[variant],
-									isActiveLink(currentHref) && 'text-primary'
+									isActiveLink(currentHref) && 'text-accent'
 								)}>
 								{variant === 'dashboard' && <Icon className='size-6 shrink-0' />}
 								<span className={cn(!isExpanded && 'hidden')}>

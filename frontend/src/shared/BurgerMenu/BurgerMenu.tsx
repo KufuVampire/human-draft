@@ -127,7 +127,7 @@ export const BurgerMenu = ({ className }: Props) => {
 							onClick={() => setOpen(false)}
 							className={cn(
 								'p-2 hover:bg-main-hover w-full flex gap-x-1 justify-normal text-secondary',
-								isActiveLink(currentHref) && 'text-primary'
+								isActiveLink(currentHref) && 'text-accent'
 							)}>
 							<Icon />
 							{t(translationKey)}

@@ -56,7 +56,7 @@ export const TagsPicker = ({ tags, setTags, className }: Props) => {
 						type='button'
 						key={id}
 						data-tag={name}
-						className='flex items-center py-0.5 px-1 gap-x-0.5 text-[var(--text-color-main)] font-title text-sm leading-[150%] hover:bg-secondary border border-secondary dark:border-placeholder dark:hover:bg-placeholder transition-colors rounded-sm cursor-pointer'>
+						className='flex items-center py-0.5 px-1 gap-x-0.5 text-foreground font-title text-sm leading-body hover:bg-secondary border border-secondary dark:border-placeholder dark:hover:bg-placeholder transition-colors rounded-sm cursor-pointer'>
 						{name}
 					</Button>
 				))
@@ -153,7 +153,7 @@ export const TagsPicker = ({ tags, setTags, className }: Props) => {
 			<div
 				className={cn('flex flex-col gap-y-4', className)}
 				onClick={() => setFocus('search')}>
-				<h2 className='font-bold text-xl leading-[110%] font-title cursor-pointer'>
+				<h2 className='font-bold text-xl leading-heading-tight font-title cursor-pointer'>
 					{t('tagsPickerTitle')}
 				</h2>
 				<div
@@ -169,7 +169,7 @@ export const TagsPicker = ({ tags, setTags, className }: Props) => {
 										variant='clear'
 										type='button'
 										data-tag={tag}
-										className='flex items-center py-0.5 px-1 gap-x-0.5 text-[var(--text-color-main)] font-title text-xs leading-[150%] bg-secondary dark:bg-placeholder dark:hover:bg-primary-hover hover:bg-primary hover:text-secondary transition-colors rounded-sm cursor-pointer'>
+										className='flex items-center py-0.5 px-1 gap-x-0.5 text-foreground font-title text-xs leading-body bg-secondary dark:bg-placeholder dark:hover:bg-primary-hover hover:bg-primary hover:text-secondary transition-colors rounded-sm cursor-pointer'>
 										<span>{tag}</span>
 										<X className='size-4' />
 									</Button>
