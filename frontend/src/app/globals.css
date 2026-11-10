@@ -16,33 +16,7 @@
 	--border-subtle: #e5e5e5;
 	--selection: #ede0d4;
 
-	/* light theme */
-	--main-bg-light-theme: #e5e5e5;
-	--card-bg-light-theme: #ffffff;
-	--tag-bg-light-theme: #e5e5e5;
-
-	--primary-text-color-light-theme: #151517;
-
-	--dropdown-border-color-light-theme: #e5e5e5;
-
-	--form-icon-color-light-theme: #151517;
-
-	/* dark theme */
-	--main-bg-dark-theme: #171717;
-	--card-bg-dark-theme: #242424;
-	--tag-bg-dark-theme: rgba(229, 229, 229, 0.25);
-
-	--primary-text-color-dark-theme: #ffffff;
-
-	--dropdown-border-color-dark-theme: #7d7d7d;
-
-	--form-icon-color-dark-theme: #ffffff;
-
 	/* neutral */
-	--layout-bg: #2d2d2d;
-
-	--secondary-text-color: #e5e5e5;
-
 	--primary-color: #1b4a5a;
 	--primary-color-hover: #246276;
 
@@ -86,22 +60,6 @@
 	--leading-nav: 1.375rem;
 	--tracking-snug: 0.02em;
 
-	--background-color-main: var(--main-bg-light-theme);
-	--background-color-card: var(--card-bg-light-theme);
-	--background-color-tag: var(--tag-bg-light-theme);
-
-	--text-color-main: var(--primary-text-color-light-theme);
-	--color-text: var(--primary-text-color-light-theme);
-
-	--stroke-form-icon: var(--form-icon-color-light-theme);
-
-	/* neutral styles for all themes */
-	--background-color-layout: var(--layout-bg);
-
-	--text-color-secondary: var(--secondary-text-color);
-	--text-color-primary: var(--primary-color);
-	--text-color-primary-hover: var(--primary-color-hover);
-
 	--color-primary: var(--primary-color);
 	--color-primary-hover: var(--primary-color-hover);
 	--color-error: var(--error-color);
@@ -109,10 +67,6 @@
 	--color-secondary: var(--secondary-color);
 	--color-layout: var(--layout-color);
 	--color-disabled: var(--disabled-color);
-
-	--border-color-primary: var(--primary-color);
-	--border-color-footer-bottom: var(--footer-border-bottom-color);
-	--border-color-field: var(--field-border-color);
 
 	--backdrop-blur-disabled: var(--bg-blur);
 
@@ -150,16 +104,6 @@
 
 	--border-subtle: #7d7d7d;
 	--selection: var(--primary-color);
-
-	--background-color-main: var(--main-bg-dark-theme);
-	--background-color-card: var(--card-bg-dark-theme);
-	--background-color-tag: var(--tag-bg-dark-theme);
-
-	--text-color-main: var(--primary-text-color-dark-theme);
-
-	--border-color-primary: var(--primary-color-dark-theme);
-
-	--stroke-form-icon: var(--form-icon-color-dark-theme);
 }
 
 html {
@@ -294,7 +238,4 @@ body {
 
 .milkdown-content figure:has(+ img) {
 	@apply mb-8;
-}
-
-@media (prefers-reduced-motion: reduce) {
 }

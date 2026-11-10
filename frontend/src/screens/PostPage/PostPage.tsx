@@ -318,7 +318,7 @@ export const PostPage = ({ initialData }: Props = {}) => {
 								variant='clear'
 								className={cn(
 									'flex items-center gap-x-2',
-									likedAtObj?.isLiked && 'hover:text-[--text-color-main]'
+									likedAtObj?.isLiked && 'hover:text-foreground'
 								)}
 								disabled={
 									likedAtObj?.isLiked &&
