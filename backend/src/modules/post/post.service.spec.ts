@@ -9,6 +9,8 @@ import { PostService } from './post.service';
 import { AwsStorageService } from '../aws-storage/aws-storage.service';
 import { PrismaService } from '../prisma/prisma.service';
 
+import { MediaStatus } from '@/prisma/generated/enums';
+
 describe('PostService', () => {
 	describe('create', () => {
 		it('нормализует и дедуплицирует теги при создании поста', async () => {
@@ -39,6 +41,53 @@ describe('PostService', () => {
 						],
 					},
 				}),
+			});
+		});
+
+		it('привязывает найденные в контенте изображения со статусом ATTACHED', async () => {
+			const mockCreate = vi.fn().mockResolvedValue({ id: 'post-1' });
+			const mockUpdateMany = vi.fn().mockResolvedValue({ count: 1 });
+			const mockPrisma = {
+				post: {
+					create: mockCreate,
+				},
+				mediaAttachment: {
+					updateMany: mockUpdateMany,
+				},
+			} as unknown as PrismaService;
+			const mockStorage = {
+				extractKey: vi.fn((url: string) =>
+					url.replace('https://bucket.s3.amazonaws.com/', '')
+				),
+			} as unknown as AwsStorageService;
+
+			const service = new PostService(mockPrisma, mockStorage);
+
+			await service.create('author-1', {
+				title: 'Post With Image',
+				content: {
+					type: 'doc',
+					content: [
+						{
+							type: 'image',
+							attrs: {
+								src: 'https://bucket.s3.amazonaws.com/posts/img-1.webp',
+							},
+						},
+					],
+				},
+			});
+
+			expect(mockUpdateMany).toHaveBeenCalledWith({
+				where: {
+					key: { in: ['posts/img-1.webp'] },
+					authorId: 'author-1',
+					status: MediaStatus.PENDING,
+				},
+				data: {
+					postId: 'post-1',
+					status: MediaStatus.ATTACHED,
+				},
 			});
 		});
 	});
@@ -119,6 +168,86 @@ describe('PostService', () => {
 				},
 			});
 		});
+
+		it('удаляет исключенные изображения из S3 и БД и привязывает новые при обновлении контента', async () => {
+			const mockFindUnique = vi.fn().mockResolvedValue({
+				id: 'post-1',
+				authorId: 'author-1',
+			});
+			const mockUpdate = vi.fn().mockResolvedValue({ id: 'post-1' });
+			const mockFindManyAttachments = vi.fn().mockResolvedValue([
+				{ id: 'att-1', key: 'posts/old-to-delete.webp' },
+				{ id: 'att-2', key: 'posts/kept.webp' },
+			]);
+			const mockDeleteManyAttachments = vi.fn().mockResolvedValue({ count: 1 });
+			const mockUpdateManyAttachments = vi.fn().mockResolvedValue({ count: 1 });
+			const mockRemoveManyStorage = vi.fn().mockResolvedValue(undefined);
+
+			const mockPrisma = {
+				post: {
+					findUnique: mockFindUnique,
+					update: mockUpdate,
+				},
+				mediaAttachment: {
+					findMany: mockFindManyAttachments,
+					deleteMany: mockDeleteManyAttachments,
+					updateMany: mockUpdateManyAttachments,
+				},
+			} as unknown as PrismaService;
+
+			const mockStorage = {
+				extractKey: vi.fn((url: string) =>
+					url.replace('https://bucket.s3.amazonaws.com/', '')
+				),
+				removeMany: mockRemoveManyStorage,
+			} as unknown as AwsStorageService;
+
+			const service = new PostService(mockPrisma, mockStorage);
+
+			const result = await service.update('author-1', 'post-1', {
+				title: 'Updated Title',
+				content: {
+					type: 'doc',
+					content: [
+						{
+							type: 'image',
+							attrs: {
+								src: 'https://bucket.s3.amazonaws.com/posts/kept.webp',
+							},
+						},
+						{
+							type: 'image',
+							attrs: {
+								src: 'https://bucket.s3.amazonaws.com/posts/newly-added.webp',
+							},
+						},
+					],
+				},
+			});
+
+			expect(result).toBe(true);
+			expect(mockRemoveManyStorage).toHaveBeenCalledWith([
+				'posts/old-to-delete.webp',
+			]);
+			expect(mockDeleteManyAttachments).toHaveBeenCalledWith({
+				where: {
+					id: {
+						in: ['att-1'],
+					},
+				},
+			});
+			expect(mockUpdateManyAttachments).toHaveBeenCalledWith({
+				where: {
+					key: { in: ['posts/newly-added.webp'] },
+					authorId: 'author-1',
+					status: MediaStatus.PENDING,
+				},
+				data: {
+					postId: 'post-1',
+					status: MediaStatus.ATTACHED,
+				},
+			});
+		});
 	});
 
 	describe('delete', () => {
@@ -161,47 +290,39 @@ describe('PostService', () => {
 			const mockFindUnique = vi.fn().mockResolvedValue({
 				id: 'post-1',
 				authorId: 'author-1',
-				content: {
-					content: [
-						{
-							type: 'image',
-							attrs: { src: 'https://s3.amazonaws.com/bucket/posts/img1.webp' },
-						},
-						{
-							type: 'paragraph',
-							content: [
-								{
-									type: 'image',
-									attrs: { src: 'https://s3.amazonaws.com/bucket/posts/img2.webp' },
-								},
-							],
-						},
-					],
-				},
 			});
+			const mockFindManyAttachments = vi.fn().mockResolvedValue([
+				{ key: 'posts/img1.webp' },
+				{ key: 'posts/img2.webp' },
+			]);
 			const mockDelete = vi.fn().mockResolvedValue({ id: 'post-1' });
-			const mockStorageRemove = vi.fn().mockResolvedValue(undefined);
+			const mockStorageRemoveMany = vi.fn().mockResolvedValue(undefined);
 
 			const mockPrisma = {
 				post: {
 					findUnique: mockFindUnique,
 					delete: mockDelete,
 				},
+				mediaAttachment: {
+					findMany: mockFindManyAttachments,
+				},
 			} as unknown as PrismaService;
 			const mockStorage = {
-				remove: mockStorageRemove,
+				removeMany: mockStorageRemoveMany,
 			} as unknown as AwsStorageService;
 
 			const service = new PostService(mockPrisma, mockStorage);
 
 			await service.delete('author-1', 'post-1');
 
-			expect(mockStorageRemove).toHaveBeenCalledWith(
-				'https://s3.amazonaws.com/bucket/posts/img1.webp'
-			);
-			expect(mockStorageRemove).toHaveBeenCalledWith(
-				'https://s3.amazonaws.com/bucket/posts/img2.webp'
-			);
+			expect(mockFindManyAttachments).toHaveBeenCalledWith({
+				where: { postId: 'post-1' },
+				select: { key: true },
+			});
+			expect(mockStorageRemoveMany).toHaveBeenCalledWith([
+				'posts/img1.webp',
+				'posts/img2.webp',
+			]);
 			expect(mockDelete).toHaveBeenCalledWith({
 				where: { id: 'post-1' },
 			});

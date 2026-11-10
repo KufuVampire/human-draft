@@ -1,3 +1,4 @@
+export { extractMediaKeysFromContent } from './extractMediaKeys';
 export { validateFileFormat, validateFileSize } from './file.util';
 export { readStreamWithLimit, validateNoGif } from './fileStream.util';
 export { IS_DEV_ENV, isDev } from './isDev.util';

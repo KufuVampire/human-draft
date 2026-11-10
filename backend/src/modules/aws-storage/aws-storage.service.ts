@@ -1,11 +1,13 @@
 import {
 	DeleteObjectCommand,
 	DeleteObjectCommandInput,
+	DeleteObjectsCommand,
+	DeleteObjectsCommandInput,
 	PutObjectCommand,
 	PutObjectCommandInput,
 	S3Client,
 } from '@aws-sdk/client-s3';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { FileUpload } from 'graphql-upload-ts';
 import sharp from 'sharp';
@@ -13,10 +15,12 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { PrismaService } from '../prisma/prisma.service';
 
+import { MediaStatus } from '@/prisma/generated/enums';
 import { readStreamWithLimit, validateNoGif } from '@/src/utils';
 
 @Injectable()
 export class AwsStorageService {
+	private readonly logger = new Logger(AwsStorageService.name);
 	private readonly client: S3Client;
 	private readonly bucket: string;
 
@@ -55,6 +59,7 @@ export class AwsStorageService {
 
 	public async uploadForPost(
 		file: FileUpload,
+		authorId?: string,
 		mimetype: 'image/webp' = 'image/webp'
 	) {
 		if (!file) {
@@ -80,7 +85,21 @@ export class AwsStorageService {
 
 		await this.client.send(new PutObjectCommand(command));
 
-		return { url: this.getFileUrl(key) };
+		const url = this.getFileUrl(key);
+
+		if (authorId) {
+			await this.prisma.mediaAttachment.create({
+				data: {
+					key,
+					url,
+					authorId,
+					status: MediaStatus.PENDING,
+					postId: null,
+				},
+			});
+		}
+
+		return { url };
 	}
 
 	public async remove(keyOrUrl: string) {
@@ -95,6 +114,44 @@ export class AwsStorageService {
 		};
 
 		await this.client.send(new DeleteObjectCommand(command));
+	}
+
+	public async removeMany(keysOrUrls: string[]): Promise<void> {
+		if (!keysOrUrls || keysOrUrls.length === 0) {
+			return;
+		}
+
+		const keys = Array.from(
+			new Set(
+				keysOrUrls
+					.map((item) => this.extractKey(item))
+					.filter((key): key is string => Boolean(key))
+			)
+		);
+
+		if (keys.length === 0) {
+			return;
+		}
+
+		// S3 DeleteObjectsCommand allows up to 1000 keys per request
+		const CHUNK_SIZE = 1000;
+		for (let i = 0; i < keys.length; i += CHUNK_SIZE) {
+			const chunk = keys.slice(i, i + CHUNK_SIZE);
+			const command: DeleteObjectsCommandInput = {
+				Bucket: this.bucket,
+				Delete: {
+					Objects: chunk.map((Key) => ({ Key })),
+					Quiet: true,
+				},
+			};
+
+			const output = await this.client.send(new DeleteObjectsCommand(command));
+			if (output.Errors && output.Errors.length > 0) {
+				this.logger.warn(
+					`Failed to delete ${output.Errors.length} objects from S3: ${JSON.stringify(output.Errors)}`
+				);
+			}
+		}
 	}
 
 	public extractKey(keyOrUrl: string): string {

@@ -15,6 +15,7 @@ model User {
   comments Comment[]
   blogs    Blog[]
   posts    Post[]
+  mediaAttachments MediaAttachment[]
 
   @@map("users")
 }

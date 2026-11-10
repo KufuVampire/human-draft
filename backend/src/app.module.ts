@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
+import { ScheduleModule } from '@nestjs/schedule';
 
 import { getGraphQLConfig } from '@/src/configs';
 import { GlobalGqlExceptionFilter } from '@/src/filters';
@@ -24,6 +25,7 @@ import { UserModule } from './modules/user/user.module';
 
 @Module({
 	imports: [
+		ScheduleModule.forRoot(),
 		ConfigModule.forRoot({
 			ignoreEnvFile: !IS_DEV_ENV,
 			isGlobal: true,
