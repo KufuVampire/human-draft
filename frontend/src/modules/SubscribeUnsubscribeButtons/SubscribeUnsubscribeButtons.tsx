@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 
 import { SubscribeButton, UnsubscribeButton } from '@/shared';
-import { useProfile } from '@/hooks';
+import { useProfileStore } from '@/store';
 
 interface Props {
 	toId: string;
@@ -18,7 +18,7 @@ export const SubscribeUnsubscribeButtons = ({
 }: Props) => {
 	const [mounted, setMounted] = useState(false);
 	const [isSubscribe, setSubscribe] = useState(isSubscribed);
-	const { profile } = useProfile();
+	const profile = useProfileStore((s) => s.profile);
 
 	useEffect(() => {
 		if (!mounted) {

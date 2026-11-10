@@ -4,8 +4,8 @@ import { useRouter } from 'next/navigation';
 import { PropsWithChildren, useEffect } from 'react';
 
 import { routesConfig } from '@/config';
-import { useProfile } from '@/hooks';
 import { Skeleton } from '@/shared';
+import { useProfileStore } from '@/store';
 
 const AuthFormSkeleton = () => (
 	<div
@@ -25,7 +25,8 @@ const AuthFormSkeleton = () => (
 );
 
 export const GuestGuard = ({ children }: PropsWithChildren) => {
-	const { isAuth, isLoading } = useProfile();
+	const isAuth = useProfileStore((s) => s.isAuth);
+	const isLoading = useProfileStore((s) => s.isLoading);
 	const router = useRouter();
 
 	useEffect(() => {

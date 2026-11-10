@@ -1,11 +1,11 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { useRef } from 'react';
+import { useCallback, useRef } from 'react';
 
 import { useClickOutside } from '@/hooks';
 import { Button, Modal } from '@/shared';
-import { useConfirmationChangesModal } from '@/store';
+import { useModalData, useModalStore } from '@/store';
 import { cn } from '@/utils';
 
 interface Props {
@@ -15,15 +15,24 @@ interface Props {
 const buttonStyles = 'py-3 w-full tracking-[5%] uppercase rounded-lg';
 
 export const ConfirmationChangesModal = ({ className }: Props) => {
-	const { isOpen, setOpen, cb } = useConfirmationChangesModal();
+	const activeModal = useModalStore((s) => s.activeModal);
+	const modalData = useModalData('confirmationChanges');
+	const closeModal = useModalStore((s) => s.closeModal);
 	const t = useTranslations();
 	const modalRef = useRef<HTMLDivElement>(null);
 
-	const handleClose = () => {
-		setOpen(false);
-	};
+	const isOpen = activeModal === 'confirmationChanges';
+
+	const handleClose = useCallback(() => {
+		closeModal();
+	}, [closeModal]);
 
 	useClickOutside(modalRef, handleClose);
+
+	const handleConfirm = () => {
+		modalData?.cb();
+		closeModal();
+	};
 
 	return (
 		<Modal
@@ -47,7 +56,7 @@ export const ConfirmationChangesModal = ({ className }: Props) => {
 					</Button>
 					<Button
 						className={buttonStyles}
-						onClick={cb}>
+						onClick={handleConfirm}>
 						{t('btns.save')}
 					</Button>
 				</div>

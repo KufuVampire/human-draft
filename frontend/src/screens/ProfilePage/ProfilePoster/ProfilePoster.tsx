@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import { PropsWithChildren } from 'react';
 
-import { useProfile } from '@/hooks';
+import { useProfileStore } from '@/store';
 
 interface Props {
 	isOwner: boolean;
@@ -15,7 +15,7 @@ export const ProfilePoster = ({
 	children,
 	user,
 }: PropsWithChildren<Props>) => {
-	const { profile } = useProfile();
+	const profile = useProfileStore((s) => s.profile);
 
 	return (
 		<div className='min-h-50 md:min-h-62.5 max-h-50 md:max-h-62.5 bg-placeholder relative'>

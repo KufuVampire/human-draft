@@ -36,6 +36,13 @@ vi.mock('@/store', () => ({
 	useComments: () => ({
 		addComment: mockAddComment,
 	}),
+	useProfileStore: (selector?: (s: unknown) => unknown) => {
+		const state = {
+			profile: { id: 'user-1', username: 'alice', avatarUrl: null },
+			isAuth: mockIsAuth,
+		};
+		return selector ? selector(state) : state;
+	},
 }));
 
 vi.mock('@/graphql/generated/output', () => ({

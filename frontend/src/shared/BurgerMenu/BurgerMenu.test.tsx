@@ -11,12 +11,18 @@ vi.mock('next-intl', () => ({
 }));
 
 vi.mock('@/hooks', () => ({
-	useProfile: () => ({
-		isAuth: mockIsAuth,
-		profile: mockProfile,
-	}),
 	useActiveLink: () => () => false,
 	useResolvedHref: () => (href: string) => href,
+}));
+
+vi.mock('@/store', () => ({
+	useProfileStore: (selector?: (s: unknown) => unknown) => {
+		const state = {
+			isAuth: mockIsAuth,
+			profile: mockProfile,
+		};
+		return selector ? selector(state) : state;
+	},
 }));
 
 vi.mock('@/shared', () => ({

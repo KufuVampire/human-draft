@@ -31,7 +31,7 @@ export const BlogCard = ({
 	tags,
 	posterUrl,
 }: Props) => {
-	const { profile } = useProfile();
+	const profile = useProfile((s) => s.profile);
 
 	const isOwner = profile?.username === author.username;
 

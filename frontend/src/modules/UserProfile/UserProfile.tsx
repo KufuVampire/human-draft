@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
 
 import { routesConfig } from '@/config';
-import { useActiveLink, useProfile, useResolvedHref } from '@/hooks';
+import { useActiveLink, useResolvedHref } from '@/hooks';
 import {
 	Button,
 	CustomLink,
@@ -13,6 +13,7 @@ import {
 	LogoutButton,
 	UserBadge,
 } from '@/shared';
+import { useProfileStore } from '@/store';
 import { cn } from '@/utils';
 
 const items = [
@@ -34,7 +35,9 @@ const items = [
 export const UserProfile = () => {
 	const t = useTranslations();
 	const [isOpen, setOpen] = useState(false);
-	const { profile, isAuth, isLoading } = useProfile();
+	const isAuth = useProfileStore((s) => s.isAuth);
+	const profile = useProfileStore((s) => s.profile);
+	const isLoading = useProfileStore((s) => s.isLoading);
 	const isActiveLink = useActiveLink();
 	const resolveHref = useResolvedHref();
 

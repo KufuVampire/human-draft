@@ -34,9 +34,8 @@ import {
 } from '@/shared';
 import {
 	useComments,
-	useConfirmationDeletionModal,
-	useNeedAuthModal,
-	useProfile,
+	useModalStore,
+	useProfileStore,
 } from '@/store';
 import { cn, isNotFoundError } from '@/utils';
 
@@ -66,11 +65,11 @@ export const PostPage = ({ initialData }: Props = {}) => {
 	const t = useTranslations();
 	const router = useRouter();
 	const { postId } = useParams<{ postId: string }>();
-	const { profile, isAuth } = useProfile();
+	const profile = useProfileStore((s) => s.profile);
+	const isAuth = useProfileStore((s) => s.isAuth);
+	const openModal = useModalStore((s) => s.openModal);
 	const [likedAt, setLikedAt] = useLocalStorage<ILikedAt[]>(`likedAt`, []);
 	const { getCommentsCount } = useComments();
-	const { setOpen, setType, setCb } = useConfirmationDeletionModal();
-	const { setOpen: setNeedAuthOpen } = useNeedAuthModal();
 	const [isDropdownOpen, setDropdownOpen] = useState(false);
 	const [pinnedBlogId, setPinnedBlogId] = useState<string | null>(null);
 	const { register, watch } = useForm<TypeSearchSchema>({
@@ -160,21 +159,21 @@ export const PostPage = ({ initialData }: Props = {}) => {
 	);
 
 	const handleDeletePost = useCallback(() => {
-		setType('post');
-		setCb(() => {
-			deletePost({
-				variables: {
-					postId,
-				},
-			});
-			setOpen(false);
+		openModal('confirmationDeletion', {
+			type: 'post',
+			cb: () => {
+				deletePost({
+					variables: {
+						postId,
+					},
+				});
+			},
 		});
-		setOpen(true);
-	}, [deletePost, postId, setCb, setOpen, setType]);
+	}, [deletePost, openModal, postId]);
 
 	const handleLike = useCallback(() => {
 		if (!isAuth) {
-			setNeedAuthOpen(true);
+			openModal('needAuth');
 			return;
 		}
 
@@ -202,7 +201,7 @@ export const PostPage = ({ initialData }: Props = {}) => {
 				},
 			];
 		});
-	}, [isAuth, likedAt, postId, profile, setLikedAt, setNeedAuthOpen]);
+	}, [isAuth, likedAt, openModal, postId, profile, setLikedAt]);
 
 	const handleTogglePinBlog = useCallback(
 		(e: MouseEvent<HTMLUListElement>) => {

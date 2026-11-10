@@ -11,7 +11,7 @@ import {
 	GetAllUsersQuery,
 	useGetAllUsersQuery,
 } from '@/graphql/generated/output';
-import { useDebounce, useInfiniteScroll, useProfile } from '@/hooks';
+import { useDebounce, useInfiniteScroll } from '@/hooks';
 import { SubscribeUnsubscribeButtons } from '@/modules';
 import { TypeUsersSearchSchema } from '@/schemas';
 import {
@@ -22,6 +22,7 @@ import {
 	UserAvatar,
 	UserAvatarSkeleton,
 } from '@/shared';
+import { useSubscriptions } from '@/store';
 import { cn } from '@/utils';
 
 const initialSkeletonCount = 10;
@@ -35,7 +36,7 @@ export const UsersPage = () => {
 	const [page, setPage] = useState<number>(SEARCH_PARAMS.PAGE);
 	const perPage = SEARCH_PARAMS.PER_PAGE;
 	const [allUsers, setAllUsers] = useState<UserItem[]>([]);
-	const { subscriptions } = useProfile();
+	const subscriptions = useSubscriptions((s) => s.subscriptions);
 	const { register, watch } = useForm<TypeUsersSearchSchema>({
 		defaultValues: {
 			search: '',

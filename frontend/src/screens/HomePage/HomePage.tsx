@@ -12,7 +12,6 @@ import {
 	useInfiniteScroll,
 	usePostsAndBlogs,
 	usePostsAndBlogsSearch,
-	useProfile,
 } from '@/hooks';
 import { TypeHomePageSearchSchema } from '@/schemas';
 import {
@@ -26,6 +25,7 @@ import {
 	TagsList,
 	UserBadgeWithCreatedAt,
 } from '@/shared';
+import { useProfileStore } from '@/store';
 import { cn } from '@/utils';
 
 interface IFilter {
@@ -58,7 +58,7 @@ const searchedItemStyles = 'items-start px-5 py-3 flex-col gap-y-2 group';
 
 export const HomePage = () => {
 	const t = useTranslations();
-	const { isAuth } = useProfile();
+	const isAuth = useProfileStore((s) => s.isAuth);
 	const [page, setPage] = useState(SEARCH_PARAMS.PAGE);
 	const { register, watch } = useForm<TypeHomePageSearchSchema>({
 		defaultValues: {

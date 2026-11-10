@@ -28,7 +28,7 @@ import {
 	usePinPostMutation,
 	useUnPinPostMutation,
 } from '@/graphql/generated/output';
-import { useBlog, useBlobUrl, useDebounce, useProfile } from '@/hooks';
+import { useBlog, useBlobUrl, useDebounce } from '@/hooks';
 import { TypeSearchSchema } from '@/schemas';
 import {
 	BlogPageSkeleton,
@@ -41,7 +41,7 @@ import {
 	Section,
 	TagsList,
 } from '@/shared';
-import { useConfirmationDeletionModal } from '@/store';
+import { useModalStore, useProfileStore } from '@/store';
 import { cn, isNotFoundError } from '@/utils';
 
 const btnStyles = 'px-3 py-2 leading-[150%] font-bold rounded-lg';
@@ -63,13 +63,9 @@ export const BlogPage = memo(({ initialData }: Props = {}) => {
 		initialData?.posterUrl ?? null
 	);
 	const [isOpen, setOpen] = useState(false);
-	const { profile } = useProfile();
+	const profile = useProfileStore((s) => s.profile);
+	const openModal = useModalStore((s) => s.openModal);
 	const t = useTranslations();
-	const {
-		setType,
-		setCb,
-		setOpen: setModalOpen,
-	} = useConfirmationDeletionModal();
 
 	const { register, watch } = useForm<TypeSearchSchema>({
 		defaultValues: {
@@ -246,29 +242,29 @@ export const BlogPage = memo(({ initialData }: Props = {}) => {
 
 		if (!postId) return;
 
-		setType('post');
-		setCb(() => {
-			deletePost({
-				variables: {
-					postId,
-				},
-			});
-			setModalOpen(false);
+		openModal('confirmationDeletion', {
+			type: 'post',
+			cb: () => {
+				deletePost({
+					variables: {
+						postId,
+					},
+				});
+			},
 		});
-		setModalOpen(true);
 	};
 
 	const handleDeleteBlog = () => {
-		setType('blog');
-		setCb(() => {
-			deleteBlog({
-				variables: {
-					blogId,
-				},
-			});
-			setModalOpen(false);
+		openModal('confirmationDeletion', {
+			type: 'blog',
+			cb: () => {
+				deleteBlog({
+					variables: {
+						blogId,
+					},
+				});
+			},
 		});
-		setModalOpen(true);
 	};
 
 	const handleChangePoster = (e: ChangeEvent<HTMLInputElement>) => {
@@ -285,18 +281,18 @@ export const BlogPage = memo(({ initialData }: Props = {}) => {
 	};
 
 	const handleDeletePoster = () => {
-		setType('poster');
-		setCb(() => {
-			setPosterFile(null);
-			setPosterUrl(null);
-			deletePoster({
-				variables: {
-					blogId,
-				},
-			});
-			setModalOpen(false);
+		openModal('confirmationDeletion', {
+			type: 'poster',
+			cb: () => {
+				setPosterFile(null);
+				setPosterUrl(null);
+				deletePoster({
+					variables: {
+						blogId,
+					},
+				});
+			},
 		});
-		setModalOpen(true);
 	};
 
 	const isOwner = profile?.username === blog.author.username;

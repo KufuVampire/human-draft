@@ -11,7 +11,7 @@ import {
 	GetUserByUsernameQuery,
 	useGetUserByUsernameQuery,
 } from '@/graphql/generated/output';
-import { useProfile } from '@/hooks';
+import { useProfile, useProfileAvatar, useProfilePoster } from '@/hooks';
 import { SubscribeUnsubscribeButtons } from '@/modules';
 import {
 	Button,
@@ -33,18 +33,19 @@ interface Props {
 export const ProfilePage = ({ username, initialData }: Props) => {
 	const router = useRouter();
 	const [isOpen, setOpen] = useState(false);
+	const { profile, subscriptions } = useProfile();
 	const {
-		profile,
-		subscriptions,
 		changePosterLoading,
 		removePosterLoading,
-		isAvatarChanging,
-		isAvatarRemoving,
 		handleLoadPoster,
 		handleRemovePoster,
+	} = useProfilePoster();
+	const {
+		isAvatarChanging,
+		isAvatarRemoving,
 		handleRemoveAvatar,
 		handleChangeAvatar,
-	} = useProfile();
+	} = useProfileAvatar();
 	const t = useTranslations();
 
 	const isOwner = profile?.username === username;

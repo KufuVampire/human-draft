@@ -1,8 +1,14 @@
 export { useComments } from './useComments';
-export { useConfirmationChangesModal } from './useConfirmationChangesModal';
-export { useConfirmationDeletionModal } from './useConfirmationDeletionModal';
-export { useCropperModal } from './useCropperModal';
-export { useNeedAuthModal } from './useNeedAuthModal';
-export { useProfile } from './useProfile';
+export {
+	useModalStore,
+	useModalData,
+	type ConfirmationChangesData,
+	type ConfirmationDeletionData,
+	type CropperData,
+	type DeletionType,
+	type ModalDataMap,
+	type ModalState,
+	type ModalType,
+} from './useModalStore';
+export { useProfile, useProfile as useProfileStore } from './useProfile';
 export { useSubscriptions } from './useSubscriptions';
-
