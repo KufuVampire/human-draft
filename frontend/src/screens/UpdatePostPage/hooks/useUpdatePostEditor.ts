@@ -1,11 +1,12 @@
 'use client';
 
 import { editorViewCtx } from '@milkdown/core';
-import { Crepe } from '@milkdown/crepe';
 import { useEditor } from '@milkdown/react';
 import { useEffect, useState } from 'react';
 
 import { uploadPostImage } from '@/api';
+// Прямой путь, а не бочка @/libs: её импортируют серверные страницы, Milkdown им не нужен
+import { createPostCrepe } from '@/libs/post-editor';
 import { type ProseMirrorNode, convertImageToImageBlock } from '@/utils';
 
 interface Params {
@@ -13,32 +14,13 @@ interface Params {
 	rawContent?: ProseMirrorNode | null;
 }
 
+const uploadImage = async (file: File) => (await uploadPostImage(file)).url;
+
 export const useUpdatePostEditor = ({ t, rawContent }: Params) => {
 	const [isContentLoaded, setIsContentLoaded] = useState(false);
 
 	const { loading, get } = useEditor(
-		(root: HTMLElement) =>
-			new Crepe({
-				root,
-				features: {
-					placeholder: true,
-					'image-block': true,
-				},
-				featureConfigs: {
-					placeholder: {
-						text: t('createPostPage.defaultValue'),
-					},
-					'code-mirror': {
-						copyText: t('createPostPage.copyCode'),
-					},
-					'image-block': {
-						onUpload: async (file) => {
-							const data = await uploadPostImage(file);
-							return data.url;
-						},
-					},
-				},
-			}),
+		(root: HTMLElement) => createPostCrepe({ root, t, onUpload: uploadImage }),
 		[t]
 	);
 
