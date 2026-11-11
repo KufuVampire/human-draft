@@ -60,7 +60,9 @@ export const Navigation = ({
 			<ul
 				className={cn(
 					'flex',
-					direction === 'column' ? 'flex-col gap-1' : 'flex-row',
+					direction === 'column'
+						? cn('flex-col gap-1', !isExpanded && 'items-center')
+						: 'flex-row',
 					variant === 'footer' && 'gap-x-6 justify-between md:justify-normal'
 				)}>
 				{listItem.map(({ href, translationKey, Icon }) => {
@@ -71,16 +73,16 @@ export const Navigation = ({
 					const currentHref = resolveHref(href);
 
 					return (
-						<li key={href}>
+						<li key={href} className={cn(!isExpanded && 'w-full flex justify-center')}>
 							<CustomLink
 								href={currentHref}
 								className={cn(
 									'justify-normal w-full text-sm md:text-base font-medium',
-									!isExpanded && 'justify-center px-2',
 									styles[variant],
 									variant === 'dashboard' &&
 										isActiveLink(currentHref) &&
-										'text-primary font-semibold bg-primary/10 hover:bg-primary/15'
+										'text-primary font-semibold bg-primary/10 hover:bg-primary/15',
+									!isExpanded && 'justify-center px-0 gap-0'
 								)}>
 								{variant === 'dashboard' && <Icon className='size-5 shrink-0' />}
 								<span

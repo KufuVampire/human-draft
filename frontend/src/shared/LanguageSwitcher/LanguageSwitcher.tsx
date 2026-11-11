@@ -75,9 +75,13 @@ export const LanguageSwitcher = ({ className, isExpanded = true }: Props) => {
 				title={t('language')}
 				className={cn(
 					'flex items-center justify-between w-full p-2.5 rounded-xl text-sm font-medium hover:bg-surface-tag text-foreground transition-colors',
-					!isExpanded && 'justify-center p-2'
+					!isExpanded && 'justify-center p-2 px-0'
 				)}>
-				<div className='flex items-center gap-2 overflow-hidden'>
+				<div
+					className={cn(
+						'flex items-center gap-2 overflow-hidden',
+						!isExpanded && 'gap-0 justify-center'
+					)}>
 					<Globe className='size-5 text-muted shrink-0' />
 					<span
 						className={cn(

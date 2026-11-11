@@ -75,6 +75,7 @@
 		"signUp": "Registration"
 	},
 	"filters": {
+		"all": "All",
 		"posts": "Posts",
 		"blogs": "Blogs",
 		"myPosts": "My posts",
