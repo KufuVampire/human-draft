@@ -44,6 +44,11 @@ export const PostStatsBar = ({
 		() => likedAt.find((el) => el.postId === postId),
 		[likedAt, postId]
 	);
+	const isLiked = Boolean(
+		likedAtObj?.isLiked &&
+			!isLikeExpired(likedAtObj.date) &&
+			likedAtObj.userId === profile?.id
+	);
 
 	const handleLike = useCallback(() => {
 		if (!isAuth) {
@@ -51,17 +56,7 @@ export const PostStatsBar = ({
 			return;
 		}
 
-		const currentLiked = likedAt.find((el) => el.postId === postId);
-
-		if (
-			currentLiked &&
-			currentLiked.isLiked &&
-			!isLikeExpired(currentLiked.date) &&
-			currentLiked.postId === postId &&
-			currentLiked.userId === profile?.id
-		) {
-			return;
-		}
+		if (isLiked) return;
 
 		setLikedAt((prev) => {
 			const filteredPrev = prev.filter((o) => o.postId !== postId);
@@ -75,7 +70,7 @@ export const PostStatsBar = ({
 				},
 			];
 		});
-	}, [isAuth, likedAt, openModal, postId, profile, setLikedAt]);
+	}, [isAuth, isLiked, openModal, postId, profile, setLikedAt]);
 
 	return (
 		<div className='flex flex-col gap-4 sm:flex-row sm:items-center justify-between pt-6 border-t border-border-subtle'>
@@ -86,23 +81,12 @@ export const PostStatsBar = ({
 						variant='clear'
 						className={cn(
 							'flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-tag text-muted text-xs font-medium hover:text-foreground transition-colors',
-							likedAtObj?.isLiked && 'text-danger hover:text-danger'
+							isLiked && 'text-danger hover:text-danger'
 						)}
-						disabled={
-							likedAtObj?.isLiked &&
-							!isLikeExpired(likedAtObj.date) &&
-							likedAtObj.userId === profile?.id &&
-							likedAtObj.postId === postId
-						}
+						disabled={isLiked}
 						onClick={handleLike}>
 						<Heart
-							className={cn(
-								'size-4',
-								likedAtObj?.isLiked &&
-									!isLikeExpired(likedAtObj.date) &&
-									likedAtObj.userId === profile?.id &&
-									'stroke-danger fill-danger'
-							)}
+							className={cn('size-4', isLiked && 'stroke-danger fill-danger')}
 						/>
 						<span>{likesCount ?? 0}</span>
 					</Button>
