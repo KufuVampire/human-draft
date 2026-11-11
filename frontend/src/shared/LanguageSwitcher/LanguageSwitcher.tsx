@@ -1,13 +1,12 @@
 'use client';
 
-import { ChevronRight, Globe } from 'lucide-react';
+import { Check, ChevronDown, Globe } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
-import { MouseEvent, useCallback, useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { Locale, locales, setLocale } from '@/libs';
+import { useClickOutside } from '@/hooks';
 import { Button } from '../Button/Button';
-import { Dropdown } from '../Dropdown/Dropdown';
-import { FormField } from '../FormField/FormField';
 import { cn } from '@/utils';
 
 interface LanguageItem {
@@ -16,14 +15,8 @@ interface LanguageItem {
 }
 
 const languageItems: LanguageItem[] = [
-	{
-		locale: 'ru',
-		text: 'Русский',
-	},
-	{
-		locale: 'en',
-		text: 'English',
-	},
+	{ locale: 'ru', text: 'Русский' },
+	{ locale: 'en', text: 'English' },
 ];
 
 interface Props {
@@ -32,82 +25,90 @@ interface Props {
 }
 
 export const LanguageSwitcher = ({ className, isExpanded = true }: Props) => {
-	const currentLocale = useLocale();
+	const currentLocale = useLocale() as Locale;
 	const [isOpen, setOpen] = useState(false);
 	const t = useTranslations('dashboard');
+	const containerRef = useRef<HTMLDivElement>(null);
 
-	const handleClose = useCallback(() => {
-		setOpen(false);
-	}, []);
+	useClickOutside(containerRef, () => setOpen(false));
 
-	const handleClick = (e: MouseEvent<HTMLUListElement>) => {
-		const target = e.target as HTMLElement;
-		const input = target.closest('input');
-
-		if (!input || input.type !== 'radio') return;
-
-		const locale = input.dataset.locale as Locale;
-
+	const handleSelectLocale = (locale: Locale) => {
 		if (locale === currentLocale || !locales.includes(locale)) {
+			setOpen(false);
 			return;
 		}
-
-		handleClose();
+		setOpen(false);
 		setLocale(locale);
 	};
 
-	const mappedLanguageItems = languageItems.map(({ locale, text }) => (
-		<FormField
-			key={locale}
-			text={isExpanded ? text : locale.toUpperCase()}
-			name='language'
-			type='radio'
-			data-locale={locale}
-			className='outline-0 bg-transparent hover:text-accent-hover focus-visible:text-accent-hover gap-x-1 flex justify-normal hover:stroke-accent-hover'
-			wrapperClassNames={cn(
-				'px-2 md:px-3.5 py-2.5 text-foreground gap-x-1',
-				currentLocale === locale && !isExpanded && 'text-accent'
-			)}
-			inputWrapperClassName={cn(!isExpanded && 'hidden')}
-			labelTextClassName='text-[1rem] md:text-xl leading-nav'
-			checked={currentLocale === locale}
-			readOnly
-		/>
-	));
+	const renderOptions = () =>
+		languageItems.map(({ locale, text }) => {
+			const isSelected = currentLocale === locale;
+			return (
+				<button
+					key={locale}
+					type='button'
+					onClick={() => handleSelectLocale(locale)}
+					className={cn(
+						'flex items-center justify-between w-full px-2.5 py-1.5 rounded-lg text-xs transition-colors cursor-pointer',
+						isSelected
+							? 'bg-primary/10 text-primary font-semibold'
+							: 'text-muted hover:text-foreground hover:bg-surface-tag'
+					)}>
+					<div className='flex items-center gap-2'>
+						<span className='font-bold uppercase text-xs'>{locale}</span>
+						<span>{text}</span>
+					</div>
+					{isSelected && <Check className='size-3.5 text-primary shrink-0' />}
+				</button>
+			);
+		});
 
 	return (
-		<Dropdown
-			isOpen={isOpen}
-			setOpen={setOpen}
-			items={mappedLanguageItems}
-			className={className}
-			listClassName={cn(
-				'static h-0 bg-transparent shadow-none overflow-x',
-				isOpen && 'h-auto'
-			)}
-			displayDirection='top'
-			onClick={handleClick}>
+		<div
+			ref={containerRef}
+			className={cn('relative flex flex-col w-full', className)}>
 			<Button
 				variant='clear'
+				type='button'
+				onClick={() => setOpen((prev) => !prev)}
+				title={t('language')}
 				className={cn(
-					'gap-x-1 w-full text-[1rem] md:text-xl leading-nav hover:stroke-accent-hover justify-between p-2 md:p-2.5 md:px-3.5',
-					!isExpanded && 'justify-center'
-				)}
-				onClick={() => setOpen((prev) => !prev)}>
-				<div className='flex items-center gap-x-1'>
-					<Globe />
-					<span className={cn(!isExpanded && 'md:hidden')}>
+					'flex items-center justify-between w-full p-2.5 rounded-xl text-sm font-medium hover:bg-surface-tag text-foreground transition-colors',
+					!isExpanded && 'justify-center p-2'
+				)}>
+				<div className='flex items-center gap-2'>
+					<Globe className='size-5 text-muted shrink-0' />
+					<span className={cn('text-muted font-medium', !isExpanded && 'hidden')}>
 						{t('language')}
 					</span>
 				</div>
-				<ChevronRight
-					className={cn(
-						'transition-transform shrink-0',
-						!isExpanded && 'md:hidden',
-						isOpen && 'rotate-90'
-					)}
-				/>
+				{isExpanded && (
+					<div className='flex items-center gap-1.5'>
+						<span className='text-xs font-semibold text-primary uppercase'>
+							{currentLocale}
+						</span>
+						<ChevronDown
+							className={cn(
+								'size-4 text-muted transition-transform duration-200',
+								isOpen && 'rotate-180'
+							)}
+						/>
+					</div>
+				)}
 			</Button>
-		</Dropdown>
+
+			{isOpen && (
+				<div
+					className={cn(
+						'flex flex-col gap-1 p-1 bg-surface-card rounded-xl border border-border-subtle shadow-lg',
+						isExpanded
+							? 'mt-1'
+							: 'absolute left-full ml-3 top-0 z-dropdown w-36 shadow-xl'
+					)}>
+					{renderOptions()}
+				</div>
+			)}
+		</div>
 	);
 };

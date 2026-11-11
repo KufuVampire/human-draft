@@ -30,59 +30,30 @@ export const ThemeSwitcher = () => {
 		<label
 			aria-label={t(`theme.${theme}`) || t('theme.light')}
 			title={t(`theme.${theme}`) || t('theme.light')}
-			className={cn(
-				'flex items-center cursor-pointer relative bg-foreground py-1 px-1 md:px-1.5 rounded-full md:gap-x-2 transition-colors duration-500',
-				{
-					['bg-secondary']: !isChecked,
-				}
-			)}>
+			className='relative flex items-center justify-between w-14 h-8 md:w-16 md:h-9 px-1.5 rounded-full bg-surface-tag border border-border-subtle hover:border-primary/50 shadow-inner cursor-pointer transition-all select-none'>
+			<Sun
+				className={cn(
+					'size-3.5 md:size-4 z-10 transition-colors',
+					!isChecked ? 'text-amber-500' : 'text-muted'
+				)}
+			/>
+			<Moon
+				className={cn(
+					'size-3.5 md:size-4 z-10 transition-colors',
+					isChecked ? 'text-primary' : 'text-muted'
+				)}
+			/>
 			<div
 				className={cn(
-					'relative z-10 rounded-full p-0.5 md:p-1 transition-all duration-500 bg-layout',
-					{
-						['bg-transparent md:translate-x-[calc(100%+0.5rem)] translate-x-[calc(100%+0.125rem)]']:
-							isChecked,
-					}
-				)}>
-				<Sun
-					className={cn(
-						'transition-colors duration-500 stroke-secondary size-4 md:size-6',
-						{
-							['stroke-none']: isChecked,
-						}
-					)}
-				/>
-			</div>
-			<div
-				className={cn(
-					'relative z-10 rounded-full p-0.5 md:p-1 transition-all duration-500 bg-transparent',
-					{
-						['bg-secondary']: isChecked,
-						['md:-translate-x-[calc(100%+0.5rem)] -translate-x-[calc(100%+0.125rem)]']:
-							!isChecked,
-					}
-				)}>
-				<Moon
-					className={cn(
-						'transition-colors duration-500 stroke-none size-4 md:size-6',
-						{
-							['stroke-layout']: isChecked,
-						}
-					)}
-				/>
-			</div>
-			<div
-				className={cn(
-					'absolute top-1 left-1 md:left-1.5 p-2.5 md:p-4 rounded-full bg-layout transition-transform duration-500',
-					isChecked &&
-						'md:translate-x-[calc(100%+0.5rem)] translate-x-full bg-secondary'
+					'absolute top-0.5 left-0.5 size-6.5 md:size-7.5 rounded-full bg-surface-card border border-border-subtle shadow-xs transition-transform duration-300',
+					isChecked ? 'translate-x-6 md:translate-x-7' : 'translate-x-0'
 				)}
 			/>
 			<input
 				type='checkbox'
 				checked={isChecked}
 				onChange={handleChange}
-				className='appearance-none sr-only'
+				className='sr-only'
 				name='theme-switcher'
 			/>
 		</label>
