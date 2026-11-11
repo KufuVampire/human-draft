@@ -219,8 +219,13 @@ body {
 	@apply hidden! md:flex! md:gap-x-0.5;
 }
 
+/* Кнопка 24px с иконкой 20px по центру: у Crepe иконка жёстко 24px и при уменьшении кнопки съезжала */
 .milkdown-block-handle .operation-item {
-	@apply p-0! size-6! md:size-7! md:p-1!;
+	@apply p-0! size-6! flex! items-center! justify-center!;
+}
+
+.milkdown-block-handle .operation-item svg {
+	@apply size-5!;
 }
 
 /* Тема Crepe на токенах проекта: светлая и тёмная переключаются самими токенами */
