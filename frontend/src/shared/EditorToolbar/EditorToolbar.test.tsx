@@ -1,8 +1,15 @@
-import type { Editor } from '@milkdown/core';
+import { commandsCtx, type Editor } from '@milkdown/core';
+import { toggleLinkCommand } from '@milkdown/kit/component/link-tooltip';
 import { createEvent, fireEvent, render, screen } from '@testing-library/react';
-import { Schema } from 'prosemirror-model';
+import { type Node, Schema } from 'prosemirror-model';
 import { history } from 'prosemirror-history';
-import { EditorState, TextSelection, Transaction } from 'prosemirror-state';
+import {
+	EditorState,
+	NodeSelection,
+	type Selection,
+	TextSelection,
+	Transaction,
+} from 'prosemirror-state';
 import { describe, expect, it, vi } from 'vitest';
 
 import { EditorToolbar } from './EditorToolbar';
@@ -28,36 +35,46 @@ const schema = new Schema({
 	marks: { strong: {}, emphasis: {}, inlineCode: {}, strike_through: {} },
 });
 
-const setup = () => {
-	const doc = schema.node('doc', null, [
-		schema.node('paragraph', null, [schema.text('привет')]),
-	]);
+const paragraph = (text: string) => schema.node('paragraph', null, text ? [schema.text(text)] : []);
+
+const setup = (
+	doc: Node = schema.node('doc', null, [paragraph('привет')]),
+	select: (doc: Node) => Selection = (d) => TextSelection.create(d, 1, 7)
+) => {
 	const view = {
-		state: EditorState.create({
-			doc,
-			selection: TextSelection.create(doc, 1, 7),
-			plugins: [history()],
-		}),
+		state: EditorState.create({ doc, selection: select(doc), plugins: [history()] }),
 		dispatch: (tr: Transaction) => {
 			view.state = view.state.apply(tr);
 		},
 		focus: vi.fn(),
 	};
+	const commands = { call: vi.fn() };
 	const editor = {
-		action: (cb: (ctx: { get: () => typeof view }) => void) => cb({ get: () => view }),
+		action: (cb: (ctx: { get: (key: unknown) => unknown }) => void) =>
+			cb({ get: (key) => (key === commandsCtx ? commands : view) }),
 	} as unknown as Editor;
 
 	render(<EditorToolbar getEditor={() => editor} />);
-	return view;
+	return { view, commands };
 };
 
-const marksOfFirstText = (view: ReturnType<typeof setup>) =>
+const marksOfFirstText = (view: ReturnType<typeof setup>['view']) =>
 	view.state.doc.firstChild?.firstChild?.marks.map((m) => m.type.name);
+
+const blocks = (view: ReturnType<typeof setup>['view']) => {
+	const result: string[] = [];
+	view.state.doc.forEach((node) =>
+		result.push(node.isTextblock ? `${node.type.name}:${node.textContent}` : node.type.name)
+	);
+	return result;
+};
+
+const clickImage = () => fireEvent.click(screen.getByRole('button', { name: 'image' }));
 
 describe('EditorToolbar (панель форматирования редактора)', () => {
 	it('для каждой кнопки находит mark или node в схеме с именами Milkdown', () => {
-		for (const action of toolbarActions) {
-			expect(action.getCommand(schema), action.labelKey).not.toBeNull();
+		for (const action of toolbarActions.filter((a) => a.getCommand)) {
+			expect(action.getCommand?.(schema), action.labelKey).not.toBeNull();
 		}
 	});
 
@@ -67,7 +84,7 @@ describe('EditorToolbar (панель форматирования редакт�
 		['strike', 'strike_through'],
 		['code', 'inlineCode'],
 	])('кнопка «%s» применяет mark %s к выделенному тексту', (label, markName) => {
-		const view = setup();
+		const { view } = setup();
 
 		fireEvent.click(screen.getByRole('button', { name: label }));
 
@@ -75,8 +92,16 @@ describe('EditorToolbar (панель форматирования редакт�
 		expect(view.focus).toHaveBeenCalled();
 	});
 
+	it('«Ссылка» вызывает команду ссылки Milkdown (окно ввода адреса Crepe)', () => {
+		const { commands } = setup();
+
+		fireEvent.click(screen.getByRole('button', { name: 'link' }));
+
+		expect(commands.call).toHaveBeenCalledWith(toggleLinkCommand.key);
+	});
+
 	it('кнопка заголовка превращает абзац в заголовок нужного уровня', () => {
-		const view = setup();
+		const { view } = setup();
 
 		fireEvent.click(screen.getByRole('button', { name: 'heading2' }));
 
@@ -85,7 +110,7 @@ describe('EditorToolbar (панель форматирования редакт�
 	});
 
 	it('кнопка списка оборачивает абзац в маркированный список', () => {
-		const view = setup();
+		const { view } = setup();
 
 		fireEvent.click(screen.getByRole('button', { name: 'bulletList' }));
 
@@ -93,7 +118,7 @@ describe('EditorToolbar (панель форматирования редакт�
 	});
 
 	it('«Отменить» и «Повторить» откатывают и возвращают последнее изменение', () => {
-		const view = setup();
+		const { view } = setup();
 
 		fireEvent.click(screen.getByRole('button', { name: 'bold' }));
 		fireEvent.click(screen.getByRole('button', { name: 'undo' }));
@@ -103,15 +128,56 @@ describe('EditorToolbar (панель форматирования редакт�
 		expect(marksOfFirstText(view)).toEqual(['strong']);
 	});
 
-	it('«Картинка» вставляет пустой блок изображения, не стирая выделенный текст', () => {
-		const view = setup();
+	describe('«Картинка»', () => {
+		it('при курсоре посреди абзаца вставляет блок после абзаца, не разрезая его', () => {
+			const doc = schema.node('doc', null, [paragraph('Hello world')]);
+			const { view } = setup(doc, (d) => TextSelection.create(d, 2));
 
-		fireEvent.click(screen.getByRole('button', { name: 'image' }));
+			clickImage();
 
-		const types: string[] = [];
-		view.state.doc.forEach((node) => types.push(node.type.name));
-		expect(types).toContain('image-block');
-		expect(view.state.doc.textContent).toBe('привет');
+			expect(blocks(view)).toEqual(['paragraph:Hello world', 'image-block']);
+		});
+
+		it('не разрезает заголовок', () => {
+			const doc = schema.node('doc', null, [
+				schema.node('heading', { level: 2 }, [schema.text('Заголовок')]),
+			]);
+			const { view } = setup(doc, (d) => TextSelection.create(d, 4));
+
+			clickImage();
+
+			expect(blocks(view)).toEqual(['heading:Заголовок', 'image-block']);
+		});
+
+		it('при выделенном изображении добавляет новое после него, старое остаётся', () => {
+			const doc = schema.node('doc', null, [
+				schema.node('image-block', { src: 'a.png' }),
+				paragraph('после'),
+			]);
+			const { view } = setup(doc, (d) => NodeSelection.create(d, 0));
+
+			clickImage();
+
+			expect(blocks(view)).toEqual(['image-block', 'image-block', 'paragraph:после']);
+			expect(view.state.doc.firstChild?.attrs.src).toBe('a.png');
+		});
+
+		it('заменяет пустой абзац блоком изображения', () => {
+			const doc = schema.node('doc', null, [paragraph('текст'), paragraph('')]);
+			const { view } = setup(doc, (d) => TextSelection.create(d, 8));
+
+			clickImage();
+
+			expect(blocks(view)).toEqual(['paragraph:текст', 'image-block']);
+		});
+
+		it('не стирает выделенный текст', () => {
+			const { view } = setup();
+
+			clickImage();
+
+			expect(blocks(view)).toEqual(['paragraph:привет', 'image-block']);
+		});
 	});
 
 	it('нажатие на кнопку не забирает фокус у редактора', () => {

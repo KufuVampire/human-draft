@@ -234,6 +234,7 @@
 		"orderedList": "Numbered list",
 		"undo": "Undo",
 		"redo": "Redo",
+		"link": "Link",
 		"image": "Insert image"
 	},
 	"editorMenu": {

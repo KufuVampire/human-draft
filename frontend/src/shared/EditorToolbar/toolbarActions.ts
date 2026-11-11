@@ -1,3 +1,6 @@
+import { commandsCtx } from '@milkdown/core';
+import { toggleLinkCommand } from '@milkdown/kit/component/link-tooltip';
+import type { Ctx } from '@milkdown/kit/ctx';
 import {
 	Bold,
 	Code,
@@ -5,6 +8,7 @@ import {
 	Heading3,
 	ImagePlus,
 	Italic,
+	Link,
 	List,
 	ListOrdered,
 	type LucideIcon,
@@ -17,13 +21,15 @@ import type { Schema } from 'prosemirror-model';
 import { setBlockType, toggleMark, wrapIn } from 'prosemirror-commands';
 import { redo, undo } from 'prosemirror-history';
 import { wrapInList } from 'prosemirror-schema-list';
-import { type Command, Selection } from 'prosemirror-state';
+import { type Command, NodeSelection } from 'prosemirror-state';
 
 export interface ToolbarAction {
 	labelKey: string;
 	Icon: LucideIcon;
-	/** Команда для схемы редактора; null — нужного mark/node в схеме нет. */
-	getCommand: (schema: Schema) => Command | null;
+	/** Команда ProseMirror для схемы редактора; null — нужного mark/node в схеме нет. */
+	getCommand?: (schema: Schema) => Command | null;
+	/** Команда Milkdown, которой нужен контекст редактора (например, окно ввода ссылки Crepe). */
+	run?: (ctx: Ctx) => void;
 }
 
 const mark = (name: string) => (schema: Schema) =>
@@ -34,14 +40,27 @@ const heading = (level: number) => (schema: Schema) =>
 
 /**
  * Пустой блок изображения Crepe (в нём сразу кнопка загрузки файла).
- * Вставляется после выделения, а не вместо него — выделенный текст не теряется.
+ * Встаёт после текущего блока верхнего уровня — абзац, заголовок и код не режутся,
+ * выделенное изображение не заменяется. Пустой абзац заменяется блоком изображения.
  */
 const insertImageBlock = (schema: Schema): Command | null => {
 	const imageBlock = schema.nodes['image-block'];
 	if (!imageBlock) return null;
 	return (state, dispatch) => {
-		const tr = state.tr.setSelection(Selection.near(state.doc.resolve(state.selection.to)));
-		dispatch?.(tr.replaceSelectionWith(imageBlock.create()).scrollIntoView());
+		const { $to } = state.selection;
+		const block = $to.depth > 0 ? $to.node(1) : null;
+		const isEmptyTextBlock = Boolean(block?.isTextblock && block.content.size === 0);
+
+		const tr = state.tr;
+		let pos: number;
+		if (block && isEmptyTextBlock) {
+			pos = $to.before(1);
+			tr.replaceWith(pos, $to.after(1), imageBlock.create());
+		} else {
+			pos = block ? $to.after(1) : state.selection.to;
+			tr.insert(pos, imageBlock.create());
+		}
+		dispatch?.(tr.setSelection(NodeSelection.create(tr.doc, pos)).scrollIntoView());
 		return true;
 	};
 };
@@ -61,6 +80,12 @@ export const toolbarGroups: ToolbarAction[][] = [
 		{ labelKey: 'italic', Icon: Italic, getCommand: mark('emphasis') },
 		{ labelKey: 'strike', Icon: Strikethrough, getCommand: mark('strike_through') },
 		{ labelKey: 'code', Icon: Code, getCommand: mark('inlineCode') },
+		{
+			labelKey: 'link',
+			Icon: Link,
+			// Та же команда, что у кнопки ссылки в тулбаре Crepe: открывает окно ввода адреса
+			run: (ctx) => ctx.get(commandsCtx).call(toggleLinkCommand.key),
+		},
 	],
 	[
 		{

@@ -91,7 +91,7 @@ export const CreatePostPage = () => {
 			<Container className='selection:bg-selection'>
 				<form
 					onSubmit={handleSubmit(onSubmit)}
-					className='w-full flex flex-col gap-y-6 pb-20 md:pb-0'>
+					className='w-full flex flex-col gap-y-6'>
 					<div className='flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between border-b border-border-subtle pb-4'>
 						<FormField
 							text={t('createPostPage.title')}
@@ -120,12 +120,13 @@ export const CreatePostPage = () => {
 						</div>
 					</div>
 
-					<EditorToolbar getEditor={get} />
 					<Milkdown />
 					<TagsPicker
 						tags={tags}
 						setTags={setTags}
 					/>
+					{/* Последним в форме: sticky держит тулбар у края экрана и не пускает на футер */}
+					<EditorToolbar getEditor={get} />
 				</form>
 			</Container>
 		</Section>
