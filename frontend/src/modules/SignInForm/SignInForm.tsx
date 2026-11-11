@@ -78,9 +78,9 @@ export const SignInForm = () => {
 
 	return (
 		<form
-			className='border-2 border-primary p-3 rounded-xl flex flex-col gap-y-4'
+			className='bg-surface-card border border-border-subtle shadow-md p-6 sm:p-8 rounded-2xl flex flex-col gap-y-5 transition-colors'
 			onSubmit={handleSubmit(onSubmit)}>
-			<h1 className='text-center text-3xl'>{t('authPages.signIn.title')}</h1>
+			<h1 className='text-center text-2xl font-bold font-title text-foreground'>{t('authPages.signIn.title')}</h1>
 			{fields.map((field) => (
 				<FormField
 					key={field.text}
@@ -88,24 +88,18 @@ export const SignInForm = () => {
 					placeholder={t(field.placeholder)}
 					type={field.type}
 					bottomText={field.bottomText ? t(field.bottomText) : ''}
+					className='rounded-xl border border-border-subtle focus:border-primary'
 					{...register(field.registerName, field.registerOptions)}
 				/>
 			))}
-			{!loading ? (
-				<Button
-					type='submit'
-					variant={isValid ? 'primary' : 'disabled'}
-					className='rounded-lg py-2'
-					disabled={!isValid}>
-					{t('btns.signIn')}
-				</Button>
-			) : (
-				<button
-					className='rounded-lg py-2 transition-colors bg-gray-400'
-					disabled>
-					{t('loading')}
-				</button>
-			)}
+			<Button
+				type='submit'
+				variant='primary'
+				isLoading={loading}
+				disabled={!isValid || loading}
+				className='rounded-xl py-3 font-semibold text-sm uppercase tracking-wider shadow-xs hover:shadow-primary transition-all mt-2'>
+				{t('btns.signIn')}
+			</Button>
 		</form>
 	);
 };

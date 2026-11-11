@@ -24,42 +24,41 @@ export const Footer = () => {
 	const t = useTranslations();
 
 	return (
-		<footer className='bg-layout min-h-[15.75rem]'>
-			<Container className='flex flex-col justify-between items-center py-6 md:py-12'>
-				<div className='flex justify-between items-center border-b border-footer-bottom pb-8 gap-y-6 w-full flex-col-reverse md:flex-row'>
+		<footer className='bg-surface-card border-t border-border-subtle min-h-64 mt-auto transition-colors'>
+			<Container className='flex flex-col justify-between items-center py-8 md:py-12 gap-y-6'>
+				<div className='flex justify-between items-center border-b border-border-subtle pb-8 gap-y-6 w-full flex-col-reverse md:flex-row'>
 					<div className='flex flex-col gap-y-6 w-full items-center md:items-stretch'>
 						<Navigation
 							direction='row'
 							variant='footer'
 						/>
-						{/* TODO: поменять ссылки, номер телефона, поставить соц-сети, придумать название для сайта */}
-						<div className='flex flex-col md:flex-row gap-x-3 gap-y-6 w-full items-center md:items-stretch'>
+						<div className='flex flex-col md:flex-row gap-x-6 gap-y-3 w-full items-center md:items-stretch'>
 							<div className='flex gap-x-3'>
 								<a
 									href='mailto:dmitrykertsman@mail.ru'
-									className='text-secondary md:leading-6 leading-subtext text-xs font-light hover:text-accent-hover transition-colors'>
+									className='text-muted text-xs hover:text-primary transition-colors'>
 									{t('fields.email')}: dmitrykertsman@mail.ru
 								</a>
 							</div>
-							<div className='text-secondary leading-6 flex gap-x-3 md:gap-x-2 justify-center md:justify-normal'>
-								<div>Vk</div>
-								<div>Tg</div>
-								<div>GitHub</div>
+							<div className='text-muted text-xs flex gap-x-4 justify-center md:justify-normal'>
+								<span>Vk</span>
+								<span>Tg</span>
+								<span>GitHub</span>
 							</div>
 						</div>
 					</div>
 					<Logo />
 				</div>
-				<div className='flex justify-between items-center pt-8 w-full flex-col md:flex-row gap-y-2'>
-					<div className='text-secondary font-light text-xs leading-subtext'>
+				<div className='flex justify-between items-center pt-2 w-full flex-col md:flex-row gap-y-3 text-muted text-xs'>
+					<div>
 						© {new Date().getFullYear()} HUMAN DRAFT
 					</div>
 					<nav>
-						<ul className='flex gap-2 text-secondary flex-col md:flex-row'>
+						<ul className='flex gap-3 flex-col md:flex-row items-center'>
 							{additionalNavigationItems.map(({ href, translationKey }) => (
 								<li
 									key={href}
-									className='text-secondary md:pr-2 md:last:border-0 md:border-r md:border-secondary font-light text-xs leading-subtext'>
+									className='md:pr-3 md:last:border-0 md:border-r md:border-border-subtle hover:text-primary transition-colors'>
 									<CustomLink href={href}>{t(translationKey)}</CustomLink>
 								</li>
 							))}

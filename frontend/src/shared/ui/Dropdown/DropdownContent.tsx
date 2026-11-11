@@ -4,7 +4,7 @@ import { useDropdown } from './DropdownContext';
 import { cn } from '@/utils';
 
 export interface DropdownContentProps extends HTMLAttributes<HTMLDivElement> {
-	align?: 'start' | 'end';
+	align?: 'start' | 'end' | 'center';
 }
 
 export const DropdownContent = ({
@@ -30,6 +30,7 @@ export const DropdownContent = ({
 	const alignClasses = {
 		start: 'left-0',
 		end: 'right-0',
+		center: 'left-1/2 -translate-x-1/2',
 	};
 
 	return (
@@ -37,7 +38,7 @@ export const DropdownContent = ({
 			ref={contentRef}
 			role='menu'
 			className={cn(
-				'absolute z-dropdown mt-1.5 min-w-44 rounded-xl border border-border-subtle bg-surface-card p-1 shadow-primary text-foreground outline-none',
+				'absolute z-dropdown mt-1.5 min-w-44 rounded-xl border border-border-subtle bg-surface-card p-1 shadow-primary text-foreground outline-none animate-dropdown-enter origin-top flex flex-col',
 				alignClasses[align],
 				className
 			)}

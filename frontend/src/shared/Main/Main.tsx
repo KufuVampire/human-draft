@@ -8,11 +8,7 @@ interface Props {
 
 export const Main = ({ children, className }: PropsWithChildren<Props>) => {
 	return (
-		<main
-			className={cn(
-				'md:min-h-[calc(100dvh-15.75rem)] min-h-[calc(100dvh-20.875rem)] w-full py-5 pt-[5.125rem] md:pt-[6.5rem]',
-				className
-			)}>
+		<main className={cn('flex-1 w-full py-6 pt-16 md:pt-20', className)}>
 			{children}
 		</main>
 	);

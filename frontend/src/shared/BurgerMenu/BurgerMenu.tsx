@@ -7,8 +7,8 @@ import { Burger } from './Burger/Burger';
 import { burgerDropdownItems } from './burgerMenuItems';
 import { useActiveLink, useResolvedHref } from '@/hooks';
 import { CustomLink } from '../CustomLink/CustomLink';
-import { Dropdown } from '../Dropdown/Dropdown';
 import { UserBadge } from '../UserBadge/UserBadge';
+import { Drawer } from '@/shared/ui';
 import { useProfileStore } from '@/store';
 import { cn } from '@/utils';
 
@@ -40,12 +40,7 @@ export const BurgerMenu = ({ className }: Props) => {
 					}
 
 					if (Component) {
-						return (
-							<Component
-								key={i}
-								className='text-secondary'
-							/>
-						);
+						return <Component key={i} />;
 					}
 
 					if (!href || !Icon || !translationKey) {
@@ -60,11 +55,11 @@ export const BurgerMenu = ({ className }: Props) => {
 							href={currentHref}
 							onClick={() => setOpen(false)}
 							className={cn(
-								'p-2 hover:bg-main-hover w-full flex gap-x-1 justify-normal text-secondary',
-								isActiveLink(currentHref) && 'text-accent'
+								'px-3 py-2 hover:bg-surface-tag rounded-lg text-sm transition-colors w-full flex items-center justify-start text-left gap-x-2.5 text-foreground',
+								isActiveLink(currentHref) && 'text-primary font-medium bg-primary/10'
 							)}>
-							<Icon />
-							{t(translationKey)}
+							<Icon className='size-4 shrink-0' />
+							<span>{t(translationKey)}</span>
 						</CustomLink>
 					);
 				}
@@ -75,12 +70,12 @@ export const BurgerMenu = ({ className }: Props) => {
 			return [
 				<div
 					key='user-profile'
-					className='flex gap-x-1 p-2 w-full items-center'>
+					className='flex gap-x-2 px-3 py-2 w-full items-center border-b border-border-subtle mb-1'>
 					<UserBadge
 						username={profile?.username}
 						avatarUrl={profile.avatarUrl}
 						location='burger-menu'
-						className='size-6'
+						className='size-7'
 					/>
 				</div>,
 				...items,
@@ -91,17 +86,21 @@ export const BurgerMenu = ({ className }: Props) => {
 	}, [isActiveLink, isAuth, profile, resolveHref, t]);
 
 	return (
-		<Dropdown
-			displayDirection='top-right'
-			className={className}
-			listClassName='top-[calc(100%+1.875rem)] bg-layout'
-			isOpen={isOpen}
-			setOpen={setOpen}
-			items={dropdownItems}>
+		<div className={className}>
 			<Burger
 				isOpen={isOpen}
 				setOpen={setOpen}
 			/>
-		</Dropdown>
+			<Drawer
+				isOpen={isOpen}
+				onClose={() => setOpen(false)}
+				placement='right'
+				title={t('navigation.menu')}
+				className='w-72 sm:w-80 p-5'>
+				<nav className='flex flex-col gap-1.5 mt-2'>
+					{dropdownItems}
+				</nav>
+			</Drawer>
+		</div>
 	);
 };

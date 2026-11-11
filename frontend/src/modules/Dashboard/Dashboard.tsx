@@ -18,24 +18,30 @@ export const Dashboard = () => {
 	return (
 		<aside
 			className={cn(
-				'sticky py-3.5 pb-0 md:top-26 bg-surface-card shadow-primary rounded-xl md:flex flex-col hidden gap-y-5.5 h-min w-full max-w-42.5 shrink-0 transition-all z-10',
-				!isExpanded && 'max-w-13.5'
+				'sticky p-3 md:top-20 bg-surface-card border border-border-subtle shadow-sm rounded-2xl md:flex flex-col hidden gap-y-4 h-min w-full max-w-52 shrink-0 transition-[max-width,padding] duration-300 ease-in-out overflow-hidden z-10',
+				!isExpanded && 'max-w-16 p-2 items-center'
 			)}>
 			<Button
 				variant='clear'
 				className={cn(
-					'justify-normal gap-x-1 w-full text-xl leading-5.5 hover:stroke-primary-hover p-2.5 px-3.5',
-					!isExpanded && 'justify-center'
+					'justify-normal gap-x-2 w-full text-sm font-medium hover:bg-surface-tag rounded-xl p-2.5 transition-colors overflow-hidden',
+					!isExpanded && 'justify-center p-2 px-0 gap-0'
 				)}
 				onClick={handleClick}
 				title={t(isExpanded ? 'collapse' : 'expand')}>
 				<ArrowLeft
 					className={cn(
-						'transition-transform duration-300 size-6 shrink-0',
+						'transition-transform duration-300 size-5 shrink-0 text-muted',
 						!isExpanded && 'rotate-180'
 					)}
 				/>
-				<span className={cn(!isExpanded && 'hidden')}>{t('collapse')}</span>
+				<span
+					className={cn(
+						'text-muted font-medium whitespace-nowrap overflow-hidden transition-all duration-300',
+						!isExpanded ? 'max-w-0 opacity-0 pointer-events-none' : 'max-w-40 opacity-100'
+					)}>
+					{t('collapse')}
+				</span>
 			</Button>
 			<Navigation isExpanded={isExpanded} />
 			<LanguageSwitcher

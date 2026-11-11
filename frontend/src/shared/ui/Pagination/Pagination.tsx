@@ -97,7 +97,7 @@ export const Pagination = ({
 						className={cn(
 							'size-9 flex items-center justify-center rounded-lg text-sm font-medium transition-colors cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-primary',
 							isCurrent
-								? 'bg-primary text-secondary font-bold shadow-sm'
+								? 'bg-primary text-on-primary font-bold shadow-sm'
 								: 'border border-border-subtle bg-surface-card text-foreground hover:bg-surface-tag'
 						)}>
 						{page}

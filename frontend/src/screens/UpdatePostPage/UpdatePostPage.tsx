@@ -8,13 +8,19 @@ import { useEffect, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
-import { UpdatePostMobileBar } from './components/UpdatePostMobileBar';
 import { useUpdatePostEditor } from './hooks/useUpdatePostEditor';
 import { routesConfig } from '@/config';
 import { useUpdatePostMutation } from '@/graphql/generated/output';
 import { usePost } from '@/hooks';
 import { TypeUpdatePostSchema } from '@/schemas';
-import { Button, Container, FormField, Section, TagsPicker } from '@/shared';
+import {
+	Button,
+	Container,
+	EditorToolbar,
+	FormField,
+	Section,
+	TagsPicker,
+} from '@/shared';
 import { convertImageBlockToImage, isNotFoundError } from '@/utils';
 
 export const UpdatePostPage = () => {
@@ -97,36 +103,35 @@ export const UpdatePostPage = () => {
 	};
 
 	return (
-		<Section className='flex flex-col w-full bg-surface-card rounded-xl transition-colors'>
-			<Container className='md:px-22 selection:bg-selection'>
+		<Section className='flex flex-col w-full bg-surface-card rounded-2xl border border-border-subtle shadow-sm transition-colors p-4 md:p-8'>
+			<Container className='selection:bg-selection'>
 				<form
 					onSubmit={handleSubmit(onSubmit)}
-					className='w-full flex flex-col gap-y-6 pb-20 md:pb-0'>
-					<FormField
-						text={t('createPostPage.title')}
-						className='w-full outline-0 border-0 [&:not(:placeholder-shown)]:shadow-none px-0'
-						placeholder={t('createPostPage.title')}
-						{...register('title', { required: true })}
-					/>
+					className='w-full flex flex-col gap-y-6'>
+					<div className='flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between border-b border-border-subtle pb-4'>
+						<FormField
+							text={t('createPostPage.title')}
+							className='w-full outline-0 border-0 [&:not(:placeholder-shown)]:shadow-none px-0 text-2xl md:text-3xl font-bold font-title'
+							placeholder={t('createPostPage.title')}
+							{...register('title', { required: true })}
+						/>
+						<div className='flex flex-wrap sm:flex-nowrap items-center gap-3 shrink-0'>
+							<Button
+								type='submit'
+								isLoading={loading || isUpdating}
+								disabled={!isValid || loading || isUpdating}
+								variant='primary'
+								className='rounded-xl px-6 py-2.5 font-bold uppercase text-sm tracking-wider w-full sm:w-auto shrink-0'>
+								{t('postPage.editPost')}
+							</Button>
+						</div>
+					</div>
+
+					<EditorToolbar getEditor={get} />
 					<Milkdown />
 					<TagsPicker
 						tags={tags}
 						setTags={setTags}
-					/>
-					<Button
-						type='submit'
-						isLoading={loading || isUpdating}
-						variant={isValid ? 'primary' : 'disabled'}
-						className='rounded-xl py-4 w-full md:font-bold uppercase md:text-xl md:leading-heading leading-heading-tight md:tracking-widest tracking-wider'>
-						{t('postPage.editPost')}
-					</Button>
-
-					<UpdatePostMobileBar
-						title={watch('title')}
-						fallbackTitle={t('createPostPage.title')}
-						buttonText={t('postPage.editPost')}
-						isLoading={loading || isUpdating}
-						isValid={isValid}
 					/>
 				</form>
 			</Container>

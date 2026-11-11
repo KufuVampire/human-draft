@@ -19,12 +19,11 @@ interface Props extends Omit<AnchorProps, keyof LinkProps> {
 
 const styles: LinkAndButtonVariantType = {
 	primary:
-		'bg-primary text-secondary hover:bg-primary-hover focus-visible:bg-primary-hover',
+		'bg-primary text-on-primary hover:bg-primary-hover focus-visible:bg-primary-hover',
 	secondary:
-		'bg-transparent text-accent border border-primary hover:bg-primary-hover hover:border-primary-hover focus-visible:bg-primary-hover focus-visible:border-primary-hover hover:text-secondary focus-visible:text-accent',
-	disabled:
-		'bg-disabled hover:bg-disabled backdrop-blur-disabled text-foreground cursor-auto',
-	clear: 'hover:text-accent-hover focus-visible:text-accent-hover',
+		'bg-surface-card text-foreground border border-border-subtle hover:bg-surface-tag hover:border-primary/50 focus-visible:bg-surface-tag',
+	disabled: 'bg-surface-tag text-muted cursor-auto',
+	clear: 'hover:text-primary focus-visible:text-primary',
 	light: '',
 };
 

@@ -19,7 +19,7 @@ export const CreatePostLink = ({ href }: Props) => {
 			href={href || routesConfig.postCreate()}
 			variant='primary'
 			className={cn(
-				'w-full py-4 md:font-bold md:text-xl leading-heading-tight md:leading-heading tracking-wider md:tracking-widest uppercase rounded-card'
+				'w-full py-3.5 px-6 font-semibold text-sm md:text-base tracking-wider uppercase rounded-xl shadow-xs hover:shadow-primary transition-all text-center'
 			)}>
 			{t('createPost')}
 		</CustomLink>

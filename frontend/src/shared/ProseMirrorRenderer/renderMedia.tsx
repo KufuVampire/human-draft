@@ -26,10 +26,10 @@ export function renderMedia(
 						<img
 							src={src}
 							alt={caption}
-							className='mb-1 rounded max-h-[500px] object-contain w-auto h-auto'
+							className='mb-1 rounded-xl max-h-125 object-contain w-auto h-auto border border-border-subtle shadow-sm'
 							loading='lazy'
 						/>
-						<figcaption className='text-sm text-neutral-500 mt-1'>
+						<figcaption className='text-sm text-foreground-muted mt-1'>
 							{caption}
 						</figcaption>
 					</figure>
@@ -42,7 +42,7 @@ export function renderMedia(
 					<img
 						src={src}
 						alt=''
-						className='rounded max-h-[500px] object-contain w-auto h-auto'
+						className='rounded-xl max-h-125 object-contain w-auto h-auto border border-border-subtle shadow-sm'
 						loading='lazy'
 					/>
 				</div>

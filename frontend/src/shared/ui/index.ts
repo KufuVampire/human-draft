@@ -38,11 +38,13 @@ export {
 	DropdownTrigger,
 	DropdownContent,
 	DropdownItem,
+	DropdownLinkItem,
 	DropdownSeparator,
 	type DropdownProps,
 	type DropdownTriggerProps,
 	type DropdownContentProps,
 	type DropdownItemProps,
+	type DropdownLinkItemProps,
 } from './Dropdown';
 export {
 	Tooltip,

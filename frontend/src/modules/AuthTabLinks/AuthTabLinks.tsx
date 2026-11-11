@@ -5,56 +5,34 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 import { routesConfig } from '@/config';
-import { useResizeObserver } from '@/hooks';
 import { cn } from '@/utils';
 
 const tabLinkStyles =
-	'w-full text-center cursor-pointer rounded-md py-1.5 hover:bg-primary-hover hover:text-secondary transition-colors z-10';
+	'w-full text-center cursor-pointer rounded-lg py-2 text-sm font-semibold transition-all z-10 text-muted hover:text-foreground';
 
 export const AuthTabLinks = () => {
 	const t = useTranslations('authTabLinks');
 	const pathname = usePathname();
 
-	const [leftRef, leftRect] = useResizeObserver<HTMLAnchorElement>();
-	const [rightRef, rightRect] = useResizeObserver<HTMLAnchorElement>();
-
-	const leftSize = (leftRect.width + leftRect.x * 2) / 16 + 'rem';
-	const rightSize = (rightRect.width + rightRect.x * 2) / 16 + 'rem';
-
 	const isSignInPath = pathname === routesConfig.signin;
 	const isSignUpPath = pathname === routesConfig.signup;
 
-	const isCalculateWidthFinished = leftRect.width > 0 && rightRect.width > 0;
-
 	return (
-		<div className='flex items-center relative border-2 border-primary rounded-xl'>
+		<div className='grid grid-cols-2 p-1 bg-surface-tag border border-border-subtle rounded-xl shadow-xs'>
 			<Link
-				ref={leftRef}
 				href={routesConfig.signin}
-				className={cn(tabLinkStyles, 'rounded-tr-none rounded-br-none', {
-					['bg-primary text-secondary']: isSignInPath,
+				className={cn(tabLinkStyles, {
+					'bg-surface-card text-foreground shadow-xs font-bold': isSignInPath,
 				})}>
 				{t('signIn')}
 			</Link>
 			<Link
-				ref={rightRef}
 				href={routesConfig.signup}
-				className={cn(tabLinkStyles, 'rounded-tl-none rounded-bl-none', {
-					['bg-primary text-secondary']: isSignUpPath,
+				className={cn(tabLinkStyles, {
+					'bg-surface-card text-foreground shadow-xs font-bold': isSignUpPath,
 				})}>
 				{t('signUp')}
 			</Link>
-			<div className='absolute flex w-full h-full z-0'>
-				{isCalculateWidthFinished && (
-					<div
-						style={{
-							width: isSignUpPath ? rightSize : leftSize,
-							marginLeft: isSignUpPath ? leftSize : 0,
-						}}
-						className='bg-primary transition-all rounded-md'
-					/>
-				)}
-			</div>
 		</div>
 	);
 };

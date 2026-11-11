@@ -91,18 +91,18 @@ export const PostHeaderActions = ({
 	);
 
 	return (
-		<div className='flex items-center gap-x-2'>
+		<div className='flex flex-wrap sm:flex-nowrap items-center gap-2'>
 			<Dropdown
 				isOpen={isDropdownOpen}
 				items={allDropdownItems}
 				setOpen={setDropdownOpen}
-				className='w-full'
-				listClassName='w-full top-[calc(100%+0.5rem)] overflow-hidden py-3 px-2.5 shadow-secondary'
+				className='w-full sm:w-auto'
+				listClassName='w-64 overflow-hidden py-3 px-2.5 shadow-secondary'
 				onClick={handleDropdownClick}
-				displayDirection='top'>
+				displayDirection='bottom'>
 				<Button
 					variant='secondary'
-					className='bg-surface-card px-5 py-2 flex gap-x-5 rounded-lg w-full'
+					className='bg-surface-card px-5 py-2 flex gap-x-5 rounded-lg w-full text-nowrap'
 					onClick={() => setDropdownOpen((prev) => !prev)}>
 					<span className='w-full inline-block text-left'>
 						{t('postPage.pinBlog.pin')}
@@ -118,7 +118,7 @@ export const PostHeaderActions = ({
 
 			<Button
 				variant='secondary'
-				className='dark:text-secondary py-1.75 px-3 font-title font-bold leading-body rounded-lg md:w-auto w-full max-w-32.5'
+				className='py-1.75 px-3 font-title font-bold leading-body rounded-lg flex-1 sm:flex-none'
 				onClick={onDeletePost}>
 				{t('btns.remove')}
 			</Button>
@@ -126,7 +126,7 @@ export const PostHeaderActions = ({
 			<CustomLink
 				variant='primary'
 				href={routesConfig.postUpdate(postId)}
-				className='py-2 px-3 font-title font-bold leading-body rounded-lg text-nowrap'>
+				className='py-2 px-3 font-title font-bold leading-body rounded-lg text-nowrap flex-1 sm:flex-none'>
 				{t('postPage.editPost')}
 			</CustomLink>
 		</div>

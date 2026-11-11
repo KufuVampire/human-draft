@@ -5,7 +5,7 @@ import { notFound, useParams, useRouter } from 'next/navigation';
 import { lazy, useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
-import { PostHeaderActions } from './components/PostHeaderActions';
+import { PostAuthorHeader } from './components/PostAuthorHeader';
 import { PostStatsBar } from './components/PostStatsBar';
 import { routesConfig } from '@/config';
 import {
@@ -14,7 +14,7 @@ import {
 	useTogglePinBlogMutation,
 } from '@/graphql/generated/output';
 import { usePost } from '@/hooks';
-import { MilkdownContent, UserBadgeWithCreatedAt } from '@/shared';
+import { MilkdownContent } from '@/shared';
 import { useModalStore, useProfileStore } from '@/store';
 import { isNotFoundError } from '@/utils';
 
@@ -72,25 +72,12 @@ export const PostPage = ({ initialData }: Props = {}) => {
 	const handleDeletePost = useCallback(() => {
 		openModal('confirmationDeletion', {
 			type: 'post',
-			cb: () => {
-				deletePost({
-					variables: {
-						postId,
-					},
-				});
-			},
+			cb: () => deletePost({ variables: { postId } }),
 		});
 	}, [deletePost, openModal, postId]);
 
 	const handleTogglePinBlog = useCallback(
-		(blogId: string) => {
-			togglePin({
-				variables: {
-					blogId,
-					postId,
-				},
-			});
-		},
+		(blogId: string) => togglePin({ variables: { blogId, postId } }),
 		[postId, togglePin]
 	);
 
@@ -118,36 +105,25 @@ export const PostPage = ({ initialData }: Props = {}) => {
 	}
 
 	return (
-		<div className='flex flex-col gap-y-8 bg-surface-card rounded-xl transition-colors px-2 py-6 md:px-6 w-full'>
+		<div className='flex flex-col gap-y-8 bg-surface-card rounded-2xl border border-border-subtle shadow-sm transition-colors p-4 sm:p-6 md:p-10 w-full'>
 			<article className='flex flex-col gap-y-6 w-full'>
-				<div className='flex flex-col md:flex-row gap-y-2 md:items-center justify-between'>
-					{author && (
-						<UserBadgeWithCreatedAt
-							author={{
-								username: author.username,
-								avatarUrl: author.avatarUrl,
-							}}
-							createdAt={createdAt}
-							isShow
-						/>
-					)}
-					{isOwner && (
-						<PostHeaderActions
-							postId={postId}
-							pinnedBlogId={pinnedBlogId}
-							onTogglePinBlog={handleTogglePinBlog}
-							onDeletePost={handleDeletePost}
-						/>
-					)}
-				</div>
+				<PostAuthorHeader
+					author={author}
+					createdAt={createdAt}
+					isOwner={isOwner}
+					postId={postId}
+					pinnedBlogId={pinnedBlogId}
+					onTogglePinBlog={handleTogglePinBlog}
+					onDeletePost={handleDeletePost}
+				/>
 				{title && (
-					<h1 className='font-title font-bold leading-heading-tight text-4xl md:text-5xl mb-6'>
+					<h1 className='font-title font-bold leading-tight text-3xl sm:text-4xl md:text-5xl text-foreground tracking-tight'>
 						{title}
 					</h1>
 				)}
 				<MilkdownContent
 					content={content}
-					className='border-b border-primary pb-6'
+					className='pb-8'
 				/>
 				<PostStatsBar
 					postId={postId}
@@ -156,7 +132,9 @@ export const PostPage = ({ initialData }: Props = {}) => {
 					viewsCount={viewsCount}
 				/>
 			</article>
-			<CommentsLazy />
+			<div className='pt-6 md:pt-8 md:border-t md:border-border-subtle'>
+				<CommentsLazy />
+			</div>
 		</div>
 	);
 };

@@ -10,13 +10,13 @@ export const buttonVariants = cva(
 		variants: {
 			variant: {
 				primary:
-					'bg-primary text-secondary hover:bg-primary-hover focus-visible:ring-primary shadow-primary',
+					'bg-primary text-on-primary hover:bg-primary-hover focus-visible:ring-primary shadow-primary',
 				secondary:
 					'bg-surface-card text-foreground border border-border-subtle shadow-primary hover:bg-surface-tag focus-visible:ring-primary',
 				ghost: 'bg-transparent text-foreground hover:bg-surface-tag focus-visible:ring-primary',
 				danger: 'bg-error text-secondary hover:opacity-90 focus-visible:ring-error',
 				outline:
-					'bg-transparent text-accent border border-primary hover:bg-primary hover:text-secondary focus-visible:ring-primary',
+					'bg-transparent text-accent border border-primary hover:bg-primary hover:text-on-primary focus-visible:ring-primary',
 			},
 			size: {
 				sm: 'h-8 px-3 text-xs rounded-lg gap-1.5',

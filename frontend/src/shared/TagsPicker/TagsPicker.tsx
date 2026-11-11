@@ -80,9 +80,7 @@ export const TagsPicker = ({ tags, setTags, className }: Props) => {
 	const addTag = (tag: string) => {
 		if (!tag || tags.includes(tag)) return;
 		setTags([...tags, tag]);
-		reset({
-			search: '',
-		});
+		reset({ search: '' });
 	};
 
 	const removeTag = (tagToRemove: string) => {
@@ -90,29 +88,15 @@ export const TagsPicker = ({ tags, setTags, className }: Props) => {
 	};
 
 	const handleAddTag = (e: MouseEvent<HTMLUListElement>) => {
-		const target = e.target as HTMLElement;
-		const button = target.closest('button');
-
-		if (!button) return;
-
-		const tag = button.dataset.tag;
-
-		if (!tag || !tag.trim()) return;
-
-		addTag(tag.trim());
+		const button = (e.target as HTMLElement).closest('button');
+		const tag = button?.dataset.tag?.trim();
+		if (tag) addTag(tag);
 	};
 
 	const handleRemoveTag = (e: MouseEvent<HTMLUListElement>) => {
-		const target = e.target as HTMLElement;
-		const button = target.closest('button');
-
-		if (!button) return;
-
-		const tag = button.dataset.tag;
-
-		if (!tag) return;
-
-		removeTag(tag);
+		const button = (e.target as HTMLElement).closest('button');
+		const tag = button?.dataset.tag;
+		if (tag) removeTag(tag);
 	};
 
 	const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -120,7 +104,6 @@ export const TagsPicker = ({ tags, setTags, className }: Props) => {
 			removeTag(tags[tags.length - 1]);
 			return;
 		}
-
 		if (e.key === 'Enter') {
 			e.preventDefault();
 			addTag(search.trim());
@@ -128,12 +111,7 @@ export const TagsPicker = ({ tags, setTags, className }: Props) => {
 	};
 
 	const handleOpenDropdownOnFocus = () => {
-		if (debounceSearch.length >= 3 && allTags && allTags.length > 0) {
-			setOpen(true);
-			return;
-		}
-
-		setOpen(false);
+		setOpen(Boolean(debounceSearch.length >= 3 && allTags && allTags.length > 0));
 	};
 
 	return (
@@ -141,19 +119,19 @@ export const TagsPicker = ({ tags, setTags, className }: Props) => {
 			isOpen={isOpen}
 			items={mappedTags}
 			setOpen={setOpen}
-			listClassName='border border-primary w-full px-4 py-3 top-[calc(100%+0.25rem)] flex-row gap-2.5 justify-normal'
+			listClassName='border border-border-subtle bg-surface-card shadow-lg w-full px-4 py-3 top-full mt-1 flex-row gap-2 justify-normal'
 			itemClassName='w-auto'
 			className='w-full'
 			onClick={handleAddTag}>
 			<div
-				className={cn('flex flex-col gap-y-4', className)}
+				className={cn('flex flex-col gap-y-3', className)}
 				onClick={() => setFocus('search')}>
-				<h2 className='font-bold text-xl leading-heading-tight font-title cursor-pointer'>
+				<h2 className='font-bold text-lg font-title text-foreground cursor-pointer'>
 					{t('tagsPickerTitle')}
 				</h2>
 				<div
 					role='tags-picker'
-					className='flex flex-row flex-wrap items-center border border-primary cursor-text px-4 py-3 gap-2.5 rounded-xl'>
+					className='flex flex-row flex-wrap items-center border border-border-subtle focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 bg-surface-card cursor-text px-4 py-3 gap-2 rounded-xl transition-all'>
 					<TagsPickerSelectedList
 						tags={tags}
 						register={register}

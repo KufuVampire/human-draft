@@ -57,16 +57,16 @@ export const BlogPage = memo(({ initialData }: Props = {}) => {
 	const blog = data?.getBlogById;
 
 	useEffect(() => {
-		if (data?.getBlogById) {
+		if (blog) {
 			dispatch({
 				type: 'INIT',
-				payload: data.getBlogById.posts,
+				payload: blog.posts,
 			});
+			if (blog.posterUrl) {
+				setPosterUrl(blog.posterUrl);
+			}
 		}
-		if (data?.getBlogById.posterUrl) {
-			setPosterUrl(data.getBlogById.posterUrl);
-		}
-	}, [data]);
+	}, [blog]);
 
 	const {
 		pinPosts,

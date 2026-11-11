@@ -19,6 +19,22 @@ describe('Checkbox', () => {
 		expect(handleChange).toHaveBeenCalled();
 	});
 
+	it('без checked работает неуправляемым: отмечается и снимается кликом', async () => {
+		render(<Checkbox label='Блоги' />);
+		const checkbox = screen.getByLabelText('Блоги');
+		await userEvent.click(checkbox);
+		expect(checkbox).toBeChecked();
+		await userEvent.click(checkbox);
+		expect(checkbox).not.toBeChecked();
+	});
+
+	it('с checked остаётся управляемым', async () => {
+		render(<Checkbox label='Подписки' checked onChange={() => {}} />);
+		const checkbox = screen.getByLabelText('Подписки');
+		await userEvent.click(checkbox);
+		expect(checkbox).toBeChecked();
+	});
+
 	it('поддерживает indeterminate состояние', () => {
 		render(<Checkbox label='Частичный выбор' indeterminate />);
 		const checkbox = screen.getByLabelText('Частичный выбор');

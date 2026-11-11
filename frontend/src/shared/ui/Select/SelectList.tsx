@@ -26,7 +26,7 @@ export const SelectList = ({
 					onMouseEnter={() => onHighlight(idx)}
 					className={cn(
 						'px-3 py-2 text-sm rounded-lg cursor-pointer transition-colors select-none flex items-center justify-between',
-						opt.value === value && 'bg-primary text-secondary font-medium',
+						opt.value === value && 'bg-primary text-on-primary font-medium',
 						highlightedIndex === idx &&
 							opt.value !== value &&
 							'bg-surface-tag',

@@ -72,7 +72,9 @@ export const FormField = forwardRef<HTMLInputElement, PropsWithChildren<Props>>(
 						ref={ref}
 						type={inputType}
 						className={cn(
-							'p-2.5 outline-0 border border-field hover:border-primary focus:border-primary rounded-md w-full bg-transparent [&:not(:placeholder-shown)]:border-primary [&:not(:placeholder-shown)]:shadow-focus',
+							'p-2.5 outline-0 border border-field hover:border-primary focus:border-primary rounded-md w-full bg-transparent',
+							!inputWrapperClassName &&
+								'[&:not(:placeholder-shown)]:border-primary [&:not(:placeholder-shown)]:shadow-focus',
 							(type === 'checkbox' || type === 'radio') &&
 								'appearance-none absolute top-0 peer p-0 border-none [&:not(:placeholder-shown)]:border-none [&:not(:placeholder-shown)]:shadow-none',
 							props.className

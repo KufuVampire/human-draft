@@ -36,26 +36,23 @@ export const BlogCard = ({
 	const isOwner = profile?.username === author.username;
 
 	return (
-		<li className='bg-surface-card transition-all rounded-xl hover:shadow-primary overflow-hidden self-start min-w-85 w-full break-inside-avoid not-last:mb-6 w-full'>
+		<li className='bg-surface-card rounded-2xl border border-border-subtle hover:border-primary/50 shadow-xs hover:shadow-md transition-all overflow-hidden self-start min-w-0 w-full break-inside-avoid mb-6 inline-block group'>
 			{posterUrl && (
 				<Image
 					src={posterUrl}
 					alt={title}
 					width={460}
 					height={200}
-					className='size-full max-h-37.5 md:min-h-50 md:max-h-50'
+					className='w-full h-44 sm:h-52 object-cover'
 					loading='eager'
 				/>
 			)}
-			{!posterUrl && (
-				<div className='bg-placeholder size-full max-h-37.5 md:min-h-50 md:max-h-50' />
-			)}
-			<div className='flex flex-col gap-y-5 transition-colors hover:text-foreground py-5 px-4'>
+			<div className='flex flex-col gap-y-4 py-5 px-6'>
 				<div className='flex flex-col gap-y-3'>
 					<h2>
 						<CustomLink
 							href={routesConfig.blogById(id)}
-							className='font-bold text-[1.75rem] md:text-4xl leading-heading-tight font-title text-left wrap-break-word text-wrap hyphens-manual justify-start'>
+							className='font-bold text-2xl md:text-3xl leading-snug font-title text-foreground group-hover:text-primary transition-colors text-left wrap-break-word justify-start'>
 							{title}
 						</CustomLink>
 					</h2>
@@ -66,7 +63,11 @@ export const BlogCard = ({
 							createdAt={createdAt}
 						/>
 					</div>
-					{description && <p>{description}</p>}
+					{description && (
+						<p className='text-muted text-sm leading-relaxed line-clamp-3'>
+							{description}
+						</p>
+					)}
 				</div>
 				{tags && tags.length > 0 && <TagsList tags={tags} />}
 			</div>

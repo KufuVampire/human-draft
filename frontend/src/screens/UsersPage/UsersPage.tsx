@@ -15,6 +15,7 @@ import {
 import { useDebounce, useInfiniteScroll } from '@/hooks';
 import { TypeUsersSearchSchema } from '@/schemas';
 import { FormField, Section } from '@/shared';
+import { Checkbox } from '@/shared/ui';
 import { useSubscriptions } from '@/store';
 
 type UserItem = GetAllUsersQuery['getAllUsersPagination']['data'][number];
@@ -98,23 +99,23 @@ export const UsersPage = () => {
 	}, [onlySubscriptionsValue, subscriptions, allUsers]);
 
 	return (
-		<Section className='w-full flex flex-col gap-y-6 px-2 md:px-0 rounded-xl md:p-0'>
-			<div className='flex gap-x-6'>
+		<Section className='w-full flex flex-col gap-y-6 px-2 md:px-0 rounded-2xl md:p-0'>
+			<div className='flex flex-row gap-2 sm:gap-4 items-center'>
 				<FormField
-					className='w-full p-0 border-none [&:not(:placeholder-shown)]:border-none [&:not(:placeholder-shown)]:shadow-none leading-heading-tight'
-					wrapperClassNames='w-full'
-					inputWrapperClassName='bg-surface-card transition-colors py-4 px-5 flex gap-x-2 md:gap-x-5 rounded-lg'
+					className='w-full p-0 border-none outline-none text-sm md:text-base'
+					wrapperClassNames='flex-1 min-w-0'
+					inputWrapperClassName='bg-surface-card border border-border-subtle shadow-xs hover:border-primary/50 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all py-2.5 px-3 sm:py-3 sm:px-4 flex items-center gap-x-2 sm:gap-x-3 rounded-xl'
 					placeholder={t('fields.searchByName')}
 					{...register('search')}>
-					<Search />
+					<Search className='size-4 sm:size-5 text-muted shrink-0' />
 				</FormField>
-				<FormField
-					type='checkbox'
-					wrapperClassNames='bg-surface-card py-3 px-5 rounded-xl text-xl leading-heading-tight'
-					text={t('filters.subscriptions')}
-					checked={onlySubscriptionsValue}
-					{...register('onlySubscriptions')}
-				/>
+				<div className='bg-surface-card border border-border-subtle shadow-xs py-2.5 px-3 sm:py-3 sm:px-4 rounded-xl text-xs sm:text-sm font-medium whitespace-nowrap shrink-0 flex items-center'>
+					<Checkbox
+						label={t('filters.subscriptions')}
+						checked={onlySubscriptionsValue}
+						{...register('onlySubscriptions')}
+					/>
+				</div>
 			</div>
 
 			{filteredUsers.length > 0 && (

@@ -8,6 +8,7 @@ export { useDebounce } from './useDebounce';
 export { useFreePostsForPin } from './useFreePostsForPin';
 export { useInfiniteScroll } from './useInfiniteScroll';
 export { useLocalStorage } from './useLocalStorage';
+export { useLogout } from './useLogout';
 export { usePost } from './usePost';
 export { usePosts } from './usePosts';
 export { usePostsAndBlogs } from './usePostsAndBlogs';

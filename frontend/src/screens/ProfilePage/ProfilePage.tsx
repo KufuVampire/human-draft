@@ -1,6 +1,7 @@
 'use client';
 
 import { notFound, useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useEffect } from 'react';
 
 import { ProfileDropdown } from './components/ProfileDropdown';
@@ -17,6 +18,7 @@ import {
 	ProfilePageSkeleton,
 	Section,
 } from '@/shared';
+import { Tabs } from '@/shared/ui';
 import { isNotFoundError } from '@/utils';
 
 interface Props {
@@ -25,6 +27,7 @@ interface Props {
 }
 
 export const ProfilePage = ({ username, initialData }: Props) => {
+	const t = useTranslations();
 	const router = useRouter();
 	const { profile, subscriptions } = useProfile();
 	const {
@@ -90,7 +93,7 @@ export const ProfilePage = ({ username, initialData }: Props) => {
 
 	return (
 		<div className='flex flex-col w-full gap-y-6'>
-			<Section className='flex flex-col w-full py-0 md:py-0 bg-surface-card rounded-xl overflow-hidden transition-colors'>
+			<Section className='flex flex-col w-full py-0 md:py-0 bg-surface-card rounded-2xl border border-border-subtle shadow-sm overflow-hidden transition-colors'>
 				<ProfilePoster
 					isOwner={isOwner}
 					user={{ posterUrl: user.posterUrl }}>
@@ -118,7 +121,28 @@ export const ProfilePage = ({ username, initialData }: Props) => {
 			</Section>
 			{isOwner && <CreatePostBlogLinks />}
 			{sortedUserBlogsAndPosts.length > 0 && (
-				<PostsAndBlogsList data={sortedUserBlogsAndPosts} />
+				<Tabs defaultValue='all' className='w-full'>
+					<Tabs.List className='self-start'>
+						<Tabs.Trigger value='all'>
+							{t('filters.all')} ({sortedUserBlogsAndPosts.length})
+						</Tabs.Trigger>
+						<Tabs.Trigger value='posts'>
+							{t('filters.posts')} ({user.posts.length})
+						</Tabs.Trigger>
+						<Tabs.Trigger value='blogs'>
+							{t('filters.blogs')} ({user.blogs.length})
+						</Tabs.Trigger>
+					</Tabs.List>
+					<Tabs.Content value='all'>
+						<PostsAndBlogsList data={sortedUserBlogsAndPosts} />
+					</Tabs.Content>
+					<Tabs.Content value='posts'>
+						<PostsAndBlogsList data={user.posts} />
+					</Tabs.Content>
+					<Tabs.Content value='blogs'>
+						<PostsAndBlogsList data={user.blogs} />
+					</Tabs.Content>
+				</Tabs>
 			)}
 		</div>
 	);

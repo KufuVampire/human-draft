@@ -10,6 +10,7 @@ export { CreatePostLink } from './CreatePostLink/CreatePostLink';
 export { CustomLink } from './CustomLink/CustomLink';
 export { Dropdown } from './Dropdown/Dropdown';
 export { DropdownList } from './DropdownList/DropdownList';
+export { EditorToolbar } from './EditorToolbar/EditorToolbar';
 export { FormField } from './FormField/FormField';
 export { GoToHomeButton } from './GoToHomeButton/GoToHomeButton';
 export { LanguageSwitcher } from './LanguageSwitcher/LanguageSwitcher';

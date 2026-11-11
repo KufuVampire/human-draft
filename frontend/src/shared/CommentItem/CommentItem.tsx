@@ -64,9 +64,9 @@ export const CommentItem = ({ comment, className }: Props) => {
 	return (
 		<li
 			className={cn(
-				'flex flex-col relative after:content-[""] after:absolute after:top-8 after:left-4 after:w-0.25 after:bg-placeholder after:bottom-5',
+				'flex flex-col relative after:content-[""] after:absolute after:top-8 after:left-4 after:w-px after:bg-border-subtle after:bottom-5',
 				isReply && 'after:bottom-3/4',
-				isReply && replies && replies.length && 'after:h-[calc(100%-4rem)]',
+				isReply && replies && replies.length && 'after:bottom-16',
 				className
 			)}>
 			<CommentItemHeader
@@ -89,17 +89,17 @@ export const CommentItem = ({ comment, className }: Props) => {
 						onClose={() => setEditMode(false)}
 					/>
 				) : (
-					<p className='leading-body tracking-snug'>{text}</p>
+					<p className='leading-body tracking-snug text-foreground/90'>{text}</p>
 				)}
 				{!isReply && (
 					<Button
 						variant='clear'
 						onClick={() => setReply(true)}
 						className={cn(
-							'flex items-center gap-x-1 font-bold text-xs leading-body self-start relative',
+							'flex items-center gap-x-1 font-semibold text-xs text-muted hover:text-primary self-start relative mt-1 transition-colors',
 							replies &&
 								replies.length < 1 &&
-								'after:absolute after:-left-5.5 after:bottom-1/2 after:w-5 after:h-full after:border-l after:border-b after:border-placeholder after:rounded-bl-xl'
+								'after:absolute after:-left-5.5 after:bottom-1/2 after:w-5 after:h-full after:border-l after:border-b after:border-border-subtle after:rounded-bl-xl'
 						)}>
 						<Reply className='size-3.5' />
 						{t('btns.reply')}
@@ -110,7 +110,7 @@ export const CommentItem = ({ comment, className }: Props) => {
 						parentId={id}
 						setReply={setReply}
 						className={cn(
-							'relative after:absolute after:-left-5.5 after:bottom-3/4 after:w-5 after:border-placeholder after:border-l after:border-b',
+							'relative after:absolute after:-left-5.5 after:bottom-3/4 after:w-5 after:border-border-subtle after:border-l after:border-b',
 							replies &&
 								replies.length < 1 &&
 								'after:rounded-bl-xl after:h-full'
@@ -118,7 +118,7 @@ export const CommentItem = ({ comment, className }: Props) => {
 					/>
 				)}
 				{isShowReplies && replies && replies.length > 0 && (
-					<ul className='flex flex-col gap-y-3'>
+					<ul className='flex flex-col gap-y-3 mt-2'>
 						{replies.map((reply) => (
 							<CommentItem
 								key={reply.id}
@@ -130,14 +130,14 @@ export const CommentItem = ({ comment, className }: Props) => {
 				{replies && replies.length > 0 && (
 					<Button
 						variant='clear'
-						className='relative self-start font-bold leading-body flex items-center gap-x-1 after:absolute after:-left-5.5 after:bottom-[50%] after:w-5 after:h-10 after:border-l after:border-b after:border-placeholder after:rounded-bl-xl'
+						className='relative self-start font-semibold text-xs text-muted hover:text-primary leading-normal flex items-center gap-x-1 mt-1 after:absolute after:-left-5.5 after:bottom-1/2 after:w-5 after:h-10 after:border-l after:border-b after:border-border-subtle after:rounded-bl-xl transition-colors'
 						onClick={() => setShowReplies((prev) => !prev)}>
 						{isShowReplies
 							? t('comments.hideReplies')
 							: t('comments.replies', { count: replies.length })}
 						<ChevronDown
 							className={cn(
-								'transition-transform',
+								'size-3.5 transition-transform',
 								isShowReplies && 'rotate-180'
 							)}
 						/>

@@ -1,6 +1,12 @@
 'use client';
 
-import { useGetAllBlogsQuery } from '@/graphql/generated/output';
+import {
+	type GetAllBlogsQuery,
+	useGetAllBlogsQuery,
+} from '@/graphql/generated/output';
+
+// Стабильная ссылка: новый `[]` на каждом рендере зацикливает эффекты потребителей
+const emptyBlogs: GetAllBlogsQuery['getAllBlogsPagination']['data'] = [];
 
 interface Params {
 	page: number;
@@ -25,7 +31,7 @@ export const useBlogs = ({ page, perPage, filters }: Params) => {
 	const paginationData = data?.getAllBlogsPagination;
 
 	return {
-		blogs: paginationData?.data || [],
+		blogs: paginationData?.data ?? emptyBlogs,
 		page: paginationData?.page,
 		perPage: paginationData?.perPage,
 		totalCount: paginationData?.totalCount,

@@ -10,18 +10,25 @@
 	--surface-tag: #e5e5e5;
 
 	--foreground: #151517;
+	--foreground-muted: #5f5f5f;
 	--accent: var(--primary-color);
 	--accent-hover: var(--primary-color-hover);
 
 	--border-subtle: #e5e5e5;
 	--selection: #ede0d4;
 
-	/* neutral */
-	--primary-color: #1b4a5a;
-	--primary-color-hover: #246276;
+	/* neutral & primary: modern teal (WCAG AA: белый текст на заливке 5.5:1) */
+	--primary-color: #0f766e;
+	--primary-color-hover: #115e59;
+	/* текст поверх заливки primary */
+	--on-primary-color: #ffffff;
 
 	--placeholder-color: #7d7d7d;
 	--error-color: #ee4545;
+	--warning-color: #f59e0b;
+	/* текст и элементы поверх цветной заливки или фото */
+	--on-fill-color: #ffffff;
+	--overlay-color: rgba(0, 0, 0, 0.5);
 	--layout-color: #2d2d2d;
 	--secondary-color: #e5e5e5;
 	--disabled-color: rgba(255, 255, 255, 0.25);
@@ -31,7 +38,7 @@
 
 	--primary-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
 	--secondary-shadow: 2px 4px 4px 0px rgba(0, 0, 0, 0.25);
-	--input-filled-shadow: 0px 0px 6px 0px #1b4a5a;
+	--input-filled-shadow: 0px 0px 6px 0px rgba(13, 148, 136, 0.4);
 
 	--bg-blur: blur(4px);
 }
@@ -42,6 +49,8 @@
 	--color-surface-tag: var(--surface-tag);
 
 	--color-foreground: var(--foreground);
+	--color-foreground-muted: var(--foreground-muted);
+	--color-muted: var(--foreground-muted);
 	--color-accent: var(--accent);
 	--color-accent-hover: var(--accent-hover);
 
@@ -62,7 +71,12 @@
 
 	--color-primary: var(--primary-color);
 	--color-primary-hover: var(--primary-color-hover);
+	--color-on-primary: var(--on-primary-color);
 	--color-error: var(--error-color);
+	--color-danger: var(--error-color);
+	--color-warning: var(--warning-color);
+	--color-on-fill: var(--on-fill-color);
+	--color-overlay: var(--overlay-color);
 	--color-placeholder: var(--placeholder-color);
 	--color-secondary: var(--secondary-color);
 	--color-layout: var(--layout-color);
@@ -82,7 +96,63 @@
 	--font-title: var(--font-ubuntu);
 	--font-text: var(--font-roboto);
 
+	--spacing-switch-thumb: 30px;
+	/* предельная высота модального окна: остаётся место под край экрана */
+	--spacing-modal: 90dvh;
+
 	--animate-shine-lines: shine-lines 3s linear 1s infinite;
+	--animate-dropdown-enter: dropdown-enter 150ms ease-out;
+	--animate-fade-in: fade-in 200ms ease-out;
+	--animate-drawer-slide-in-right: drawer-slide-in-right 250ms cubic-bezier(0.16, 1, 0.3, 1);
+	--animate-drawer-slide-in-left: drawer-slide-in-left 250ms cubic-bezier(0.16, 1, 0.3, 1);
+	--animate-drawer-slide-in-bottom: drawer-slide-in-bottom 250ms cubic-bezier(0.16, 1, 0.3, 1);
+
+	@keyframes dropdown-enter {
+		from {
+			opacity: 0;
+			transform: scale(0.95) translateY(-4px);
+		}
+		to {
+			opacity: 1;
+			transform: scale(1) translateY(0);
+		}
+	}
+
+	@keyframes fade-in {
+		from {
+			opacity: 0;
+		}
+		to {
+			opacity: 1;
+		}
+	}
+
+	@keyframes drawer-slide-in-right {
+		from {
+			transform: translateX(100%);
+		}
+		to {
+			transform: translateX(0);
+		}
+	}
+
+	@keyframes drawer-slide-in-left {
+		from {
+			transform: translateX(-100%);
+		}
+		to {
+			transform: translateX(0);
+		}
+	}
+
+	@keyframes drawer-slide-in-bottom {
+		from {
+			transform: translateY(100%);
+		}
+		to {
+			transform: translateY(0);
+		}
+	}
 
 	@keyframes shine-lines {
 		from {
@@ -97,14 +167,28 @@
 .dark {
 	--surface-base: #171717;
 	--surface-card: #242424;
-	--surface-tag: rgba(229, 229, 229, 0.25);
+	--surface-tag: rgba(229, 229, 229, 0.15);
+
+	--primary-color: #14b8a6;
+	--primary-color-hover: #2dd4bf;
+	/* на светлой бирюзе — тёмный текст (5.8:1), белый не проходит AA */
+	--on-primary-color: #042f2e;
 
 	--foreground: #ffffff;
-	--accent: var(--primary-color-hover);
-	--accent-hover: color-mix(in oklab, var(--accent) 80%, white);
+	--foreground-muted: #a3a3a3;
+	--accent: var(--primary-color);
+	--accent-hover: var(--primary-color-hover);
 
-	--border-subtle: #7d7d7d;
-	--selection: var(--primary-color);
+	--border-subtle: #383838;
+	--selection: rgba(20, 184, 166, 0.3);
+}
+
+@utility scrollbar-none {
+	scrollbar-width: none;
+
+	&::-webkit-scrollbar {
+		display: none;
+	}
 }
 
 html {
@@ -141,102 +225,139 @@ body {
 .milkdown {
 	@apply rounded-xl min-h-70 transition-colors;
 	/* Background Colors */
-	--crepe-color-background: #fffdfb; /* Main background color */
-	--crepe-color-surface: #fff8f4; /* Surface color for cards/panels */
-	--crepe-color-surface-low: #fff1e5; /* Lower surface color for depth */
+	--crepe-color-background: var(--surface-card);
+	--crepe-color-surface: var(--surface-card);
+	--crepe-color-surface-low: var(--surface-tag);
 
 	/* Text Colors */
-	--crepe-color-on-background: #1f1b16; /* Text color on background */
-	--crepe-color-on-surface: #201b13; /* Text color on surface */
-	--crepe-color-on-surface-variant: #4f4539; /* Secondary text color */
+	--crepe-color-on-background: var(--foreground);
+	--crepe-color-on-surface: var(--foreground);
+	--crepe-color-on-surface-variant: var(--foreground-muted);
 
 	/* Accent Colors */
-	--crepe-color-primary: var(--primary-color); /* Primary brand color */
-	--crepe-color-secondary: #fbdebc; /* Secondary accent color */
-	--crepe-color-on-secondary: #271904; /* Text color on secondary */
+	--crepe-color-primary: var(--primary-color);
+	--crepe-color-secondary: var(--surface-tag);
+	--crepe-color-on-secondary: var(--foreground);
 
 	/* UI Colors */
-	--crepe-color-outline: #242424; /* Border/outline color */
-	--crepe-color-inverse: #362f27; /* Inverse color for contrast */
-	--crepe-color-on-inverse: #fcefe2; /* Text color on inverse */
-	--crepe-color-inline-code: var(
-		--color-secondary
-	); /* Inline code color */
-	--crepe-color-error: #ba1a1a; /* Error state color */
+	--crepe-color-outline: var(--border-subtle);
+	--crepe-color-inverse: var(--foreground);
+	--crepe-color-on-inverse: var(--surface-card);
+	--crepe-color-inline-code: var(--primary-color);
+	--crepe-color-error: var(--error-color);
 
 	/* Interactive Colors */
-	--crepe-color-hover: #f9ecdf; /* Hover state color */
-	--crepe-color-selected: var(--primary-color-hover); /* Selected state color */
-	--crepe-color-inline-area: var(
-		--primary-color
-	); /* Inline editing area color */
+	--crepe-color-hover: var(--surface-tag);
+	--crepe-color-selected: var(--primary-color-hover);
+	--crepe-color-inline-area: var(--primary-color);
 
 	--crepe-shadow-1: var(--shadow-primary);
 }
 
 .dark .milkdown {
-	--crepe-color-background: var(
-		--surface-card
-	); /* Main background color */
-	--crepe-color-surface: var(
-		--surface-card
-	); /* Surface color for cards/panels */
-	--crepe-color-surface-low: var(
-		--surface-card
-	); /* Lower surface color for depth */
+	--crepe-color-background: var(--surface-card);
+	--crepe-color-surface: var(--surface-card);
+	--crepe-color-surface-low: var(--surface-tag);
 
 	/* Text Colors */
-	--crepe-color-on-background: var(
-		--foreground
-	); /* Text color on background */
-	--crepe-color-on-surface: var(--foreground); /* Text color on surface */
-	--crepe-color-on-surface-variant: var(
-		--foreground
-	); /* Secondary text color */
+	--crepe-color-on-background: var(--foreground);
+	--crepe-color-on-surface: var(--foreground);
+	--crepe-color-on-surface-variant: var(--foreground-muted);
 
 	/* Accent Colors */
-	--crepe-color-primary: var(--color-primary); /* Primary brand color */
-	--crepe-color-secondary: var(--color-primary); /* Secondary accent color */
-	--crepe-color-on-secondary: #271904; /* Text color on secondary */
+	--crepe-color-primary: var(--primary-color);
+	--crepe-color-secondary: var(--primary-color);
+	--crepe-color-on-secondary: var(--foreground);
 
 	/* UI Colors */
-	--crepe-color-outline: var(--color-secondary); /* Border/outline color */
-	--crepe-color-inverse: #362f27; /* Inverse color for contrast */
-	--crepe-color-on-inverse: #fcefe2; /* Text color on inverse */
-	--crepe-color-error: #ba1a1a; /* Error state color */
+	--crepe-color-outline: var(--border-subtle);
+	--crepe-color-inverse: var(--foreground);
+	--crepe-color-on-inverse: var(--surface-card);
+	--crepe-color-error: var(--error-color);
 
 	/* Interactive Colors */
-	--crepe-color-hover: var(--color-primary-hover); /* Hover state color */
-	--crepe-color-selected: var(--color-primary); /* Selected state color */
+	--crepe-color-hover: var(--primary-color-hover);
+	--crepe-color-selected: var(--primary-color);
 }
 
+/* Типографика статьи и редактора. У заголовков префикс .milkdown: иначе размеры берутся из темы Crepe */
+.ProseMirror,
+.milkdown-content {
+	@apply text-base md:text-lg leading-relaxed text-foreground;
+}
+
+.ProseMirror p,
 .milkdown-content p {
-	@apply my-6;
+	@apply my-4 leading-relaxed;
 }
 
-.milkdown-content h1,
-.milkdown-content h2,
-.milkdown-content h3,
-.milkdown-content h4,
-.milkdown-content h5,
-.milkdown-content h6 {
-	@apply my-4;
+.milkdown .ProseMirror h1,
+.milkdown-content h1 {
+	@apply text-2xl md:text-4xl font-bold font-title tracking-tight mt-8 mb-4;
 }
 
+.milkdown .ProseMirror h2,
+.milkdown-content h2 {
+	@apply text-xl md:text-3xl font-bold font-title tracking-tight mt-8 mb-3 pb-2 border-b border-border-subtle;
+}
+
+.milkdown .ProseMirror h3,
+.milkdown-content h3 {
+	@apply text-lg md:text-2xl font-semibold font-title mt-6 mb-2;
+}
+
+.ProseMirror blockquote,
+.milkdown-content blockquote {
+	@apply border-l-4 border-primary pl-4 md:pl-5 py-2.5 my-6 bg-surface-tag/30 rounded-r-xl italic text-foreground/90;
+}
+
+.ProseMirror pre,
+.milkdown-content pre {
+	@apply bg-surface-tag border border-border-subtle rounded-xl p-4 my-6 font-mono text-sm leading-relaxed overflow-x-auto shadow-sm;
+	tab-size: 2;
+}
+
+.ProseMirror p code,
+.milkdown-content p code,
+.ProseMirror li code,
+.milkdown-content li code {
+	@apply bg-surface-tag text-primary px-1.5 py-0.5 rounded text-sm font-mono;
+}
+
+.ProseMirror ul,
+.milkdown-content ul {
+	@apply my-4 pl-6 list-disc flex flex-col gap-y-1.5;
+}
+
+.ProseMirror ol,
+.milkdown-content ol {
+	@apply my-4 pl-6 list-decimal flex flex-col gap-y-1.5;
+}
+
+.ProseMirror ul p,
 .milkdown-content ul p,
+.ProseMirror ol p,
 .milkdown-content ol p {
 	@apply m-0;
 }
 
-.milkdown-content ul,
-.milkdown-content ol {
-	@apply my-8 pl-8 list-disc flex flex-col gap-y-2;
+.ProseMirror hr,
+.milkdown-content hr {
+	@apply my-8 border-border-subtle;
 }
 
-.milkdown-content pre {
-	tab-size: 2;
+.ProseMirror img,
+.milkdown-content img {
+	@apply rounded-xl max-w-full my-6 shadow-sm mx-auto block border border-border-subtle;
 }
 
 .milkdown-content figure:has(+ img) {
 	@apply mb-8;
+}
+
+/* Превью в карточке: заголовки из текста не крупнее названия карточки */
+.milkdown-content.milkdown-preview h1,
+.milkdown-content.milkdown-preview h2,
+.milkdown-content.milkdown-preview h3 {
+	@apply text-base md:text-lg mt-3 mb-1 pb-0 border-0;
 }

@@ -73,7 +73,7 @@ export const CropperModal = () => {
 			onClose={handleClose}>
 			<div
 				ref={cropperModalRef}
-				className='flex flex-col bg-surface-card px-3 md:px-5 py-6 max-w-112.5 w-full rounded-t-2xl sm:rounded-2xl max-h-[90vh] overflow-y-auto gap-y-6'>
+				className='flex flex-col bg-surface-card p-6 max-w-md w-full rounded-t-2xl sm:rounded-2xl border border-border-subtle shadow-xl max-h-modal overflow-y-auto gap-y-6'>
 				{avatarImage && (
 					<div className='relative aspect-square rounded-2xl overflow-hidden'>
 						<Cropper
@@ -92,16 +92,17 @@ export const CropperModal = () => {
 					</div>
 				)}
 
-				<div className='flex gap-x-12'>
+				<div className='flex items-center gap-4'>
 					<Button
 						variant='secondary'
-						className='py-3 uppercase tracking-wider leading-heading-tight rounded-card w-full dark:text-secondary'
+						className='py-2.5 px-4 uppercase text-xs font-semibold tracking-wider rounded-xl w-full border border-border-subtle hover:bg-surface-tag'
 						disabled={isSaving}
 						onClick={handleClose}>
 						{t('btns.cancel')}
 					</Button>
 					<Button
-						className='py-3 uppercase tracking-wider leading-heading-tight rounded-card w-full'
+						variant='primary'
+						className='py-2.5 px-4 uppercase text-xs font-semibold tracking-wider rounded-xl w-full'
 						disabled={isSaving}
 						onClick={handleSave}>
 						{t('btns.save')}

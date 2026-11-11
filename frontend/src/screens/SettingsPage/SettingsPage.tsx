@@ -93,11 +93,11 @@ export const SettingsPage = () => {
 	};
 
 	return (
-		<Section className='bg-surface-card transition-colors w-full px-2 py-6 md:px-6 rounded-xl flex flex-col md:gap-y-12 gap-y-6'>
-			<h1 className='font-title font-bold text-[1.75rem] md:text-5xl leading-heading-tight text-center md:text-left'>
+		<Section className='bg-surface-card rounded-2xl border border-border-subtle shadow-sm transition-colors w-full p-6 md:p-10 flex flex-col gap-y-8'>
+			<h1 className='font-title font-bold text-2xl sm:text-3xl md:text-4xl text-foreground leading-tight text-center md:text-left'>
 				{t('settingsPage.metadata.title')}
 			</h1>
-			<div className='flex flex-col md:flex-row gap-6 items-center'>
+			<div className='flex flex-col md:flex-row gap-8 items-center md:items-start'>
 				<SettingsAvatarUpload
 					avatarUrl={profile?.avatarUrl}
 					username={profile?.username}
@@ -115,8 +115,8 @@ export const SettingsPage = () => {
 								text={t(text)}
 								type={type}
 								placeholder={t(placeholder)}
-								wrapperClassNames='font-bold text-xl leading-heading-tight font-title'
-								className='rounded-xl px-4 py-3 text-[1rem] leading-6 font-normal'
+								wrapperClassNames='font-semibold text-base font-title'
+								className='rounded-xl px-4 py-3 text-base font-normal border-border-subtle'
 								{...register(registerName, registerOptions)}
 							/>
 						)
@@ -126,8 +126,9 @@ export const SettingsPage = () => {
 			<Button
 				form={formId}
 				type='submit'
-				variant={isValid && isDirty ? 'primary' : 'disabled'}
-				className='py-4 rounded-card md:text-xl md:font-bold leading-heading uppercase tracking-wider md:tracking-widest'>
+				variant='primary'
+				disabled={!isValid || !isDirty}
+				className='py-3.5 w-full rounded-xl font-bold text-sm uppercase tracking-wider shadow-xs hover:shadow-primary transition-all'>
 				{t('btns.saveChanges')}
 			</Button>
 		</Section>

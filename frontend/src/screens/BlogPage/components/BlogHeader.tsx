@@ -33,7 +33,7 @@ export const BlogHeader = ({
 
 	return (
 		<Section
-			className='py-0 md:py-0 relative overflow-hidden rounded-xl bg-placeholder before:absolute before:inset-0 before:bg-[rgba(0,0,0,0.4)] before:z-0 bg-no-repeat bg-size-[100%_330px]'
+			className='py-0 md:py-0 relative overflow-hidden rounded-2xl border border-border-subtle bg-surface-tag before:absolute before:inset-0 before:bg-overlay before:z-0 bg-no-repeat bg-cover bg-center'
 			style={
 				currentPosterUrl
 					? {
@@ -41,28 +41,30 @@ export const BlogHeader = ({
 						}
 					: undefined
 			}>
-			<div className='w-full p-3 pt-16 md:p-6 md:pt-10 z-10 relative min-h-82.5 flex flex-col justify-between'>
-				<div className='w-full flex flex-col gap-y-7.5 md:gap-y-12'>
-					<h1 className='font-title font-bold text-[1.75rem] md:text-5xl leading-heading-tight w-full text-center text-secondary'>
+			<div className='w-full p-4 pt-16 md:p-8 md:pt-12 z-10 relative min-h-80 flex flex-col justify-between'>
+				<div className='w-full flex flex-col gap-y-6 md:gap-y-8'>
+					<h1 className='font-title font-bold text-2xl sm:text-3xl md:text-5xl leading-tight w-full text-center text-on-fill drop-shadow-sm'>
 						{title}
 					</h1>
 					<div className='flex flex-col gap-y-4'>
 						{description && (
-							<p className='leading-body tracking-snug text-secondary'>
+							<p className='leading-relaxed text-sm md:text-base text-on-fill/90 text-center max-w-2xl mx-auto'>
 								{description}
 							</p>
 						)}
 						{tags && (
-							<TagsList
-								tags={tags}
-								location='blog'
-							/>
+							<div className='flex justify-center'>
+								<TagsList
+									tags={tags}
+									location='blog'
+								/>
+							</div>
 						)}
 					</div>
 				</div>
 				{isOwner && (
-					<div className='flex gap-x-2 self-end'>
-						<label className='text-secondary px-3 rounded-lg leading-6 backdrop-blur-disabled hover:text-accent-hover focus-visible:text-accent-hover cursor-pointer transition-colors text-left z-10 relative bg-disabled py-2'>
+					<div className='flex gap-x-2 self-end mt-4'>
+						<label className='text-on-fill text-xs font-semibold uppercase tracking-wider px-3.5 py-2 rounded-xl backdrop-blur-md bg-on-fill/20 hover:bg-on-fill/30 cursor-pointer transition-all border border-on-fill/20 text-left z-10 relative'>
 							{t('btns.editPoster')}
 							<input
 								type='file'
@@ -74,9 +76,9 @@ export const BlogHeader = ({
 						{currentPosterUrl && (
 							<Button
 								variant='light'
-								className='p-2 rounded-lg'
+								className='p-2 rounded-xl bg-on-fill/20 hover:bg-danger/80 text-on-fill backdrop-blur-md border border-on-fill/20 transition-all'
 								onClick={onDeletePoster}>
-								<Trash />
+								<Trash className='size-4' />
 							</Button>
 						)}
 					</div>

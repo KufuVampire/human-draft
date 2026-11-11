@@ -32,8 +32,8 @@ export const CreatePostBlogLinks = () => {
 					href={href}
 					variant={variant === 'secondary' ? 'secondary' : 'primary'}
 					className={cn(
-						'w-full py-4 md:font-bold md:text-xl leading-heading-tight md:leading-heading tracking-wider md:tracking-widest uppercase rounded-card',
-						variant === 'secondary' && 'dark:text-secondary'
+						'w-full py-3.5 px-6 font-semibold text-sm md:text-base tracking-wider uppercase rounded-xl shadow-xs transition-all text-center',
+						variant === 'secondary' && 'border border-border-subtle hover:bg-surface-tag'
 					)}>
 					{t(translationKey)}
 				</CustomLink>

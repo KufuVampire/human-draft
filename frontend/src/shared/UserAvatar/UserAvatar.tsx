@@ -25,27 +25,27 @@ export const UserAvatar = ({
 			className={cn(
 				'relative',
 				{
-					['-mt-16 md:-mt-[5.5rem] size-[8rem] md:size-[9.375rem] p-1 md:p-[0.313rem] rounded-full bg-surface-card z-10 transition-colors']:
+					'-mt-16 md:-mt-20 size-32 md:size-36 p-1 md:p-1.5 rounded-full bg-surface-card z-10 transition-colors':
 						location === 'profile-page',
-					['bg-placeholder shrink-0 size-[5.625rem] rounded-lg']:
+					'bg-surface-tag shrink-0 size-12 sm:size-16 rounded-xl':
 						location === 'users-page',
-					['size-full rounded-full bg-surface-card transition-colors']:
+					'size-full rounded-full bg-surface-card transition-colors':
 						location === 'settings-page',
 				},
 				className
 			)}>
 			{avatarUrl && (
-				<div className='relative size-full overflow-hidden'>
+				<div
+					className={cn(
+						'relative size-full overflow-hidden',
+						location === 'users-page' ? 'rounded-xl' : 'rounded-full'
+					)}>
 					<Image
 						src={avatarUrl}
 						alt={`${t('userAvatar')} ${username}`}
 						className={cn(
 							'object-cover size-full',
-							location === 'settings-page' && 'cursor-pointer',
-							{
-								['rounded-full']:
-									location === 'profile-page' || location === 'settings-page',
-							}
+							location === 'settings-page' && 'cursor-pointer'
 						)}
 						fill
 						sizes='100%'
@@ -57,11 +57,10 @@ export const UserAvatar = ({
 			{!avatarUrl && (
 				<div
 					className={cn(
-						'uppercase flex items-center justify-center bg-[linear-gradient(45deg,#4792c1,#aa67c2,#ea2047)] text-secondary cursor-default text-7xl size-full rounded-lg',
-						{
-							['rounded-full']:
-								location === 'profile-page' || location === 'settings-page',
-						}
+						'uppercase flex items-center justify-center bg-gradient-to-tr from-primary to-accent text-secondary font-bold cursor-default size-full',
+						location === 'profile-page' && 'text-4xl sm:text-5xl rounded-full',
+						location === 'settings-page' && 'text-2xl rounded-full',
+						location === 'users-page' && 'text-lg sm:text-xl rounded-xl'
 					)}>
 					{username && username.at(0)}
 				</div>

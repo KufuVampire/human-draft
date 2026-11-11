@@ -28,19 +28,19 @@ export const ProfileUserInfo = ({
 	const t = useTranslations();
 
 	return (
-		<div className='flex lg:flex-row flex-col items-center gap-y-2 lg:items-stretch justify-between px-6 pb-6 md:py-3 min-h-[7.188rem]'>
-			<div className='flex lg:flex-row flex-col items-center lg:items-stretch gap-x-3 gap-y-2'>
+		<div className='flex flex-col lg:flex-row items-center lg:items-start justify-between gap-4 p-6 min-h-28 transition-colors'>
+			<div className='flex flex-col lg:flex-row items-center lg:items-start gap-4'>
 				<UserAvatar
 					username={username}
 					avatarUrl={avatarUrl}
 					location='profile-page'
 				/>
-				<div className='flex flex-col gap-y-2 items-center lg:items-stretch'>
-					<h1 className='font-title font-bold text-4xl leading-heading-tight text-center lg:text-left'>
+				<div className='flex flex-col gap-y-1.5 items-center lg:items-start text-center lg:text-left'>
+					<h1 className='font-title font-bold text-2xl md:text-3xl leading-tight text-foreground'>
 						{username}
 					</h1>
 					{description && (
-						<p className='leading-6 text-center lg:text-left'>
+						<p className='text-sm text-muted leading-relaxed max-w-xl'>
 							{description}
 						</p>
 					)}
@@ -50,14 +50,14 @@ export const ProfileUserInfo = ({
 				<CustomLink
 					href={routesConfig.profileSettings(ownerUsername)}
 					variant='secondary'
-					className='py-2 px-3 font-bold leading-6 lg:self-start rounded-lg dark:text-secondary text-center self-center'>
+					className='py-2 px-4 text-xs font-semibold uppercase tracking-wider rounded-xl transition-all shrink-0'>
 					{t('navigation.settings')}
 				</CustomLink>
 			)}
 			{!isOwner && (
 				<SubscribeUnsubscribeButtons
 					toId={userId}
-					className='py-2 px-3 font-bold leading-6 lg:self-start rounded-lg self-center'
+					className='py-2 px-4 text-xs font-semibold uppercase tracking-wider rounded-xl shadow-xs transition-all shrink-0'
 					isSubscribed={isSubscribed}
 				/>
 			)}

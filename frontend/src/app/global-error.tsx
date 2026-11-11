@@ -45,7 +45,7 @@ export default function GlobalError({ error, reset }: Props) {
 						<button
 							type='button'
 							onClick={() => reset()}
-							className='px-5 py-2.5 rounded-xl font-bold text-sm bg-primary text-secondary hover:opacity-90 transition-opacity cursor-pointer'>
+							className='px-5 py-2.5 rounded-xl font-bold text-sm bg-primary text-on-primary hover:opacity-90 transition-opacity cursor-pointer'>
 							Попробовать снова / Try again
 						</button>
 						<Link

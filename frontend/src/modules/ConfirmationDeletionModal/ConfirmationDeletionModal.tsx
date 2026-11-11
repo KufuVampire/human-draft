@@ -12,7 +12,7 @@ interface Props {
 	className?: string;
 }
 
-const buttonStyles = 'p-2 md:p-3 w-full tracking-wider uppercase rounded-lg';
+const buttonStyles = 'py-2.5 px-4 w-full tracking-wider uppercase text-xs font-semibold rounded-xl transition-all';
 
 export const ConfirmationDeletionModal = ({ className }: Props) => {
 	const activeModal = useModalStore((s) => s.activeModal);
@@ -43,21 +43,22 @@ export const ConfirmationDeletionModal = ({ className }: Props) => {
 			<div
 				ref={modalRef}
 				className={cn(
-					'bg-surface-card px-4 md:px-5 py-5 md:py-6 rounded-t-2xl sm:rounded-xl w-full sm:w-auto max-h-[90vh] overflow-y-auto flex flex-col gap-y-7.5 md:gap-y-12',
+					'bg-surface-card p-6 md:p-8 rounded-t-2xl sm:rounded-2xl border border-border-subtle shadow-xl w-full sm:max-w-md max-h-modal overflow-y-auto flex flex-col gap-y-6',
 					className
 				)}>
-				<h2 className='font-title text-[1.75rem] md:text-4xl font-bold leading-heading-tight text-center'>
+				<h2 className='font-title text-xl md:text-2xl font-bold leading-snug text-foreground text-center'>
 					{t(`modals.remove${type.charAt(0).toUpperCase() + type.slice(1)}`)}
 				</h2>
-				<div className='flex justify-between gap-x-12'>
+				<div className='flex items-center gap-4'>
 					<Button
 						variant='secondary'
-						className={cn(buttonStyles, 'dark:text-secondary')}
+						className={cn(buttonStyles, 'border border-border-subtle hover:bg-surface-tag')}
 						onClick={handleClose}>
 						{t('btns.cancel')}
 					</Button>
 					<Button
-						className={buttonStyles}
+						variant='primary'
+						className={cn(buttonStyles, 'bg-danger hover:bg-danger/90 focus-visible:bg-danger/90 text-on-fill')}
 						onClick={handleConfirm}>
 						{t('btns.remove')}
 					</Button>
