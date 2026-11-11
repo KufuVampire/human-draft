@@ -43,7 +43,7 @@ export const ConfirmationDeletionModal = ({ className }: Props) => {
 			<div
 				ref={modalRef}
 				className={cn(
-					'bg-surface-card p-6 md:p-8 rounded-2xl border border-border-subtle shadow-xl w-full sm:max-w-md overflow-y-auto flex flex-col gap-y-6',
+					'bg-surface-card p-6 md:p-8 rounded-t-2xl sm:rounded-2xl border border-border-subtle shadow-xl w-full sm:max-w-md max-h-modal overflow-y-auto flex flex-col gap-y-6',
 					className
 				)}>
 				<h2 className='font-title text-xl md:text-2xl font-bold leading-snug text-foreground text-center'>
@@ -58,7 +58,7 @@ export const ConfirmationDeletionModal = ({ className }: Props) => {
 					</Button>
 					<Button
 						variant='primary'
-						className={cn(buttonStyles, 'bg-danger hover:bg-danger/90 text-white')}
+						className={cn(buttonStyles, 'bg-danger hover:bg-danger/90 focus-visible:bg-danger/90 text-on-fill')}
 						onClick={handleConfirm}>
 						{t('btns.remove')}
 					</Button>

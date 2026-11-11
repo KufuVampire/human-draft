@@ -221,6 +221,18 @@
 		"copyCode": "Скопировать код",
 		"tagPickerPlaceholder": "Выберите теги"
 	},
+	"editorToolbar": {
+		"label": "Форматирование текста",
+		"heading2": "Заголовок 2 уровня",
+		"heading3": "Заголовок 3 уровня",
+		"bold": "Жирный",
+		"italic": "Курсив",
+		"strike": "Зачёркнутый",
+		"code": "Код",
+		"quote": "Цитата",
+		"bulletList": "Маркированный список",
+		"orderedList": "Нумерованный список"
+	},
 	"in": "в",
 	"tagsPickerTitle": "Выбор тэгов",
 	"usersPage": {

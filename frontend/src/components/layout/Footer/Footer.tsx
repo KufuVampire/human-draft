@@ -41,9 +41,9 @@ export const Footer = () => {
 								</a>
 							</div>
 							<div className='text-muted text-xs flex gap-x-4 justify-center md:justify-normal'>
-								<span className='hover:text-primary cursor-pointer transition-colors'>Vk</span>
-								<span className='hover:text-primary cursor-pointer transition-colors'>Tg</span>
-								<span className='hover:text-primary cursor-pointer transition-colors'>GitHub</span>
+								<span>Vk</span>
+								<span>Tg</span>
+								<span>GitHub</span>
 							</div>
 						</div>
 					</div>

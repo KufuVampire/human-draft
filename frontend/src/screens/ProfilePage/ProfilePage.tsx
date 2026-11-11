@@ -124,13 +124,13 @@ export const ProfilePage = ({ username, initialData }: Props) => {
 				<Tabs defaultValue='all' className='w-full'>
 					<Tabs.List className='self-start'>
 						<Tabs.Trigger value='all'>
-							{t('filters.all') || 'Все'} ({sortedUserBlogsAndPosts.length})
+							{t('filters.all')} ({sortedUserBlogsAndPosts.length})
 						</Tabs.Trigger>
 						<Tabs.Trigger value='posts'>
-							{t('filters.posts') || 'Посты'} ({user.posts.length})
+							{t('filters.posts')} ({user.posts.length})
 						</Tabs.Trigger>
 						<Tabs.Trigger value='blogs'>
-							{t('filters.blogs') || 'Блоги'} ({user.blogs.length})
+							{t('filters.blogs')} ({user.blogs.length})
 						</Tabs.Trigger>
 					</Tabs.List>
 					<Tabs.Content value='all'>

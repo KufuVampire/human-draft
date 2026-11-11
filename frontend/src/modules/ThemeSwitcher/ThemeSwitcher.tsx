@@ -40,7 +40,7 @@ export const ThemeSwitcher = () => {
 			<Sun
 				className={cn(
 					'size-4 ml-1 z-10 transition-colors duration-200',
-					!isDark ? 'text-amber-500' : 'text-muted'
+					!isDark ? 'text-warning' : 'text-muted'
 				)}
 			/>
 			<Moon

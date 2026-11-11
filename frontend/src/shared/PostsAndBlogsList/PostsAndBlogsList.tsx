@@ -28,7 +28,7 @@ export const PostsAndBlogsList = ({
 }: Props) => {
 	return (
 		<ul
-			className='columns-1 lg:columns-2 gap-6 [column-fill:_balance]'
+			className='columns-1 lg:columns-2 gap-6'
 			onClick={onClick}>
 			{data.map((o) => {
 				if (o.__typename === 'BlogModel') {

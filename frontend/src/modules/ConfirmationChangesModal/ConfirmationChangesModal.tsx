@@ -41,7 +41,7 @@ export const ConfirmationChangesModal = ({ className }: Props) => {
 			<div
 				ref={modalRef}
 				className={cn(
-					'bg-surface-card p-6 md:p-8 rounded-2xl border border-border-subtle shadow-xl w-full sm:max-w-md overflow-y-auto flex flex-col gap-y-6',
+					'bg-surface-card p-6 md:p-8 rounded-t-2xl sm:rounded-2xl border border-border-subtle shadow-xl w-full sm:max-w-md max-h-modal overflow-y-auto flex flex-col gap-y-6',
 					className
 				)}>
 				<h2 className='font-title text-xl md:text-2xl font-bold text-foreground text-center'>

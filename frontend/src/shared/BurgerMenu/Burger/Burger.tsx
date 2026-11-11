@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import { Dispatch, SetStateAction } from 'react';
 
 import { Button } from '../../Button/Button';
@@ -12,11 +13,14 @@ const lineStyles =
 	'h-0.5 w-5 bg-foreground block transition-all duration-200 rounded-full origin-center';
 
 export const Burger = ({ isOpen, setOpen }: Props) => {
+	const t = useTranslations('navigation');
+
 	return (
 		<Button
 			variant='clear'
 			onClick={() => setOpen((prev) => !prev)}
-			aria-label='Меню навигации'
+			aria-label={t('menu')}
+			aria-expanded={isOpen}
 			className='flex flex-col justify-center items-center gap-1 size-8 rounded-lg hover:bg-surface-tag text-foreground transition-colors'>
 			<span
 				className={cn(lineStyles, isOpen && 'rotate-45 translate-y-1.5')}

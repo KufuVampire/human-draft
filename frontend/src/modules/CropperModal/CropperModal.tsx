@@ -73,7 +73,7 @@ export const CropperModal = () => {
 			onClose={handleClose}>
 			<div
 				ref={cropperModalRef}
-				className='flex flex-col bg-surface-card p-6 max-w-md w-full rounded-2xl border border-border-subtle shadow-xl overflow-y-auto gap-y-6'>
+				className='flex flex-col bg-surface-card p-6 max-w-md w-full rounded-t-2xl sm:rounded-2xl border border-border-subtle shadow-xl max-h-modal overflow-y-auto gap-y-6'>
 				{avatarImage && (
 					<div className='relative aspect-square rounded-2xl overflow-hidden'>
 						<Cropper

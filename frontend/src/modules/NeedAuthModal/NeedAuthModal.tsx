@@ -31,7 +31,7 @@ export const NeedAuthModal = () => {
 			onClose={handleClose}>
 			<div
 				ref={modalRef}
-				className='bg-surface-card p-6 md:p-8 rounded-2xl border border-border-subtle shadow-xl w-full sm:max-w-md overflow-y-auto flex flex-col gap-y-6'>
+				className='bg-surface-card p-6 md:p-8 rounded-t-2xl sm:rounded-2xl border border-border-subtle shadow-xl w-full sm:max-w-md max-h-modal overflow-y-auto flex flex-col gap-y-6'>
 				<h2 className='font-title text-xl md:text-2xl font-bold text-foreground text-center'>
 					{t('modals.needAuth')}
 				</h2>

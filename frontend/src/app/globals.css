@@ -10,6 +10,7 @@
 	--surface-tag: #e5e5e5;
 
 	--foreground: #151517;
+	--foreground-muted: #6b6b6b;
 	--accent: var(--primary-color);
 	--accent-hover: var(--primary-color-hover);
 
@@ -22,6 +23,10 @@
 
 	--placeholder-color: #7d7d7d;
 	--error-color: #ee4545;
+	--warning-color: #f59e0b;
+	/* текст и элементы поверх цветной заливки или фото */
+	--on-fill-color: #ffffff;
+	--overlay-color: rgba(0, 0, 0, 0.5);
 	--layout-color: #2d2d2d;
 	--secondary-color: #e5e5e5;
 	--disabled-color: rgba(255, 255, 255, 0.25);
@@ -42,6 +47,8 @@
 	--color-surface-tag: var(--surface-tag);
 
 	--color-foreground: var(--foreground);
+	--color-foreground-muted: var(--foreground-muted);
+	--color-muted: var(--foreground-muted);
 	--color-accent: var(--accent);
 	--color-accent-hover: var(--accent-hover);
 
@@ -63,6 +70,10 @@
 	--color-primary: var(--primary-color);
 	--color-primary-hover: var(--primary-color-hover);
 	--color-error: var(--error-color);
+	--color-danger: var(--error-color);
+	--color-warning: var(--warning-color);
+	--color-on-fill: var(--on-fill-color);
+	--color-overlay: var(--overlay-color);
 	--color-placeholder: var(--placeholder-color);
 	--color-secondary: var(--secondary-color);
 	--color-layout: var(--layout-color);
@@ -83,6 +94,8 @@
 	--font-text: var(--font-roboto);
 
 	--spacing-switch-thumb: 30px;
+	/* предельная высота модального окна: остаётся место под край экрана */
+	--spacing-modal: 90dvh;
 
 	--animate-shine-lines: shine-lines 3s linear 1s infinite;
 	--animate-dropdown-enter: dropdown-enter 150ms ease-out;
@@ -157,11 +170,20 @@
 	--primary-color-hover: #2dd4bf;
 
 	--foreground: #ffffff;
+	--foreground-muted: #a3a3a3;
 	--accent: var(--primary-color);
 	--accent-hover: var(--primary-color-hover);
 
 	--border-subtle: #383838;
 	--selection: rgba(20, 184, 166, 0.3);
+}
+
+@utility scrollbar-none {
+	scrollbar-width: none;
+
+	&::-webkit-scrollbar {
+		display: none;
+	}
 }
 
 html {
