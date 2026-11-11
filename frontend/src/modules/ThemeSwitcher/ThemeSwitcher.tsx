@@ -52,7 +52,7 @@ export const ThemeSwitcher = () => {
 			<span
 				className={cn(
 					'absolute top-1 left-1 size-6 rounded-full bg-surface-card border border-border-subtle shadow-xs transition-transform duration-200 ease-in-out',
-					isDark ? 'translate-x-8' : 'translate-x-0'
+					isDark ? 'translate-x-switch-thumb' : 'translate-x-0'
 				)}
 			/>
 		</button>

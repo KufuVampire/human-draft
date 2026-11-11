@@ -82,6 +82,8 @@
 	--font-title: var(--font-ubuntu);
 	--font-text: var(--font-roboto);
 
+	--spacing-switch-thumb: 30px;
+
 	--animate-shine-lines: shine-lines 3s linear 1s infinite;
 	--animate-dropdown-enter: dropdown-enter 150ms ease-out;
 	--animate-fade-in: fade-in 200ms ease-out;

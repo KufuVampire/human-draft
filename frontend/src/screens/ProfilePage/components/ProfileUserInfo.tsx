@@ -50,7 +50,7 @@ export const ProfileUserInfo = ({
 				<CustomLink
 					href={routesConfig.profileSettings(ownerUsername)}
 					variant='secondary'
-					className='py-2 px-4 text-xs font-semibold uppercase tracking-wider rounded-xl border border-border-subtle hover:bg-surface-tag text-foreground transition-all shrink-0'>
+					className='py-2 px-4 text-xs font-semibold uppercase tracking-wider rounded-xl transition-all shrink-0'>
 					{t('navigation.settings')}
 				</CustomLink>
 			)}

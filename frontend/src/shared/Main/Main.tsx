@@ -8,7 +8,7 @@ interface Props {
 
 export const Main = ({ children, className }: PropsWithChildren<Props>) => {
 	return (
-		<main className={cn('flex-1 w-full py-6 pt-14 md:pt-16', className)}>
+		<main className={cn('flex-1 w-full py-6 pt-16 md:pt-20', className)}>
 			{children}
 		</main>
 	);

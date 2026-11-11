@@ -40,10 +40,10 @@ export const HomePageSearchBar = ({
 				}
 			}}
 			className={cn(
-				'flex-1 min-w-0',
+				'flex-1 min-w-0 w-full',
 				isSearchOpenOnMobile && 'absolute top-3 z-10 sm:static'
 			)}
-			listClassName='w-full shadow-lg border border-border-subtle bg-surface-card'
+			listClassName='w-full min-w-full max-w-none shadow-lg border border-border-subtle bg-surface-card max-h-80 overflow-y-auto overscroll-contain'
 			itemClassName='border-b border-border-subtle last:border-b-0'
 			items={dropdownSearchItems}>
 			<FormField

@@ -83,7 +83,11 @@ export const Navigation = ({
 										'text-primary font-semibold bg-primary/10 hover:bg-primary/15'
 								)}>
 								{variant === 'dashboard' && <Icon className='size-5 shrink-0' />}
-								<span className={cn(!isExpanded && 'hidden')}>
+								<span
+									className={cn(
+										'whitespace-nowrap overflow-hidden transition-all duration-300',
+										!isExpanded ? 'max-w-0 opacity-0 pointer-events-none' : 'max-w-40 opacity-100'
+									)}>
 									{t(translationKey)}
 								</span>
 							</CustomLink>

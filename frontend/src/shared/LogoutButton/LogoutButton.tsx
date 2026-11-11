@@ -34,11 +34,11 @@ export const LogoutButton = ({ className }: Props) => {
 			variant='clear'
 			onClick={handleClick}
 			className={cn(
-				'p-2 hover:bg-main-hover transition-colors w-full flex gap-x-1 justify-normal',
+				'px-3 py-2 hover:bg-error/10 hover:text-error rounded-lg text-sm transition-colors w-full flex items-center justify-start text-left gap-x-2.5 text-foreground h-9',
 				className
 			)}>
-			<LogOut />
-			{t('logout')}
+			<LogOut className='size-4 shrink-0' />
+			<span>{t('logout')}</span>
 		</Button>
 	);
 };

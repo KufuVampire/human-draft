@@ -14,6 +14,10 @@ const eslintConfig = [
       "react-hooks/set-state-in-effect": "warn",
       "react-hooks/preserve-manual-memoization": "warn",
       "tailwindcss/no-custom-classname": "off",
+      "tailwindcss/classnames-order": "off",
+      "tailwindcss/enforces-shorthand": "off",
+      "tailwindcss/enforces-canonical-classname": "off",
+      "tailwindcss/no-unnecessary-arbitrary-value": "off",
     },
   },
   {

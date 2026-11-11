@@ -1,15 +1,16 @@
 'use client';
 
-import { ChevronDown, Settings, User } from 'lucide-react';
+import { ChevronDown, LogOut, Settings, User } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 import { routesConfig } from '@/config';
+import { useSignOutMutation } from '@/graphql/generated/output';
 import { useResolvedHref } from '@/hooks';
 import {
 	Button,
 	CustomLink,
-	LogoutButton,
 	UserBadge,
 } from '@/shared';
 import {
@@ -26,7 +27,19 @@ export const UserProfile = () => {
 	const isAuth = useProfileStore((s) => s.isAuth);
 	const profile = useProfileStore((s) => s.profile);
 	const isLoading = useProfileStore((s) => s.isLoading);
+	const logout = useProfileStore((s) => s.logout);
 	const resolveHref = useResolvedHref();
+
+	const [signOutMutation] = useSignOutMutation({
+		onCompleted() {
+			toast.success('Вы успешно вышли из аккаунта');
+		},
+	});
+
+	const handleLogout = () => {
+		logout();
+		signOutMutation();
+	};
 
 	return (
 		<>
@@ -52,9 +65,12 @@ export const UserProfile = () => {
 							{t('navigation.settingsShort')}
 						</DropdownItem>
 						<div className='my-1 border-t border-border-subtle' />
-						<div className='px-1 py-0.5'>
-							<LogoutButton className='text-sm w-full justify-start' />
-						</div>
+						<DropdownItem
+							icon={<LogOut className='size-4' />}
+							className='text-error hover:bg-error/10 hover:text-error'
+							onClick={handleLogout}>
+							{t('navigation.logout')}
+						</DropdownItem>
 					</DropdownContent>
 				</Dropdown>
 			)}

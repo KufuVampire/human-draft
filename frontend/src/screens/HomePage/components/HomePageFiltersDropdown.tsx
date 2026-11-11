@@ -5,8 +5,7 @@ import { useTranslations } from 'next-intl';
 import type { UseFormRegister } from 'react-hook-form';
 
 import type { TypeHomePageSearchSchema } from '@/schemas';
-import { FormField } from '@/shared';
-import { Dropdown, DropdownContent, DropdownTrigger } from '@/shared/ui';
+import { Checkbox, Dropdown, DropdownContent, DropdownTrigger } from '@/shared/ui';
 
 interface IFilter {
 	key: keyof TypeHomePageSearchSchema;
@@ -38,10 +37,9 @@ export const HomePageFiltersDropdown = ({ isAuth, register }: Props) => {
 				{filters
 					.filter(({ needAuth }) => !needAuth || isAuth)
 					.map(({ key, translationKey }) => (
-						<div key={key} className='p-2 hover:bg-surface-tag rounded-lg text-sm'>
-							<FormField
-								text={t(translationKey)}
-								type='checkbox'
+						<div key={key} className='px-2.5 py-1.5 hover:bg-surface-tag rounded-lg text-sm'>
+							<Checkbox
+								label={t(translationKey)}
 								{...register(key)}
 							/>
 						</div>
