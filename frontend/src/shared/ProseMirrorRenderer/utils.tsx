@@ -54,15 +54,19 @@ export function applyMarks(
 
 	return marks.reduce<ReactNode>((acc, mark, index) => {
 		const key = `${keyPrefix}-mark-${mark.type}-${index}`;
+		// Имена марок Milkdown (emphasis, strike_through, inlineCode) и старые синонимы
 		switch (mark.type) {
 			case 'strong':
 			case 'bold':
 				return <strong key={key}>{acc}</strong>;
+			case 'emphasis':
 			case 'em':
 			case 'italic':
 				return <em key={key}>{acc}</em>;
+			case 'strike_through':
 			case 'strike':
 				return <s key={key}>{acc}</s>;
+			case 'inlineCode':
 			case 'code':
 				return (
 					<code

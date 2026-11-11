@@ -207,77 +207,65 @@ body {
 	@apply px-3! py-2! md:py-0! md:px-0!;
 }
 
+/* Ручка блока («+» и перетаскивание) — в левом отступе карточки (65px до текста), не на сайдбаре */
 .milkdown-block-handle[data-show='false'] {
-	@apply opacity-0! left-0! md:-left-10!;
+	@apply opacity-0! left-0! md:-left-16!;
 }
 .milkdown-block-handle[data-show='true'] {
-	@apply left-0! md:-left-19!;
+	@apply left-0! md:-left-16!;
 }
 
 .milkdown-block-handle {
 	@apply hidden! md:flex! md:gap-x-0.5;
 }
 
+/* Кнопка 24px с иконкой 20px по центру: у Crepe иконка жёстко 24px и при уменьшении кнопки съезжала */
 .milkdown-block-handle .operation-item {
-	@apply p-0! size-6! md:size-8! md:p-1!;
+	@apply p-0! size-6! flex! items-center! justify-center!;
 }
 
+.milkdown-block-handle .operation-item svg {
+	@apply size-5!;
+}
+
+/* Тема Crepe на токенах проекта: светлая и тёмная переключаются самими токенами */
 .milkdown {
 	@apply rounded-xl min-h-70 transition-colors;
-	/* Background Colors */
 	--crepe-color-background: var(--surface-card);
 	--crepe-color-surface: var(--surface-card);
 	--crepe-color-surface-low: var(--surface-tag);
 
-	/* Text Colors */
 	--crepe-color-on-background: var(--foreground);
 	--crepe-color-on-surface: var(--foreground);
 	--crepe-color-on-surface-variant: var(--foreground-muted);
 
-	/* Accent Colors */
 	--crepe-color-primary: var(--primary-color);
 	--crepe-color-secondary: var(--surface-tag);
 	--crepe-color-on-secondary: var(--foreground);
 
-	/* UI Colors */
-	--crepe-color-outline: var(--border-subtle);
+	/* outline красит иконки тулбара, ручки блока и меню «/» — нужен читаемый цвет, не цвет границы */
+	--crepe-color-outline: var(--foreground-muted);
 	--crepe-color-inverse: var(--foreground);
 	--crepe-color-on-inverse: var(--surface-card);
 	--crepe-color-inline-code: var(--primary-color);
 	--crepe-color-error: var(--error-color);
 
-	/* Interactive Colors */
+	/* выбранный пункт — бирюзовый тинт: текст остаётся foreground в обеих темах */
 	--crepe-color-hover: var(--surface-tag);
-	--crepe-color-selected: var(--primary-color-hover);
-	--crepe-color-inline-area: var(--primary-color);
+	--crepe-color-selected: color-mix(in srgb, var(--primary-color) 18%, transparent);
+	/* фон инлайн-кода и блоков кода — как на странице поста; бирюзовый фон с бирюзовым текстом не читался */
+	--crepe-color-inline-area: var(--surface-tag);
+
+	/* переменные next/font с <body>; токены @theme inline в CSS-переменные не попадают */
+	--crepe-font-title: var(--font-ubuntu);
+	--crepe-font-default: var(--font-roboto);
 
 	--crepe-shadow-1: var(--shadow-primary);
 }
 
-.dark .milkdown {
-	--crepe-color-background: var(--surface-card);
-	--crepe-color-surface: var(--surface-card);
-	--crepe-color-surface-low: var(--surface-tag);
-
-	/* Text Colors */
-	--crepe-color-on-background: var(--foreground);
-	--crepe-color-on-surface: var(--foreground);
-	--crepe-color-on-surface-variant: var(--foreground-muted);
-
-	/* Accent Colors */
-	--crepe-color-primary: var(--primary-color);
-	--crepe-color-secondary: var(--primary-color);
-	--crepe-color-on-secondary: var(--foreground);
-
-	/* UI Colors */
-	--crepe-color-outline: var(--border-subtle);
-	--crepe-color-inverse: var(--foreground);
-	--crepe-color-on-inverse: var(--surface-card);
-	--crepe-color-error: var(--error-color);
-
-	/* Interactive Colors */
-	--crepe-color-hover: var(--primary-color-hover);
-	--crepe-color-selected: var(--primary-color);
+/* На телефонах форматирование — в EditorToolbar внизу экрана; плавающий тулбар Crepe мешает системному меню выделения */
+.milkdown .milkdown-toolbar {
+	@apply max-md:hidden!;
 }
 
 /* Типографика статьи и редактора. У заголовков префикс .milkdown: иначе размеры берутся из темы Crepe */

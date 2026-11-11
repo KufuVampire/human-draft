@@ -43,6 +43,28 @@ describe('ProseMirrorRenderer (colocated unit tests)', () => {
 		expect(container.querySelectorAll('.prose-mirror-doc').length).toBe(1);
 	});
 
+	it.each([
+		['emphasis', 'EM'],
+		['strike_through', 'S'],
+		['inlineCode', 'CODE'],
+	])('Рендерит марку Milkdown %s тегом <%s>', (markType, tagName) => {
+		const doc: ProseMirrorNodeJSON = {
+			type: 'doc',
+			content: [
+				{
+					type: 'paragraph',
+					content: [
+						{ type: 'text', text: 'размеченный текст', marks: [{ type: markType }] },
+					],
+				},
+			],
+		};
+
+		render(<ProseMirrorRenderer doc={doc} />);
+
+		expect(screen.getByText('размеченный текст').tagName).toBe(tagName);
+	});
+
 	it('Безопасно экранирует Stored XSS в тексте (скрипт не исполняется)', () => {
 		const maliciousDoc: ProseMirrorNodeJSON = {
 			type: 'doc',

@@ -127,12 +127,13 @@ export const UpdatePostPage = () => {
 						</div>
 					</div>
 
-					<EditorToolbar getEditor={get} />
 					<Milkdown />
 					<TagsPicker
 						tags={tags}
 						setTags={setTags}
 					/>
+					{/* Последним в форме: sticky держит тулбар у края экрана и не пускает на футер */}
+					<EditorToolbar getEditor={get} />
 				</form>
 			</Container>
 		</Section>

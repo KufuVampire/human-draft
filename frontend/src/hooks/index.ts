@@ -18,3 +18,4 @@ export { useProfileAvatar } from './useProfileAvatar';
 export { useProfilePoster } from './useProfilePoster';
 export { useResizeObserver } from './useResizeObserver';
 export { useResolvedHref } from './useResolvedHref';
+export { useVisualViewportInset } from './useVisualViewportInset';
