@@ -115,13 +115,13 @@ export const UpdatePostPage = () => {
 							placeholder={t('createPostPage.title')}
 							{...register('title', { required: true })}
 						/>
-						<div className='flex items-center gap-3 shrink-0'>
+						<div className='flex flex-wrap sm:flex-nowrap items-center gap-3 shrink-0'>
 							<Button
 								type='submit'
 								isLoading={loading || isUpdating}
 								disabled={!isValid || loading || isUpdating}
 								variant='primary'
-								className='rounded-xl px-6 py-2.5 font-bold uppercase text-sm tracking-wider shrink-0'>
+								className='rounded-xl px-6 py-2.5 font-bold uppercase text-sm tracking-wider w-full sm:w-auto shrink-0'>
 								{t('postPage.editPost')}
 							</Button>
 						</div>

@@ -10,16 +10,18 @@
 	--surface-tag: #e5e5e5;
 
 	--foreground: #151517;
-	--foreground-muted: #6b6b6b;
+	--foreground-muted: #5f5f5f;
 	--accent: var(--primary-color);
 	--accent-hover: var(--primary-color-hover);
 
 	--border-subtle: #e5e5e5;
 	--selection: #ede0d4;
 
-	/* neutral & primary: modern teal */
-	--primary-color: #0d9488;
-	--primary-color-hover: #0f766e;
+	/* neutral & primary: modern teal (WCAG AA: белый текст на заливке 5.5:1) */
+	--primary-color: #0f766e;
+	--primary-color-hover: #115e59;
+	/* текст поверх заливки primary */
+	--on-primary-color: #ffffff;
 
 	--placeholder-color: #7d7d7d;
 	--error-color: #ee4545;
@@ -69,6 +71,7 @@
 
 	--color-primary: var(--primary-color);
 	--color-primary-hover: var(--primary-color-hover);
+	--color-on-primary: var(--on-primary-color);
 	--color-error: var(--error-color);
 	--color-danger: var(--error-color);
 	--color-warning: var(--warning-color);
@@ -168,6 +171,8 @@
 
 	--primary-color: #14b8a6;
 	--primary-color-hover: #2dd4bf;
+	/* на светлой бирюзе — тёмный текст (5.8:1), белый не проходит AA */
+	--on-primary-color: #042f2e;
 
 	--foreground: #ffffff;
 	--foreground-muted: #a3a3a3;
@@ -275,7 +280,7 @@ body {
 	--crepe-color-selected: var(--primary-color);
 }
 
-/* Habr-style Typography for Article Content and ProseMirror */
+/* Типографика статьи и редактора. У заголовков префикс .milkdown: иначе размеры берутся из темы Crepe */
 .ProseMirror,
 .milkdown-content {
 	@apply text-base md:text-lg leading-relaxed text-foreground;
@@ -286,17 +291,17 @@ body {
 	@apply my-4 leading-relaxed;
 }
 
-.ProseMirror h1,
+.milkdown .ProseMirror h1,
 .milkdown-content h1 {
 	@apply text-2xl md:text-4xl font-bold font-title tracking-tight mt-8 mb-4;
 }
 
-.ProseMirror h2,
+.milkdown .ProseMirror h2,
 .milkdown-content h2 {
 	@apply text-xl md:text-3xl font-bold font-title tracking-tight mt-8 mb-3 pb-2 border-b border-border-subtle;
 }
 
-.ProseMirror h3,
+.milkdown .ProseMirror h3,
 .milkdown-content h3 {
 	@apply text-lg md:text-2xl font-semibold font-title mt-6 mb-2;
 }
@@ -348,4 +353,11 @@ body {
 
 .milkdown-content figure:has(+ img) {
 	@apply mb-8;
+}
+
+/* Превью в карточке: заголовки из текста не крупнее названия карточки */
+.milkdown-content.milkdown-preview h1,
+.milkdown-content.milkdown-preview h2,
+.milkdown-content.milkdown-preview h3 {
+	@apply text-base md:text-lg mt-3 mb-1 pb-0 border-0;
 }

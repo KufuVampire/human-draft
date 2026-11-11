@@ -12,11 +12,10 @@ interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const styles: LinkAndButtonVariantType = {
 	primary:
-		'bg-primary text-secondary hover:bg-primary-hover focus-visible:bg-primary-hover',
+		'bg-primary text-on-primary hover:bg-primary-hover focus-visible:bg-primary-hover',
 	secondary:
 		'bg-surface-card text-foreground border border-border-subtle hover:bg-surface-tag hover:border-primary/50 focus-visible:bg-surface-tag',
-	disabled:
-		'bg-disabled hover:bg-disabled backdrop-blur-disabled text-muted',
+	disabled: 'bg-surface-tag text-muted',
 	clear:
 		'outline-0 border-0 bg-transparent hover:text-primary focus-visible:text-primary disabled:pointer-events-none disabled:opacity-50',
 	light:

@@ -77,7 +77,10 @@ export const PostCard = ({
 							createdAt={createdAt}
 						/>
 					</div>
-					<MilkdownContent content={previewContent} />
+					<MilkdownContent
+						content={previewContent}
+						className='milkdown-preview'
+					/>
 				</div>
 				{tags && tags.length > 0 && <TagsList tags={tags} />}
 			</div>

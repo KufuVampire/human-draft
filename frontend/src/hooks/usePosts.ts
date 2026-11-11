@@ -1,6 +1,12 @@
 'use client';
 
-import { useGetAllPostsQuery } from '@/graphql/generated/output';
+import {
+	type GetAllPostsQuery,
+	useGetAllPostsQuery,
+} from '@/graphql/generated/output';
+
+// Стабильная ссылка: новый `[]` на каждом рендере зацикливает эффекты потребителей
+const emptyPosts: GetAllPostsQuery['getAllPostsPagination']['data'] = [];
 
 interface Params {
 	page: number;
@@ -25,7 +31,7 @@ export const usePosts = ({ page, perPage, filters }: Params) => {
 	const paginationData = data?.getAllPostsPagination;
 
 	return {
-		posts: paginationData?.data || [],
+		posts: paginationData?.data ?? emptyPosts,
 		page: paginationData?.page,
 		perPage: paginationData?.perPage,
 		totalCount: paginationData?.totalCount,

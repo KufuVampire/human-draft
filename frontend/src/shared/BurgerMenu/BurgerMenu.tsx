@@ -40,12 +40,7 @@ export const BurgerMenu = ({ className }: Props) => {
 					}
 
 					if (Component) {
-						return (
-							<Component
-								key={i}
-								className='text-secondary'
-							/>
-						);
+						return <Component key={i} />;
 					}
 
 					if (!href || !Icon || !translationKey) {
@@ -100,7 +95,7 @@ export const BurgerMenu = ({ className }: Props) => {
 				isOpen={isOpen}
 				onClose={() => setOpen(false)}
 				placement='right'
-				title={profile?.username ? `@${profile.username}` : t('navigation.menu')}
+				title={t('navigation.menu')}
 				className='w-72 sm:w-80 p-5'>
 				<nav className='flex flex-col gap-1.5 mt-2'>
 					{dropdownItems}

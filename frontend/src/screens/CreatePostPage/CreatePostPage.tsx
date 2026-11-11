@@ -99,7 +99,7 @@ export const CreatePostPage = () => {
 							placeholder={t('createPostPage.title')}
 							{...register('title', { required: true })}
 						/>
-						<div className='flex items-center gap-3 shrink-0'>
+						<div className='flex flex-wrap sm:flex-nowrap items-center gap-3 shrink-0'>
 							{!blogId && (
 								<PinBlogDropdown
 									isOpen={isOpen}
@@ -114,7 +114,7 @@ export const CreatePostPage = () => {
 								isLoading={isEditorLoading || isPostCreating}
 								disabled={!isValid || isEditorLoading || isPostCreating}
 								variant='primary'
-								className='rounded-xl px-6 py-2.5 font-bold uppercase text-sm tracking-wider shrink-0'>
+								className='rounded-xl px-6 py-2.5 font-bold uppercase text-sm tracking-wider w-full sm:w-auto shrink-0'>
 								{t('btns.createPost')}
 							</Button>
 						</div>

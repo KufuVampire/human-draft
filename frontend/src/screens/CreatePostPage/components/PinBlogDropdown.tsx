@@ -26,14 +26,14 @@ export const PinBlogDropdown = ({
 			isOpen={isOpen}
 			items={items}
 			setOpen={setOpen}
-			className='w-full'
-			listClassName='w-full max-w-full overflow-y-auto max-h-60 py-3 px-2.5 shadow-secondary min-w-auto'
+			className='flex-1 sm:flex-none'
+			listClassName='w-64 max-w-[calc(100vw-2rem)] overflow-y-auto max-h-60 py-3 px-2.5 shadow-secondary'
 			itemClassName='first:mb-1'
 			onClick={onPickBlog}
-			displayDirection='top'>
+			displayDirection='bottom'>
 			<Button
 				variant='secondary'
-				className='bg-surface-card px-5 py-2 flex gap-x-5 rounded-lg w-full'
+				className='bg-surface-card px-5 py-2 flex gap-x-5 rounded-lg w-full text-nowrap'
 				onClick={() => setOpen((prev) => !prev)}
 				type='button'>
 				<span className='w-full inline-block text-left'>{buttonText}</span>

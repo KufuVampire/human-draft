@@ -9,6 +9,11 @@ export interface CheckboxProps
 	indeterminate?: boolean;
 }
 
+/**
+ * Чекбокс UI Kit. Работает и управляемым (`checked` + `onChange`), и
+ * неуправляемым (например, через `register()` react-hook-form): отметка
+ * рисуется по состоянию самого input через `peer-checked`.
+ */
 export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
 	(
 		{
@@ -18,14 +23,12 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
 			indeterminate = false,
 			disabled = false,
 			id,
-			onChange,
 			...props
 		},
 		ref
 	) => {
 		const generatedId = useId();
 		const inputId = id || generatedId;
-		const isChecked = Boolean(checked);
 
 		return (
 			<label
@@ -40,26 +43,26 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
 						ref={ref}
 						id={inputId}
 						type='checkbox'
-						checked={isChecked}
+						checked={checked}
 						disabled={disabled}
-						aria-checked={indeterminate ? 'mixed' : isChecked}
-						onChange={onChange}
-						className='sr-only'
+						aria-checked={indeterminate ? 'mixed' : undefined}
+						className='peer sr-only'
 						{...props}
 					/>
 					<div
 						className={cn(
 							'size-5 rounded-md border flex items-center justify-center transition-all',
-							isChecked || indeterminate
-								? 'bg-primary border-primary text-secondary'
-								: 'bg-surface-card border-border-field hover:border-primary',
-							disabled && 'border-border-subtle bg-surface-tag'
+							'bg-surface-card border-border-field hover:border-primary',
+							'peer-checked:bg-primary peer-checked:border-primary peer-checked:text-on-primary',
+							'peer-focus-visible:ring-2 peer-focus-visible:ring-primary/40',
+							'peer-disabled:border-border-subtle peer-disabled:bg-surface-tag',
+							indeterminate && 'bg-primary border-primary text-on-primary'
 						)}>
 						{indeterminate ? (
 							<Minus className='size-3.5 stroke-[2.5]' />
-						) : isChecked ? (
-							<Check className='size-3.5 stroke-[2.5]' />
-						) : null}
+						) : (
+							<Check className='size-3.5 stroke-[2.5] hidden [.peer:checked~*>&]:block' />
+						)}
 					</div>
 				</div>
 				{label && <span className='text-foreground'>{label}</span>}

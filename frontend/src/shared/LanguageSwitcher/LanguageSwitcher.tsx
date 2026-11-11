@@ -55,11 +55,13 @@ export const LanguageSwitcher = ({ className, isExpanded = true }: Props) => {
 							? 'bg-primary/10 text-primary font-semibold'
 							: 'text-muted hover:text-foreground hover:bg-surface-tag'
 					)}>
-					<div className='flex items-center gap-2'>
+					<div className={cn('flex items-center gap-2', !isExpanded && 'mx-auto')}>
 						<span className='font-bold uppercase text-xs'>{locale}</span>
-						<span>{text}</span>
+						{isExpanded && <span>{text}</span>}
 					</div>
-					{isSelected && <Check className='size-3.5 text-primary shrink-0' />}
+					{isExpanded && isSelected && (
+						<Check className='size-3.5 text-primary shrink-0' />
+					)}
 				</button>
 			);
 		});
@@ -107,13 +109,8 @@ export const LanguageSwitcher = ({ className, isExpanded = true }: Props) => {
 			</Button>
 
 			{isOpen && (
-				<div
-					className={cn(
-						'flex flex-col gap-1 p-1 bg-surface-card rounded-xl border border-border-subtle shadow-lg',
-						isExpanded
-							? 'mt-1'
-							: 'absolute left-full ml-3 top-0 z-dropdown w-36 shadow-xl'
-					)}>
+				// Список всегда в потоке: в свёрнутом сайдбаре (overflow-hidden) всплывающий список обрезается
+				<div className='flex flex-col gap-1 p-1 mt-1 bg-surface-card rounded-xl border border-border-subtle shadow-lg'>
 					{renderOptions()}
 				</div>
 			)}
