@@ -1,11 +1,10 @@
 'use client';
 
-import { Search } from 'lucide-react';
-import { useTranslations } from 'next-intl';
 import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { HomePageFiltersDropdown } from './components/HomePageFiltersDropdown';
+import { HomePageSearchBar } from './components/HomePageSearchBar';
 import { renderSearchItems } from './components/HomePageSearchItems';
 import { SEARCH_PARAMS } from '@/consts';
 import {
@@ -17,18 +16,14 @@ import {
 import { TypeHomePageSearchSchema } from '@/schemas';
 import {
 	CreatePostBlogLinks,
-	Dropdown,
-	FormField,
 	PostsAndBlogsList,
 	Section,
 } from '@/shared';
 import { useProfileStore } from '@/store';
-import { cn } from '@/utils';
 
 const perPage = SEARCH_PARAMS.PER_PAGE;
 
 export const HomePage = () => {
-	const t = useTranslations();
 	const isAuth = useProfileStore((s) => s.isAuth);
 	const [page, setPage] = useState(SEARCH_PARAMS.PAGE);
 	const { register, watch } = useForm<TypeHomePageSearchSchema>({
@@ -100,42 +95,16 @@ export const HomePage = () => {
 
 	return (
 		<div className='flex flex-col w-full gap-y-6'>
-			<Section className='w-full md:py-0 flex gap-x-6 relative'>
-				<Dropdown
-					isOpen={isDropdownSearchOpen}
-					setOpen={(value) => {
-						const next =
-							typeof value === 'function' ? value(isDropdownSearchOpen) : value;
-
-						setDropdownSearchOpen(next);
-
-						if (!next) {
-							setSearchOpenOnMobile(false);
-						}
-					}}
-					className={cn(
-						'w-full',
-						isSearchOpenOnMobile && 'absolute top-3 z-10 sm:static'
-					)}
-					listClassName='w-full shadow-primary'
-					itemClassName='border-b border-placeholder last:border-b-0'
-					items={dropdownSearchItems}>
-					<FormField
-						className='w-full p-0 border-none [&:not(:placeholder-shown)]:border-none [&:not(:placeholder-shown)]:shadow-none leading-heading-tight'
-						wrapperClassNames='w-full shadow rounded-card'
-						inputWrapperClassName='bg-surface-card transition-colors py-4 px-5 flex gap-x-2 md:gap-x-5 rounded-lg'
-						placeholder={t('fields.searchInput')}
-						{...register('search')}
-						onFocus={() => {
-							if (search.length >= 3 && dropdownSearchItems.length > 0) {
-								setDropdownSearchOpen(true);
-							}
-
-							setSearchOpenOnMobile(true);
-						}}>
-						<Search />
-					</FormField>
-				</Dropdown>
+			<Section className='w-full md:py-0 flex gap-x-4 items-center relative'>
+				<HomePageSearchBar
+					search={search}
+					register={register}
+					dropdownSearchItems={dropdownSearchItems}
+					isDropdownSearchOpen={isDropdownSearchOpen}
+					setDropdownSearchOpen={setDropdownSearchOpen}
+					isSearchOpenOnMobile={isSearchOpenOnMobile}
+					setSearchOpenOnMobile={setSearchOpenOnMobile}
+				/>
 				<HomePageFiltersDropdown
 					isAuth={isAuth}
 					register={register}

@@ -11,7 +11,7 @@ export const Logo = () => {
 	return (
 		<Link
 			href={routesConfig.home}
-			className='font-text font-bold text-secondary text-xl md:text-[2rem] min-w-max uppercase'>
+			className='font-title font-bold text-foreground hover:text-primary text-xl md:text-2xl min-w-max uppercase tracking-tight transition-colors'>
 			{t('logo')}
 		</Link>
 	);

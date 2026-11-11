@@ -60,10 +60,10 @@ export const BurgerMenu = ({ className }: Props) => {
 							href={currentHref}
 							onClick={() => setOpen(false)}
 							className={cn(
-								'p-2 hover:bg-main-hover w-full flex gap-x-1 justify-normal text-secondary',
-								isActiveLink(currentHref) && 'text-accent'
+								'px-3 py-2 hover:bg-surface-tag rounded-lg text-sm transition-colors w-full flex items-center gap-x-2 text-foreground',
+								isActiveLink(currentHref) && 'text-primary font-medium bg-primary/10'
 							)}>
-							<Icon />
+							<Icon className='size-4' />
 							{t(translationKey)}
 						</CustomLink>
 					);
@@ -75,12 +75,12 @@ export const BurgerMenu = ({ className }: Props) => {
 			return [
 				<div
 					key='user-profile'
-					className='flex gap-x-1 p-2 w-full items-center'>
+					className='flex gap-x-2 px-3 py-2 w-full items-center border-b border-border-subtle mb-1'>
 					<UserBadge
 						username={profile?.username}
 						avatarUrl={profile.avatarUrl}
 						location='burger-menu'
-						className='size-6'
+						className='size-7'
 					/>
 				</div>,
 				...items,
@@ -94,7 +94,7 @@ export const BurgerMenu = ({ className }: Props) => {
 		<Dropdown
 			displayDirection='top-right'
 			className={className}
-			listClassName='top-[calc(100%+1.875rem)] bg-layout'
+			listClassName='bg-surface-card border border-border-subtle shadow-xl py-1.5'
 			isOpen={isOpen}
 			setOpen={setOpen}
 			items={dropdownItems}>

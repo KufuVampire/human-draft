@@ -16,10 +16,10 @@ export default function ContentLayout({
 	children: ReactNode;
 }>) {
 	return (
-		<>
+		<div className='min-h-screen flex flex-col bg-background text-foreground transition-colors'>
 			<Header />
 			<Main>
-				<Container className='flex gap-x-4'>
+				<Container className='flex gap-x-4 flex-1'>
 					<Dashboard />
 					{children}
 				</Container>
@@ -29,6 +29,6 @@ export default function ContentLayout({
 			<CropperModal />
 			<NeedAuthModal />
 			<Footer />
-		</>
+		</div>
 	);
 }

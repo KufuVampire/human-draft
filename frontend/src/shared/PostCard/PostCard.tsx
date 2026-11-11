@@ -60,13 +60,13 @@ export const PostCard = ({
 	const isOwner = profile?.username === author.username;
 
 	return (
-		<li className='bg-surface-card transition-all rounded-xl py-5 px-4 hover:shadow-primary border-t-16 border-primary self-start min-w-85 w-full break-inside-avoid not-last:mb-6 relative w-full'>
-			<div className='flex flex-col gap-y-5 transition-colors hover:text-foreground'>
+		<li className='bg-surface-card rounded-2xl p-6 border border-border-subtle hover:border-primary/50 shadow-xs hover:shadow-md transition-all self-start min-w-80 w-full break-inside-avoid not-last:mb-6 relative group'>
+			<div className='flex flex-col gap-y-5 transition-colors'>
 				<div className='flex flex-col gap-y-3'>
 					<h2>
 						<CustomLink
 							href={routesConfig.postById(id)}
-							className='font-bold text-[1.75rem] md:text-4xl leading-heading-tight font-title text-left wrap-break-word text-wrap hyphens-manual justify-start'>
+							className='font-bold text-2xl md:text-3xl leading-snug font-title text-foreground group-hover:text-primary transition-colors text-left wrap-break-word justify-start'>
 							{title}
 						</CustomLink>
 					</h2>
@@ -83,9 +83,9 @@ export const PostCard = ({
 			</div>
 			{isBlogPage && isOwner && (
 				<Button
-					className='p-1 rounded-sm absolute top-1 right-1'
+					className='p-2 rounded-xl text-muted hover:text-danger hover:bg-danger/10 absolute top-4 right-4 transition-colors'
 					data-post={id}>
-					<Trash />
+					<Trash className='size-4' />
 				</Button>
 			)}
 		</li>

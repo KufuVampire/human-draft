@@ -78,15 +78,15 @@ export const PostStatsBar = ({
 	}, [isAuth, likedAt, openModal, postId, profile, setLikedAt]);
 
 	return (
-		<div className='flex flex-col gap-y-6 md:flex-row justify-between'>
+		<div className='flex flex-col gap-4 sm:flex-row sm:items-center justify-between pt-6 border-t border-border-subtle'>
 			{tags && <TagsList tags={tags} />}
-			<ul className='flex gap-x-6'>
+			<ul className='flex items-center gap-2 shrink-0'>
 				<li>
 					<Button
 						variant='clear'
 						className={cn(
-							'flex items-center gap-x-2',
-							likedAtObj?.isLiked && 'hover:text-foreground'
+							'flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-tag text-muted text-xs font-medium hover:text-foreground transition-colors',
+							likedAtObj?.isLiked && 'text-danger hover:text-danger'
 						)}
 						disabled={
 							likedAtObj?.isLiked &&
@@ -97,22 +97,23 @@ export const PostStatsBar = ({
 						onClick={handleLike}>
 						<Heart
 							className={cn(
+								'size-4',
 								likedAtObj?.isLiked &&
 									!isLikeExpired(likedAtObj.date) &&
 									likedAtObj.userId === profile?.id &&
-									'stroke-red-500 fill-red-500'
+									'stroke-danger fill-danger'
 							)}
 						/>
-						<span className='text-xs font-medium'>{likesCount}</span>
+						<span>{likesCount ?? 0}</span>
 					</Button>
 				</li>
-				<li className='flex items-center gap-x-2'>
-					<MessageSquare />
-					<span className='text-xs font-medium'>{getCommentsCount()}</span>
+				<li className='flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-tag text-muted text-xs font-medium'>
+					<MessageSquare className='size-4' />
+					<span>{getCommentsCount()}</span>
 				</li>
-				<li className='flex items-center gap-x-2'>
-					<Eye />
-					<span className='text-xs font-medium'>{viewsCount}</span>
+				<li className='flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-tag text-muted text-xs font-medium'>
+					<Eye className='size-4' />
+					<span>{viewsCount ?? 0}</span>
 				</li>
 			</ul>
 		</div>

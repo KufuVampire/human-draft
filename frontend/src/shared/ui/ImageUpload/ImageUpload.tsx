@@ -1,4 +1,4 @@
-import { Image as ImageIcon, UploadCloud, X } from 'lucide-react';
+import { UploadCloud, X } from 'lucide-react';
 import {
 	ChangeEvent,
 	DragEvent,
@@ -70,18 +70,20 @@ export const ImageUpload = forwardRef<HTMLInputElement, ImageUploadProps>(
 
 		const displayError = error || localError;
 
+		const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+			if ((e.key === 'Enter' || e.key === ' ') && !disabled) {
+				e.preventDefault();
+				inputRef.current?.click();
+			}
+		};
+
 		return (
 			<div className={cn('flex flex-col gap-1.5 w-full', className)}>
 				<div
 					role='button'
 					tabIndex={disabled ? -1 : 0}
 					onClick={() => !disabled && inputRef.current?.click()}
-					onKeyDown={(e: KeyboardEvent<HTMLDivElement>) => {
-						if ((e.key === 'Enter' || e.key === ' ') && !disabled) {
-							e.preventDefault();
-							inputRef.current?.click();
-						}
-					}}
+					onKeyDown={handleKeyDown}
 					onDragOver={(e) => {
 						e.preventDefault();
 						if (!disabled) setIsDragging(true);
@@ -90,12 +92,9 @@ export const ImageUpload = forwardRef<HTMLInputElement, ImageUploadProps>(
 					onDrop={handleDrop}
 					className={cn(
 						'relative flex flex-col items-center justify-center p-6 border-2 border-dashed rounded-xl transition-all cursor-pointer select-none text-center outline-none min-h-36',
-						isDragging
-							? 'border-primary bg-surface-tag'
-							: 'border-border-field hover:border-primary bg-surface-card',
+						isDragging ? 'border-primary bg-surface-tag' : 'border-border-field hover:border-primary bg-surface-card',
 						displayError && 'border-error',
-						disabled &&
-							'opacity-50 cursor-not-allowed border-border-subtle bg-surface-tag'
+						disabled && 'opacity-50 cursor-not-allowed border-border-subtle bg-surface-tag'
 					)}>
 					<input
 						ref={(el) => {
@@ -112,11 +111,7 @@ export const ImageUpload = forwardRef<HTMLInputElement, ImageUploadProps>(
 
 					{previewUrl ? (
 						<div className='relative group'>
-							<img
-								src={previewUrl}
-								alt='Превью'
-								className='max-h-32 rounded-lg object-contain'
-							/>
+							<img src={previewUrl} alt='Превью' className='max-h-32 rounded-lg object-contain' />
 							{!disabled && (
 								<button
 									type='button'

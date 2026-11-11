@@ -90,7 +90,7 @@ export const ProfilePage = ({ username, initialData }: Props) => {
 
 	return (
 		<div className='flex flex-col w-full gap-y-6'>
-			<Section className='flex flex-col w-full py-0 md:py-0 bg-surface-card rounded-xl overflow-hidden transition-colors'>
+			<Section className='flex flex-col w-full py-0 md:py-0 bg-surface-card rounded-2xl border border-border-subtle shadow-sm overflow-hidden transition-colors'>
 				<ProfilePoster
 					isOwner={isOwner}
 					user={{ posterUrl: user.posterUrl }}>

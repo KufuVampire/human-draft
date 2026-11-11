@@ -55,7 +55,7 @@ export function renderNode(
 			return (
 				<blockquote
 					key={key}
-					className='border-l-4 border-primary pl-4 italic my-4 text-foreground/90'>
+					className='border-l-4 border-primary pl-4 md:pl-5 py-2.5 my-6 bg-surface-tag/30 rounded-r-xl italic text-foreground/90'>
 					{renderChildren(node.content)}
 				</blockquote>
 			);
@@ -64,7 +64,7 @@ export function renderNode(
 			return (
 				<ul
 					key={key}
-					className='list-disc pl-6 mb-4 space-y-1 text-foreground'>
+					className='list-disc pl-6 my-4 space-y-1.5 text-foreground'>
 					{renderChildren(node.content)}
 				</ul>
 			);
@@ -73,7 +73,7 @@ export function renderNode(
 			return (
 				<ol
 					key={key}
-					className='list-decimal pl-6 mb-4 space-y-1 text-foreground'>
+					className='list-decimal pl-6 my-4 space-y-1.5 text-foreground'>
 					{renderChildren(node.content)}
 				</ol>
 			);
@@ -93,7 +93,7 @@ export function renderNode(
 			return (
 				<pre
 					key={key}
-					className='overflow-auto rounded-sm bg-surface-base whitespace-pre mb-2 transition-colors p-5'>
+					className='overflow-auto rounded-xl bg-surface-tag border border-border-subtle whitespace-pre my-6 transition-colors p-4 md:p-5 font-mono text-sm leading-relaxed shadow-sm'>
 					<code
 						className={cn(
 							'text-wrap text-foreground',

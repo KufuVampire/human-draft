@@ -39,9 +39,9 @@ const listItem = [
 ];
 
 const styles: Record<NavigationVariants, string> = {
-	dashboard: 'text-foreground leading-nav gap-x-1 px-3.5',
+	dashboard: 'text-foreground leading-normal gap-x-3 px-3 py-2.5 rounded-xl transition-colors hover:bg-surface-tag',
 	footer:
-		'text-secondary font-bold uppercase tracking-widest md:leading-6 leading-subtext text-xs',
+		'text-muted font-semibold uppercase tracking-wider text-xs hover:text-primary transition-colors',
 };
 
 export const Navigation = ({
@@ -60,8 +60,8 @@ export const Navigation = ({
 			<ul
 				className={cn(
 					'flex',
-					direction === 'column' ? 'flex-col' : 'flex-row',
-					variant === 'footer' && 'gap-x-5 justify-between md:justify-normal'
+					direction === 'column' ? 'flex-col gap-1' : 'flex-row',
+					variant === 'footer' && 'gap-x-6 justify-between md:justify-normal'
 				)}>
 				{listItem.map(({ href, translationKey, Icon }) => {
 					if (UNAVAILABLE_ROUTES_IF_NOT_AUTH.includes(href) && !isAuth) {
@@ -75,13 +75,14 @@ export const Navigation = ({
 							<CustomLink
 								href={currentHref}
 								className={cn(
-									'justify-normal w-full md:text-xl',
-									!isExpanded && 'justify-center',
-									variant !== 'footer' && 'py-2.5',
+									'justify-normal w-full text-sm md:text-base font-medium',
+									!isExpanded && 'justify-center px-2',
 									styles[variant],
-									isActiveLink(currentHref) && 'text-accent'
+									variant === 'dashboard' &&
+										isActiveLink(currentHref) &&
+										'text-primary font-semibold bg-primary/10 hover:bg-primary/15'
 								)}>
-								{variant === 'dashboard' && <Icon className='size-6 shrink-0' />}
+								{variant === 'dashboard' && <Icon className='size-5 shrink-0' />}
 								<span className={cn(!isExpanded && 'hidden')}>
 									{t(translationKey)}
 								</span>

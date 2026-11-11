@@ -3,10 +3,10 @@ import { BurgerMenu, Container, Logo } from '@/shared';
 
 export const Header = () => {
 	return (
-		<header className='w-full py-4 shadow fixed top-0 z-header bg-layout flex items-center'>
+		<header className='w-full py-3 fixed top-0 z-header bg-surface-overlay/85 backdrop-blur-md border-b border-border-subtle shadow-xs flex items-center transition-colors'>
 			<Container className='flex justify-between items-center'>
 				<Logo />
-				<div className='flex items-center gap-x-6'>
+				<div className='flex items-center gap-x-4 md:gap-x-6'>
 					<ThemeSwitcher />
 					<UserProfile />
 					<BurgerMenu className='md:hidden' />

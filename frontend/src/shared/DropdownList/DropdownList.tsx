@@ -13,15 +13,15 @@ interface Props extends Omit<HTMLAttributes<HTMLUListElement>, 'className'> {
 }
 
 const directionPositionMap: Record<DisplayDropdownDirection, string> = {
-	top: 'bottom-[calc(100%+0.5rem)] top-auto left-0 origin-bottom',
-	'top-left': 'top-[calc(100%+0.75rem)] left-0 origin-top-left',
-	'top-right': 'top-[calc(100%+0.75rem)] right-0 origin-top-right',
-	bottom: 'top-[calc(100%+0.5rem)] left-0 origin-top',
-	'bottom-left': 'bottom-[calc(100%+0.75rem)] left-0 top-auto origin-bottom-left',
-	'bottom-right': 'bottom-[calc(100%+0.75rem)] right-0 top-auto origin-bottom-right',
-	left: 'right-[calc(100%+0.5rem)] top-0 origin-right',
-	right: 'left-[calc(100%+0.5rem)] top-0 origin-left',
-	center: 'top-[calc(100%+0.5rem)] left-1/2 -translate-x-1/2 origin-center',
+	top: 'bottom-full mb-2 left-0 origin-bottom',
+	'top-left': 'top-full mt-3 left-0 origin-top-left',
+	'top-right': 'top-full mt-3 right-0 origin-top-right',
+	bottom: 'top-full mt-2 left-0 origin-top',
+	'bottom-left': 'bottom-full mb-3 left-0 origin-bottom-left',
+	'bottom-right': 'bottom-full mb-3 right-0 origin-bottom-right',
+	left: 'right-full mr-2 top-0 origin-right',
+	right: 'left-full ml-2 top-0 origin-left',
+	center: 'top-full mt-2 left-1/2 -translate-x-1/2 origin-center',
 };
 
 export const DropdownList = memo(
@@ -37,7 +37,7 @@ export const DropdownList = memo(
 			<ul
 				{...props}
 				className={cn(
-					'absolute z-dropdown flex flex-col w-max max-w-[calc(100vw-2rem)] max-h-72 overflow-y-auto rounded-xl bg-surface-card scale-0 transition-all opacity-0 duration-200 shadow-primary',
+					'absolute z-dropdown flex flex-col w-max max-w-xs sm:max-w-sm max-h-72 overflow-y-auto rounded-xl bg-surface-card border border-border-subtle scale-0 transition-all opacity-0 duration-200 shadow-md',
 					directionPositionMap[displayDirection],
 					{
 						['scale-100 opacity-100']: isOpen,

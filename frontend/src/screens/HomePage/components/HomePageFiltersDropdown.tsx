@@ -59,13 +59,14 @@ export const HomePageFiltersDropdown = ({ isAuth, register }: Props) => {
 			isOpen={isOpen}
 			setOpen={setOpen}
 			items={filterItems}
-			listClassName='w-full'>
+			listClassName='min-w-52 bg-surface-card border border-border-subtle shadow-lg p-2 rounded-xl'
+			itemClassName='p-2 hover:bg-surface-tag rounded-lg text-sm'>
 			<Button
 				variant='clear'
-				className='flex gap-x-5 items-center bg-surface-card px-5 py-4 rounded-card text-xl leading-heading-tight shadow'
+				className='flex gap-x-2.5 items-center bg-surface-card border border-border-subtle hover:border-primary/50 shadow-xs px-4 py-3 rounded-xl text-sm font-medium text-foreground transition-all shrink-0'
 				onClick={() => setOpen((prev) => !prev)}>
-				<SlidersHorizontal />
-				{t('homePage.filters')}
+				<SlidersHorizontal className='size-4 text-muted' />
+				<span className='hidden sm:inline'>{t('homePage.filters')}</span>
 			</Button>
 		</Dropdown>
 	);

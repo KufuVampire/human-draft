@@ -60,10 +60,10 @@ export const UserProfile = () => {
 						key={href}
 						href={currentHref}
 						className={cn(
-							'p-2 hover:bg-main-hover text-secondary transition-colors w-full flex items-center justify-normal gap-x-1',
-							isActiveLink(currentHref) && 'text-accent'
+							'px-3 py-2 hover:bg-surface-tag text-foreground text-sm rounded-lg transition-colors w-full flex items-center justify-normal gap-x-2',
+							isActiveLink(currentHref) && 'text-primary font-medium bg-primary/10'
 						)}>
-						<Icon />
+						<Icon className='size-4' />
 						{t(translationKey)}
 					</CustomLink>
 				);
@@ -79,19 +79,19 @@ export const UserProfile = () => {
 					setOpen={setOpen}
 					items={navigationItems}
 					className='py-0.5 px-2 hidden md:block'
-					listClassName='bg-layout top-[calc(100%+2rem)]'
+					listClassName='bg-surface-card border border-border-subtle shadow-lg py-1'
 					displayDirection='top-right'>
 					<Button
 						variant='clear'
 						onClick={() => setOpen((prev) => !prev)}
-						className='w-full flex items-center justify-end gap-x-2 text-secondary'>
+						className='w-full flex items-center justify-end gap-x-2 text-foreground hover:text-primary transition-colors'>
 						<UserBadge
 							username={profile?.username}
 							avatarUrl={profile?.avatarUrl}
 							location='header'
 						/>
 						<ChevronRight
-							className={cn('size-5 transition-transform', {
+							className={cn('size-4 transition-transform text-muted', {
 								['rotate-90']: isOpen,
 							})}
 						/>
@@ -101,14 +101,14 @@ export const UserProfile = () => {
 			{isLoading && (
 				<Button
 					isLoading={isLoading}
-					className='rounded-card py-1.5 md:py-3 px-3 md:px-16 font-bold text-sm md:text-xl text-secondary max-w-50 w-auto md:w-full text-center leading-6 shrink-0'
+					className='rounded-xl py-2 px-5 font-medium text-sm text-foreground shrink-0'
 				/>
 			)}
 			{!isAuth && !isLoading && (
 				<CustomLink
 					variant='primary'
 					href={routesConfig.signin}
-					className='rounded-card py-1.5 md:py-3 px-3 md:px-16 font-bold text-sm md:text-xl text-secondary max-w-50 w-auto md:w-full text-center leading-6 shrink-0 whitespace-nowrap'>
+					className='rounded-xl py-2 px-5 font-medium text-sm text-primary-foreground max-w-50 w-auto shrink-0 whitespace-nowrap'>
 					{t('btns.signIn')}
 				</CustomLink>
 			)}

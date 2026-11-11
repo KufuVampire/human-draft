@@ -16,7 +16,7 @@ import { useComments, useProfileStore } from '@/store';
 import { cn } from '@/utils';
 
 const buttonStyles =
-	'px-2 py-1.5 leading-heading-tight tracking-wider uppercase rounded-sm';
+	'px-3 py-1.5 text-xs font-semibold uppercase tracking-wider rounded-xl transition-all';
 
 interface Props {
 	parentId?: string;
