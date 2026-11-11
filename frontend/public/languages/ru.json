@@ -47,6 +47,7 @@
 		"language": "Язык"
 	},
 	"navigation": {
+		"menu": "Меню",
 		"profile": "Профиль",
 		"myProfile": "Мой профиль",
 		"feed": "Лента",

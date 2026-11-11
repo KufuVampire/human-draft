@@ -47,6 +47,7 @@
 		"language": "Language"
 	},
 	"navigation": {
+		"menu": "Menu",
 		"profile": "Profile",
 		"myProfile": "My profile",
 		"feed": "Feed",
