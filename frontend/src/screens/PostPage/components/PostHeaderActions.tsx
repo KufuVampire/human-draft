@@ -97,7 +97,7 @@ export const PostHeaderActions = ({
 				items={allDropdownItems}
 				setOpen={setDropdownOpen}
 				className='w-full sm:w-auto'
-				listClassName='w-64 max-w-[calc(100vw-2rem)] overflow-hidden py-3 px-2.5 shadow-secondary'
+				listClassName='w-64 overflow-hidden py-3 px-2.5 shadow-secondary'
 				onClick={handleDropdownClick}
 				displayDirection='bottom'>
 				<Button

@@ -58,12 +58,11 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
 							'peer-disabled:border-border-subtle peer-disabled:bg-surface-tag',
 							indeterminate && 'bg-primary border-primary text-on-primary'
 						)}>
-						{indeterminate ? (
-							<Minus className='size-3.5 stroke-[2.5]' />
-						) : (
-							<Check className='size-3.5 stroke-[2.5] hidden [.peer:checked~*>&]:block' />
-						)}
+						{indeterminate && <Minus className='size-3.5 stroke-[2.5]' />}
 					</div>
+					{!indeterminate && (
+						<Check className='absolute size-3.5 stroke-[2.5] text-on-primary pointer-events-none hidden peer-checked:block' />
+					)}
 				</div>
 				{label && <span className='text-foreground'>{label}</span>}
 			</label>
