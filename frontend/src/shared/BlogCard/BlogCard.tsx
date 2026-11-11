@@ -36,7 +36,7 @@ export const BlogCard = ({
 	const isOwner = profile?.username === author.username;
 
 	return (
-		<li className='bg-surface-card rounded-2xl border border-border-subtle hover:border-primary/50 shadow-xs hover:shadow-md transition-all overflow-hidden self-start min-w-0 w-full group'>
+		<li className='bg-surface-card rounded-2xl border border-border-subtle hover:border-primary/50 shadow-xs hover:shadow-md transition-all overflow-hidden self-start min-w-0 w-full break-inside-avoid mb-6 inline-block group'>
 			{posterUrl && (
 				<Image
 					src={posterUrl}
@@ -46,9 +46,6 @@ export const BlogCard = ({
 					className='w-full h-44 sm:h-52 object-cover'
 					loading='eager'
 				/>
-			)}
-			{!posterUrl && (
-				<div className='bg-surface-tag w-full h-44 sm:h-52 flex items-center justify-center text-muted text-xs' />
 			)}
 			<div className='flex flex-col gap-y-4 py-5 px-6'>
 				<div className='flex flex-col gap-y-3'>

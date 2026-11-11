@@ -60,7 +60,7 @@ export const PostCard = ({
 	const isOwner = profile?.username === author.username;
 
 	return (
-		<li className='bg-surface-card rounded-2xl p-6 border border-border-subtle hover:border-primary/50 shadow-xs hover:shadow-md transition-all self-start min-w-0 w-full relative group'>
+		<li className='bg-surface-card rounded-2xl p-6 border border-border-subtle hover:border-primary/50 shadow-xs hover:shadow-md transition-all self-start min-w-0 w-full break-inside-avoid mb-6 inline-block relative group'>
 			<div className='flex flex-col gap-y-5 transition-colors'>
 				<div className='flex flex-col gap-y-3'>
 					<h2>

@@ -94,7 +94,7 @@ export const HomePage = () => {
 	}, [dropdownSearchItems, search]);
 
 	return (
-		<div className='flex flex-col w-full gap-y-6'>
+		<div className='flex flex-col flex-1 min-w-0 gap-y-6'>
 			<Section className='w-full md:py-0 flex gap-x-4 items-center relative'>
 				<HomePageSearchBar
 					search={search}

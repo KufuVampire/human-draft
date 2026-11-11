@@ -40,7 +40,7 @@ export const HomePageSearchBar = ({
 				}
 			}}
 			className={cn(
-				'w-full',
+				'flex-1 min-w-0',
 				isSearchOpenOnMobile && 'absolute top-3 z-10 sm:static'
 			)}
 			listClassName='w-full shadow-lg border border-border-subtle bg-surface-card'
