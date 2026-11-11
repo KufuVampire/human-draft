@@ -10,7 +10,7 @@ import {
 	TextSelection,
 	Transaction,
 } from 'prosemirror-state';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { EditorToolbar } from './EditorToolbar';
 import { toolbarActions } from './toolbarActions';
@@ -18,6 +18,9 @@ import { toolbarActions } from './toolbarActions';
 vi.mock('next-intl', () => ({
 	useTranslations: () => (key: string) => key,
 }));
+
+const toastInfo = vi.hoisted(() => vi.fn());
+vi.mock('sonner', () => ({ toast: { info: toastInfo } }));
 
 // Схема с теми же именами mark/node, что у Milkdown (preset-commonmark + gfm + image-block Crepe)
 const schema = new Schema({
@@ -92,12 +95,21 @@ describe('EditorToolbar (панель форматирования редакт�
 		expect(view.focus).toHaveBeenCalled();
 	});
 
-	it('«Ссылка» вызывает команду ссылки Milkdown (окно ввода адреса Crepe)', () => {
+	it('«Ссылка» на выделенный текст вызывает команду ссылки Milkdown (окно ввода адреса Crepe)', () => {
 		const { commands } = setup();
 
 		fireEvent.click(screen.getByRole('button', { name: 'link' }));
 
 		expect(commands.call).toHaveBeenCalledWith(toggleLinkCommand.key);
+	});
+
+	it('«Ссылка» без выделения не вызывает команду и просит выделить текст', () => {
+		const { commands } = setup(undefined, (d) => TextSelection.create(d, 3));
+
+		fireEvent.click(screen.getByRole('button', { name: 'link' }));
+
+		expect(commands.call).not.toHaveBeenCalled();
+		expect(toastInfo).toHaveBeenCalledWith('linkNeedsSelection');
 	});
 
 	it('кнопка заголовка превращает абзац в заголовок нужного уровня', () => {
@@ -135,7 +147,7 @@ describe('EditorToolbar (панель форматирования редакт�
 
 			clickImage();
 
-			expect(blocks(view)).toEqual(['paragraph:Hello world', 'image-block']);
+			expect(blocks(view)).toEqual(['paragraph:Hello world', 'image-block', 'paragraph:']);
 		});
 
 		it('не разрезает заголовок', () => {
@@ -146,7 +158,7 @@ describe('EditorToolbar (панель форматирования редакт�
 
 			clickImage();
 
-			expect(blocks(view)).toEqual(['heading:Заголовок', 'image-block']);
+			expect(blocks(view)).toEqual(['heading:Заголовок', 'image-block', 'paragraph:']);
 		});
 
 		it('при выделенном изображении добавляет новое после него, старое остаётся', () => {
@@ -158,7 +170,7 @@ describe('EditorToolbar (панель форматирования редакт�
 
 			clickImage();
 
-			expect(blocks(view)).toEqual(['image-block', 'image-block', 'paragraph:после']);
+			expect(blocks(view)).toEqual(['image-block', 'image-block', 'paragraph:', 'paragraph:после']);
 			expect(view.state.doc.firstChild?.attrs.src).toBe('a.png');
 		});
 
@@ -168,7 +180,7 @@ describe('EditorToolbar (панель форматирования редакт�
 
 			clickImage();
 
-			expect(blocks(view)).toEqual(['paragraph:текст', 'image-block']);
+			expect(blocks(view)).toEqual(['paragraph:текст', 'image-block', 'paragraph:']);
 		});
 
 		it('не стирает выделенный текст', () => {
@@ -176,7 +188,45 @@ describe('EditorToolbar (панель форматирования редакт�
 
 			clickImage();
 
-			expect(blocks(view)).toEqual(['paragraph:привет', 'image-block']);
+			expect(blocks(view)).toEqual(['paragraph:привет', 'image-block', 'paragraph:']);
+		});
+
+		it('ставит курсор в абзац после блока: набор текста не заменяет изображение', () => {
+			const doc = schema.node('doc', null, [paragraph('текст'), paragraph('дальше')]);
+			const { view } = setup(doc, (d) => TextSelection.create(d, 3));
+
+			clickImage();
+			view.dispatch(view.state.tr.insertText('abc'));
+
+			expect(view.state.selection).toBeInstanceOf(TextSelection);
+			expect(blocks(view)).toEqual(['paragraph:текст', 'image-block', 'paragraph:abc', 'paragraph:дальше']);
+		});
+	});
+
+	describe('над клавиатурой', () => {
+		const originalViewport = window.visualViewport;
+		const originalInnerHeight = window.innerHeight;
+
+		afterEach(() => {
+			Object.defineProperty(window, 'visualViewport', { value: originalViewport, configurable: true });
+			Object.defineProperty(window, 'innerHeight', { value: originalInnerHeight, configurable: true });
+		});
+
+		it('поднимает порог прилипания на высоту клавиатуры, а не сдвигает тулбар', () => {
+			const viewport = Object.assign(new EventTarget(), { height: 300, offsetTop: 0 });
+			Object.defineProperty(window, 'visualViewport', { value: viewport, configurable: true });
+			Object.defineProperty(window, 'innerHeight', { value: 600, configurable: true });
+
+			render(<EditorToolbar getEditor={() => undefined} />);
+			const toolbar = screen.getByRole('toolbar');
+
+			expect(toolbar.style.bottom).toBe('308px');
+			expect(toolbar.style.transform).toBe('');
+		});
+
+		it('без клавиатуры порог берётся из класса bottom-2', () => {
+			render(<EditorToolbar getEditor={() => undefined} />);
+			expect(screen.getByRole('toolbar').style.bottom).toBe('');
 		});
 	});
 

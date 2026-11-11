@@ -235,6 +235,7 @@
 		"undo": "Undo",
 		"redo": "Redo",
 		"link": "Link",
+		"linkNeedsSelection": "Select text to turn it into a link",
 		"image": "Insert image"
 	},
 	"editorMenu": {
