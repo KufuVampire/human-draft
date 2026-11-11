@@ -56,24 +56,19 @@ vi.mock('../CustomLink/CustomLink', () => ({
 	),
 }));
 
-vi.mock('../Dropdown/Dropdown', () => ({
-	Dropdown: ({
-		children,
-		items,
-		isOpen,
-	}: {
-		children?: React.ReactNode;
-		items?: React.ReactNode;
-		isOpen?: boolean;
-	}) => (
-		<div>
-			{children}
-			<div data-testid='dropdown-container' data-is-open={isOpen}>
-				{items}
-			</div>
-		</div>
-	),
-}));
+vi.mock('@/shared/ui', async (importOriginal) => {
+	const actual = await importOriginal<typeof import('@/shared/ui')>();
+	return {
+		...actual,
+		Drawer: ({
+			children,
+			isOpen,
+		}: {
+			children?: React.ReactNode;
+			isOpen?: boolean;
+		}) => (isOpen ? <div data-testid='drawer-container'>{children}</div> : null),
+	};
+});
 
 vi.mock('../LanguageSwitcher/LanguageSwitcher', () => ({
 	LanguageSwitcher: () => <div data-testid='lang-switcher'>Lang</div>,

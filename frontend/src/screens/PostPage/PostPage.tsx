@@ -132,7 +132,7 @@ export const PostPage = ({ initialData }: Props = {}) => {
 					viewsCount={viewsCount}
 				/>
 			</article>
-			<div className='border-t border-border-subtle pt-8'>
+			<div className='pt-6 md:pt-8 md:border-t md:border-border-subtle'>
 				<CommentsLazy />
 			</div>
 		</div>

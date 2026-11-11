@@ -99,18 +99,18 @@ export const UsersPage = () => {
 
 	return (
 		<Section className='w-full flex flex-col gap-y-6 px-2 md:px-0 rounded-2xl md:p-0'>
-			<div className='flex flex-col sm:flex-row gap-4 items-stretch sm:items-center'>
+			<div className='flex flex-row gap-2 sm:gap-4 items-center'>
 				<FormField
 					className='w-full p-0 border-none outline-none text-sm md:text-base'
-					wrapperClassNames='w-full'
-					inputWrapperClassName='bg-surface-card border border-border-subtle shadow-xs hover:border-primary/50 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all py-3 px-4 flex items-center gap-x-3 rounded-xl'
+					wrapperClassNames='flex-1 min-w-0'
+					inputWrapperClassName='bg-surface-card border border-border-subtle shadow-xs hover:border-primary/50 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all py-2.5 px-3 sm:py-3 sm:px-4 flex items-center gap-x-2 sm:gap-x-3 rounded-xl'
 					placeholder={t('fields.searchByName')}
 					{...register('search')}>
-					<Search className='size-5 text-muted shrink-0' />
+					<Search className='size-4 sm:size-5 text-muted shrink-0' />
 				</FormField>
 				<FormField
 					type='checkbox'
-					wrapperClassNames='bg-surface-card border border-border-subtle shadow-xs py-3 px-4 rounded-xl text-sm font-medium whitespace-nowrap shrink-0'
+					wrapperClassNames='bg-surface-card border border-border-subtle shadow-xs py-2.5 px-3 sm:py-3 sm:px-4 rounded-xl text-xs sm:text-sm font-medium whitespace-nowrap shrink-0 cursor-pointer'
 					text={t('filters.subscriptions')}
 					checked={onlySubscriptionsValue}
 					{...register('onlySubscriptions')}

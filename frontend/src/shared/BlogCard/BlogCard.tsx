@@ -36,7 +36,7 @@ export const BlogCard = ({
 	const isOwner = profile?.username === author.username;
 
 	return (
-		<li className='bg-surface-card rounded-2xl border border-border-subtle hover:border-primary/50 shadow-xs hover:shadow-md transition-all overflow-hidden self-start min-w-80 w-full break-inside-avoid not-last:mb-6 group'>
+		<li className='bg-surface-card rounded-2xl border border-border-subtle hover:border-primary/50 shadow-xs hover:shadow-md transition-all overflow-hidden self-start min-w-0 w-full group'>
 			{posterUrl && (
 				<Image
 					src={posterUrl}

@@ -20,8 +20,9 @@ export const ThemeSwitcher = () => {
 	}, [isDark]);
 
 	const handleChange = useCallback(() => {
-		setTheme(isDark ? 'light' : 'dark');
-		setChecked(isDark);
+		const nextDark = !isDark;
+		setTheme(nextDark ? 'dark' : 'light');
+		setChecked(nextDark);
 	}, [isDark, setTheme]);
 
 	if (!mounted) return null;
@@ -45,7 +46,7 @@ export const ThemeSwitcher = () => {
 			/>
 			<div
 				className={cn(
-					'absolute top-0.5 left-0.5 size-6.5 md:size-7.5 rounded-full bg-surface-card border border-border-subtle shadow-xs transition-transform duration-300',
+					'absolute top-1 left-1 size-6 md:size-7 rounded-full bg-surface-card border border-border-subtle shadow-xs transition-transform duration-300',
 					isChecked ? 'translate-x-6 md:translate-x-7' : 'translate-x-0'
 				)}
 			/>

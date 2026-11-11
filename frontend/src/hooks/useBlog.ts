@@ -1,5 +1,7 @@
 'use client';
 
+import { useMemo } from 'react';
+
 import {
 	GetBlogByIdQuery,
 	useGetBlogByIdQuery,
@@ -16,10 +18,15 @@ export const useBlog = (
 		skip: !!initialBlog,
 	});
 
+	const initialData = useMemo(
+		() => (initialBlog ? { getBlogById: initialBlog } : undefined),
+		[initialBlog]
+	);
+
 	if (initialBlog && !result.data) {
 		return {
 			...result,
-			data: { getBlogById: initialBlog },
+			data: initialData,
 			loading: false,
 		};
 	}

@@ -7,8 +7,8 @@ import { Burger } from './Burger/Burger';
 import { burgerDropdownItems } from './burgerMenuItems';
 import { useActiveLink, useResolvedHref } from '@/hooks';
 import { CustomLink } from '../CustomLink/CustomLink';
-import { Dropdown } from '../Dropdown/Dropdown';
 import { UserBadge } from '../UserBadge/UserBadge';
+import { Drawer } from '@/shared/ui';
 import { useProfileStore } from '@/store';
 import { cn } from '@/utils';
 
@@ -91,17 +91,21 @@ export const BurgerMenu = ({ className }: Props) => {
 	}, [isActiveLink, isAuth, profile, resolveHref, t]);
 
 	return (
-		<Dropdown
-			displayDirection='top-right'
-			className={className}
-			listClassName='bg-surface-card border border-border-subtle shadow-xl py-1.5'
-			isOpen={isOpen}
-			setOpen={setOpen}
-			items={dropdownItems}>
+		<div className={className}>
 			<Burger
 				isOpen={isOpen}
 				setOpen={setOpen}
 			/>
-		</Dropdown>
+			<Drawer
+				isOpen={isOpen}
+				onClose={() => setOpen(false)}
+				placement='right'
+				title={profile?.username ? `@${profile.username}` : t('navigation.menu')}
+				className='w-72 sm:w-80 p-5'>
+				<nav className='flex flex-col gap-1.5 mt-2'>
+					{dropdownItems}
+				</nav>
+			</Drawer>
+		</div>
 	);
 };
