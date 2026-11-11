@@ -60,11 +60,11 @@ export const BurgerMenu = ({ className }: Props) => {
 							href={currentHref}
 							onClick={() => setOpen(false)}
 							className={cn(
-								'px-3 py-2 hover:bg-surface-tag rounded-lg text-sm transition-colors w-full flex items-center gap-x-2 text-foreground',
+								'px-3 py-2 hover:bg-surface-tag rounded-lg text-sm transition-colors w-full flex items-center justify-start text-left gap-x-2.5 text-foreground',
 								isActiveLink(currentHref) && 'text-primary font-medium bg-primary/10'
 							)}>
-							<Icon className='size-4' />
-							{t(translationKey)}
+							<Icon className='size-4 shrink-0' />
+							<span>{t(translationKey)}</span>
 						</CustomLink>
 					);
 				}

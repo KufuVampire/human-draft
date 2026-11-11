@@ -57,15 +57,18 @@ export const Drawer = ({
 	if (!isMounted || !isOpen) return null;
 
 	const placementClasses = {
-		bottom: 'inset-x-0 bottom-0 rounded-t-2xl max-h-[85vh]',
-		right: 'inset-y-0 right-0 w-full sm:max-w-md rounded-l-2xl h-full',
-		left: 'inset-y-0 left-0 w-full sm:max-w-md rounded-r-2xl h-full',
+		bottom:
+			'inset-x-0 bottom-0 rounded-none max-h-[85vh] border-x-0 border-b-0 border-t border-border-subtle animate-drawer-slide-in-bottom',
+		right:
+			'inset-y-0 right-0 w-full sm:max-w-md rounded-none h-full border-y-0 border-r-0 border-l border-border-subtle animate-drawer-slide-in-right',
+		left:
+			'inset-y-0 left-0 w-full sm:max-w-md rounded-none h-full border-y-0 border-l-0 border-r border-border-subtle animate-drawer-slide-in-left',
 	};
 
 	return createPortal(
 		<div className='fixed inset-0 z-modal flex'>
 			<div
-				className='fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity'
+				className='fixed inset-0 bg-black/60 backdrop-blur-xs animate-fade-in'
 				onClick={onClose}
 				aria-hidden='true'
 			/>
@@ -76,7 +79,7 @@ export const Drawer = ({
 				aria-labelledby={title ? titleId : undefined}
 				tabIndex={-1}
 				className={cn(
-					'fixed z-10 bg-surface-card border border-border-subtle p-6 shadow-secondary flex flex-col gap-4 text-foreground outline-none overflow-y-auto',
+					'fixed z-10 bg-surface-card p-6 shadow-secondary flex flex-col gap-4 text-foreground outline-none overflow-y-auto',
 					placementClasses[placement],
 					className
 				)}>

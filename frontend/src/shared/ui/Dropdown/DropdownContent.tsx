@@ -37,7 +37,7 @@ export const DropdownContent = ({
 			ref={contentRef}
 			role='menu'
 			className={cn(
-				'absolute z-dropdown mt-1.5 min-w-44 rounded-xl border border-border-subtle bg-surface-card p-1 shadow-primary text-foreground outline-none',
+				'absolute z-dropdown mt-1.5 min-w-44 rounded-xl border border-border-subtle bg-surface-card p-1 shadow-primary text-foreground outline-none animate-dropdown-enter origin-top',
 				alignClasses[align],
 				className
 			)}
