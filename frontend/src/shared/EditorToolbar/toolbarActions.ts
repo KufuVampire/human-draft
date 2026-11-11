@@ -46,9 +46,10 @@ const heading = (level: number) => (schema: Schema) =>
  * Пустой блок изображения Crepe (в нём сразу кнопка загрузки файла).
  * Встаёт после текущего блока верхнего уровня — абзац, заголовок и код не режутся,
  * выделенное изображение не заменяется. Пустой абзац заменяется блоком изображения.
- * После блока — новый пустой абзац с курсором: иначе первый набранный символ заменил бы
+ * Курсор уходит в пустой абзац после блока: иначе первый набранный символ заменил бы
  * выделенный пустой блок (клавиатура на телефоне остаётся открытой) или слился бы
- * со следующим абзацем.
+ * со следующим абзацем. Если пустой абзац там уже есть, он переиспользуется,
+ * чтобы в посте не копились лишние пустые строки.
  */
 const insertImageBlock = (schema: Schema): Command | null => {
 	const imageBlock = schema.nodes['image-block'];
@@ -71,7 +72,9 @@ const insertImageBlock = (schema: Schema): Command | null => {
 		}
 
 		const after = pos + node.nodeSize;
-		tr.insert(after, paragraph.create());
+		const next = tr.doc.resolve(after).nodeAfter;
+		const isNextEmptyParagraph = next?.type === paragraph && next.content.size === 0;
+		if (!isNextEmptyParagraph) tr.insert(after, paragraph.create());
 		dispatch?.(tr.setSelection(TextSelection.create(tr.doc, after + 1)).scrollIntoView());
 		return true;
 	};

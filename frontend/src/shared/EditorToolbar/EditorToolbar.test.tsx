@@ -201,6 +201,33 @@ describe('EditorToolbar (панель форматирования редакт�
 			expect(view.state.selection).toBeInstanceOf(TextSelection);
 			expect(blocks(view)).toEqual(['paragraph:текст', 'image-block', 'paragraph:abc', 'paragraph:дальше']);
 		});
+
+		it('переиспользует пустой абзац после блока, а не добавляет ещё один', () => {
+			const doc = schema.node('doc', null, [
+				paragraph('текст'),
+				paragraph(''),
+				paragraph('после'),
+			]);
+			const { view } = setup(doc, (d) => TextSelection.create(d, 3));
+
+			clickImage();
+			view.dispatch(view.state.tr.insertText('abc'));
+
+			expect(blocks(view)).toEqual(['paragraph:текст', 'image-block', 'paragraph:abc', 'paragraph:после']);
+		});
+
+		it('при выделенном изображении и пустом абзаце за ним не оставляет лишней пустой строки', () => {
+			const doc = schema.node('doc', null, [
+				schema.node('image-block', { src: 'a.png' }),
+				paragraph(''),
+				paragraph('после'),
+			]);
+			const { view } = setup(doc, (d) => NodeSelection.create(d, 0));
+
+			clickImage();
+
+			expect(blocks(view)).toEqual(['image-block', 'image-block', 'paragraph:', 'paragraph:после']);
+		});
 	});
 
 	describe('над клавиатурой', () => {
